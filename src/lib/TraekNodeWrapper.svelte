@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { slide } from 'svelte/transition';
-	import type { TraekEngine, MessageNode } from './TraekEngine.svelte.ts';
+	import type { TraekEngine, MessageNode, Node } from './TraekEngine.svelte.ts';
 	import Ghost from './Ghost.svelte';
 
 	const DEFAULT_PLACEHOLDER_HEIGHT = 100;
@@ -16,7 +16,7 @@
 		viewportResizeVersion = 0,
 		children
 	}: {
-		node: MessageNode;
+		node: Node;
 		isActive: boolean;
 		engine?: TraekEngine;
 		viewportRoot?: HTMLElement | null;
@@ -42,7 +42,8 @@
 	const placeholderHeight = $derived(node.metadata?.height ?? DEFAULT_PLACEHOLDER_HEIGHT);
 
 	const thoughtChild = $derived(
-		engine?.nodes.find((n) => n.parentId === node.id && n.type === 'thought') ?? null
+		(engine?.nodes.find((n) => n.parentId === node.id && n.type === 'thought') as MessageNode) ??
+			null
 	);
 	const thoughtSteps = $derived((thoughtChild?.data as { steps?: string[] })?.steps ?? []);
 	const thoughtPillLabel = $derived(
@@ -262,6 +263,9 @@
 		.role-indicator {
 			color: var(--traek-thought-header-accent, #888888);
 			user-select: none;
+			display: flex;
+			align-items: center;
+			gap: 6px;
 		}
 
 		.message-node-wrapper.user .role-indicator {
@@ -358,9 +362,6 @@
 			justify-content: center;
 			line-height: 1;
 			opacity: 0.9;
-		}
-		.thought-pill-icon svg {
-			display: block;
 		}
 
 		.thought-pill-label {

@@ -1,12 +1,19 @@
 import { browser } from '$app/environment';
+import type { SvelteComponent } from 'svelte';
 
 export type NodeStatus = 'streaming' | 'done' | 'error';
+
+export enum BasicNodeTypes {
+  TEXT = 'text',
+  CODE = 'code',
+  THOUGHT = 'thought',
+}
 
 export interface Node {
   id: string;
   parentId: string | null;
   role: 'user' | 'assistant' | 'system';
-  type: 'text' | 'code' | 'ui-component' | 'thought';
+  type: BasicNodeTypes | string;
   status?: NodeStatus;
   errorMessage?: string;
   metadata?: {
@@ -17,6 +24,11 @@ export interface Node {
   };
   data?: unknown;
 }
+
+export type CustomTraekNode = Node & {
+  component: typeof SvelteComponent;
+  props?: Record<string, unknown>;
+};
 
 export interface MessageNode extends Node {
   content: string;
@@ -71,7 +83,7 @@ export const DEFAULT_TRACK_ENGINE_CONFIG: TraekEngineConfig = {
 };
 
 export class TraekEngine {
-  nodes = $state<MessageNode[]>([]);
+  nodes = $state<Node[]>([]);
   activeNodeId = $state<string | null>(null);
   private config: TraekEngineConfig;
   private pendingHeightLayoutRafId: number | null = null;
@@ -83,7 +95,7 @@ export class TraekEngine {
   // Der "Context Path" - Gibt nur die relevanten Knoten für den aktuellen Branch zurück
   contextPath = $derived(() => {
     if (!this.activeNodeId) return [];
-    const path: MessageNode[] = [];
+    const path: Node[] = [];
     let current = this.nodes.find((n) => n.id === this.activeNodeId);
 
     while (current) {
@@ -96,11 +108,64 @@ export class TraekEngine {
   /** Set by addNode when options.autofocus is true; canvas should center on this node and then clear. */
   public pendingFocusNodeId = $state<string | null>(null);
 
+  addCustomNode(
+    component: typeof SvelteComponent,
+    props?: Record<string, unknown>,
+    role: 'user' | 'assistant' | 'system' = "user",
+    options: {
+      type?: Node['type'];
+      parentId?: string | null;
+      autofocus?: boolean;
+      x?: number;
+      y?: number;
+      data?: unknown;
+      /** When true, skip layout for this add; call flushLayoutFromRoot() after a batch. */
+      deferLayout?: boolean;
+    } = {},
+  ) {
+    const parentId = options.parentId ?? this.activeNodeId;
+    const hasExplicitPosition =
+      options.x !== undefined || options.y !== undefined;
+    const newNode: CustomTraekNode = {
+      component,
+      props,
+      id: crypto.randomUUID(),
+      parentId,
+      role,
+      type: options.type ?? 'text',
+      metadata: {
+        x: options.x ?? 0,
+        y: options.y ?? 0,
+        height: this.config.nodeHeightDefault,
+        ...(hasExplicitPosition && { manualPosition: true }),
+      },
+      data: options.data,
+    };
+
+    this.nodes.push(newNode);
+    // New node is active unless it's a thought (keep parent/current active so the main new node stays selected)
+    if (options.type !== 'thought') {
+      this.activeNodeId = newNode.id;
+    }
+
+    if (parentId && !options.deferLayout) {
+      this.layoutChildren(parentId);
+    }
+
+    if (options.autofocus && browser) {
+      requestAnimationFrame(() => {
+        this.pendingFocusNodeId = newNode.id;
+      });
+    }
+
+    return newNode;
+  }
+
   addNode(
     content: string,
     role: 'user' | 'assistant' | 'system',
     options: {
-      type?: 'text' | 'code' | 'ui-component' | 'thought';
+      type?: Node['type'];
       parentId?: string | null;
       autofocus?: boolean;
       x?: number;
@@ -242,9 +307,9 @@ export class TraekEngine {
     }
   }
 
-  private buildChildrenMap(): Map<string | null, MessageNode[]> {
+  private buildChildrenMap(): Map<string | null, Node[]> {
     // eslint-disable-next-line svelte/prefer-svelte-reactivity
-    const map = new Map<string | null, MessageNode[]>();
+    const map = new Map<string | null, Node[]>();
     for (const n of this.nodes) {
       const key = n.parentId;
       const list = map.get(key) ?? [];
@@ -256,7 +321,7 @@ export class TraekEngine {
 
   private fillSubtreeHeightCache(
     nodeId: string,
-    childrenMap: Map<string | null, MessageNode[]>,
+    childrenMap: Map<string | null, Node[]>,
     cache: Map<string, number>,
   ): void {
     const children = childrenMap.get(nodeId) ?? [];
@@ -282,7 +347,7 @@ export class TraekEngine {
 
   private fillSubtreeWidthCache(
     nodeId: string,
-    childrenMap: Map<string | null, MessageNode[]>,
+    childrenMap: Map<string | null, Node[]>,
     cache: Map<string, number>,
   ): void {
     const children = childrenMap.get(nodeId) ?? [];
@@ -308,7 +373,7 @@ export class TraekEngine {
 
   private layoutChildrenWithCache(
     parentId: string,
-    childrenMap: Map<string | null, MessageNode[]>,
+    childrenMap: Map<string | null, Node[]>,
     subtreeHeightCache: Map<string, number>,
     subtreeWidthCache: Map<string, number>,
   ): void {

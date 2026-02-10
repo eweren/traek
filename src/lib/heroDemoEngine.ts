@@ -3,6 +3,8 @@ import {
   DEFAULT_TRACK_ENGINE_CONFIG,
   type TraekEngineConfig,
 } from '$lib/TraekEngine.svelte';
+import type { SvelteComponent } from 'svelte';
+import ExampleCustomComponent from './ExampleCustomComponent.svelte';
 
 /**
  * Read‑only hero demo engine with a pre‑seeded, branching conversation.
@@ -65,17 +67,18 @@ Here’s how to make your chat with the expert effective.
     { parentId: framingUser.id },
   );
 
-  // Branch B: focus on adding context
+  // Branch B: focus on adding context + custom UI component
   const contextUser = engine.addNode(
-    'Actually, I’d like to add more context about my situation.',
+    'Give me the custom debug information component.',
     'user',
     { parentId: overview.id },
   );
 
-  engine.addNode(
-    'Great. Share 2–3 short bullets covering your current setup, what you’ve already tried, and any blockers. That makes it much easier to give concrete, high‑leverage suggestions.',
-    'assistant',
-    { parentId: contextUser.id },
+  engine.addCustomNode(
+    ExampleCustomComponent as unknown as typeof SvelteComponent,
+    {},
+    'system',
+    { parentId: contextUser.id, type: 'debugNode' },
   );
 
   // Follow‑up on Branch A: broad question refinement

@@ -5,10 +5,20 @@
 		TraekEngine,
 		type TraekEngineConfig,
 		DEFAULT_TRACK_ENGINE_CONFIG,
-		type MessageNode
+		type MessageNode,
+		type CustomTraekNode,
+		type Node
 	} from './TraekEngine.svelte';
 	import TraekNodeWrapper from './TraekNodeWrapper.svelte';
 	import TextNode from './TextNode.svelte';
+
+	type InputActionsContext = {
+		engine: TraekEngine;
+		activeNode: Node | null;
+		userInput: string;
+		setUserInput: (value: string) => void;
+		sendMessage: (options?: SendMessageOptions) => void;
+	};
 
 	let {
 		engine: engineProp,
@@ -20,7 +30,10 @@
 		onNodesChanged,
 		onViewportChange,
 		showFps = false,
-		initialOverlay
+		initialOverlay,
+		// Optional slot to fully customize the bottom input UI
+		// while still delegating message creation to the canvas.
+		inputActions
 	}: {
 		engine?: TraekEngine | null;
 		config?: Partial<TraekEngineConfig>;
@@ -29,7 +42,12 @@
 		initialScale?: number;
 		/** Restore saved pan (e.g. after reload). */
 		initialOffset?: { x: number; y: number };
-		onSendMessage?: (input: string, userNode: MessageNode) => void;
+		/**
+		 * Called whenever the user submits the input.
+		 * The third argument can be a single action or a list of actions.
+		 * Handlers that ignore the third parameter remain valid.
+		 */
+		onSendMessage?: (input: string, userNode: MessageNode, action?: string | string[]) => void;
 		/** Called when node positions change (e.g. after drag ends). Use to persist layout. */
 		onNodesChanged?: () => void;
 		/** Called when viewport (scale/offset) changes. Use to persist for reload. */
@@ -37,6 +55,12 @@
 		showFps?: boolean;
 		/** Optional Svelte 5 snippet rendered as the initial intro overlay. */
 		initialOverlay?: Snippet;
+		/**
+		 * Optional Svelte 5 snippet that replaces the default bottom input form.
+		 * It receives a single context argument:
+		 * { engine, activeNode, userInput, setUserInput, sendMessage }
+		 */
+		inputActions?: Snippet<[InputActionsContext]>;
 	} = $props();
 
 	const config = $derived({
@@ -55,13 +79,15 @@
 	$effect(() => {
 		const id = engine.pendingFocusNodeId;
 		if (!id) return;
-		const node = engine.nodes.find((n: MessageNode) => n.id === id);
+		const node = engine.nodes.find((n: Node) => n.id === id);
 		if (node) centerOnNode(node);
 		engine.clearPendingFocus();
 	});
 
 	// Canvas State (optional restore from saved viewport; use initial values only at mount)
+	// svelte-ignore state_referenced_locally
 	const initScale = initialScale ?? 1;
+	// svelte-ignore state_referenced_locally
 	const initOffset = { x: initialOffset?.x ?? 0, y: initialOffset?.y ?? 0 };
 	let scale = $state(initScale);
 	let offset = $state(initOffset);
@@ -105,6 +131,19 @@
 
 	// Input State
 	let userInput = $state('');
+
+	type SendMessageOptions = {
+		/** Identifier for the selected tool / mode, e.g. "chat" | "image" | "audio". */
+		action?: string;
+		/** Multiple tools / modes to trigger for a single prompt. */
+		actions?: string[];
+		/**
+		 * Optional arbitrary payload to store on the created user node.
+		 * This is written to `node.data` and can be used by consumers to
+		 * inspect which tool(s) were requested or to pass extra metadata.
+		 */
+		data?: unknown;
+	};
 
 	$effect(() => {
 		const el = viewportEl;
@@ -181,7 +220,7 @@
 			if (nodeEl) {
 				const id = nodeEl.getAttribute('data-node-id');
 				if (id && engine.activeNodeId === id) {
-					const node = engine.nodes.find((n: MessageNode) => n.id === id);
+					const node = engine.nodes.find((n: Node) => n.id === id);
 					if (node) {
 						draggingNodeId = id;
 						dragStartMouse = { x: single.clientX, y: single.clientY };
@@ -340,11 +379,11 @@
 	}
 
 	/** Pan canvas so the given node is centered in the viewport, with a smooth transition. */
-	function centerOnNode(node: MessageNode) {
+	function centerOnNode(node: Node) {
 		const nodeId = node.id;
 		requestAnimationFrame(() => {
 			requestAnimationFrame(() => {
-				const latest = engine.nodes.find((n: MessageNode) => n.id === nodeId);
+				const latest = engine.nodes.find((n: Node) => n.id === nodeId);
 				if (!latest || !viewportEl) return;
 				const w = viewportEl.clientWidth;
 				const h = viewportEl.clientHeight;
@@ -467,7 +506,7 @@
 		if (nodeEl) {
 			const id = nodeEl.getAttribute('data-node-id');
 			if (id && engine && engine.activeNodeId === id) {
-				const node = engine.nodes.find((n: MessageNode) => n.id === id);
+				const node = engine.nodes.find((n: Node) => n.id === id);
 				if (node) {
 					draggingNodeId = id;
 					dragStartMouse = { x: e.clientX, y: e.clientY };
@@ -517,11 +556,11 @@
 		document.body.style.cursor = '';
 	}
 
-	function sendMessage() {
+	function sendMessage(messageOptions?: SendMessageOptions) {
 		if (!userInput.trim()) return;
 
-		const parentNode = engine.nodes.find((n: MessageNode) => n.id === engine.activeNodeId);
-		let options: { x?: number; y?: number } = {};
+		const parentNode = engine.nodes.find((n: Node) => n.id === engine.activeNodeId);
+		let position: { x?: number; y?: number } = {};
 
 		if (!parentNode) {
 			const effectiveWidth = window.innerWidth - initialPlacementPadding.left;
@@ -529,18 +568,34 @@
 			const xPx = (centerX - offset.x) / scale + config.rootNodeOffsetX;
 			const yPx = (window.innerHeight / 2 - offset.y) / scale + config.rootNodeOffsetY;
 			const step = config.gridStep;
-			options = {
+			position = {
 				x: Math.round(xPx / step),
 				y: Math.round(yPx / step)
 			};
 		}
 
-		const userNode = engine.addNode(userInput, 'user', options);
+		const userNode = engine.addNode(userInput, 'user', {
+			...position,
+			data:
+				messageOptions?.data ??
+				// Store actions on the node so consumers can
+				// branch logic based on the requested tools.
+				(messageOptions?.actions && messageOptions.actions.length > 0
+					? { actions: messageOptions.actions }
+					: messageOptions?.action
+						? { action: messageOptions.action }
+						: undefined)
+		});
 		const lastInput = userInput;
 		userInput = '';
 		centerOnNode(userNode);
 
-		onSendMessage?.(lastInput, userNode);
+		const actionArg =
+			messageOptions?.actions && messageOptions.actions.length > 0
+				? messageOptions.actions
+				: messageOptions?.action;
+
+		onSendMessage?.(lastInput, userNode, actionArg);
 	}
 
 	const CONNECTION_CORNER_RADIUS = 12;
@@ -801,6 +856,7 @@
 			{#each engine.nodes as node (node.id)}
 				{@const isActive = engine.activeNodeId === node.id}
 				{#if node.type === 'text'}
+					<!-- Default text node rendering -->
 					<TextNode
 						{node}
 						{isActive}
@@ -810,27 +866,39 @@
 						nodeWidth={config.nodeWidth}
 						{viewportResizeVersion}
 					/>
-				{:else if node.type === 'code'}
-					<TraekNodeWrapper
-						{node}
-						{isActive}
-						{engine}
-						viewportRoot={viewportEl}
-						gridStep={config.gridStep}
-						nodeWidth={config.nodeWidth}
-						{viewportResizeVersion}
-					>
-						<button
-							class="node-card {node.role} {isActive ? 'active' : ''}"
-							onclick={(e) => {
-								e.stopPropagation();
-								engine.branchFrom(node.id);
-							}}
+				{:else}
+					<!-- Custom UI component provided by the consumer app, wrapped in TraekNodeWrapper -->
+					{@const uiData = node as CustomTraekNode}
+					{#if uiData?.component}
+						{@const Component = uiData.component}
+						<TraekNodeWrapper
+							{node}
+							{isActive}
+							{engine}
+							viewportRoot={viewportEl}
+							gridStep={config.gridStep}
+							nodeWidth={config.nodeWidth}
+							{viewportResizeVersion}
 						>
-							<div class="role-tag">{node.role}</div>
-							<div class="node-card-content">{node.content}</div>
-						</button>
-					</TraekNodeWrapper>
+							<Component {node} {engine} {isActive} {...uiData.props} />
+						</TraekNodeWrapper>
+					{:else if node.type !== 'thought'}
+						<!-- Fallback if ui-component node has no component attached -->
+						<TraekNodeWrapper
+							{node}
+							{isActive}
+							{engine}
+							viewportRoot={viewportEl}
+							gridStep={config.gridStep}
+							nodeWidth={config.nodeWidth}
+							{viewportResizeVersion}
+						>
+							<div class="node-card error">
+								<div class="role-tag">{node.type}</div>
+								<div class="node-card-content">Missing component for {node.type} node.</div>
+							</div>
+						</TraekNodeWrapper>
+					{/if}
 				{/if}
 			{/each}
 		</div>
@@ -842,27 +910,37 @@
 		{/if}
 
 		<div class="floating-input-container" transition:fade>
-			<div class="context-info">
-				{#if engine.activeNodeId}
-					<span class="dot"></span> Reply linked to selected message
-				{:else}
-					<span class="dot gray"></span> New thread in center
-				{/if}
-			</div>
-			<form
-				onsubmit={(e) => {
-					e.preventDefault();
-					sendMessage();
-				}}
-				class="input-wrapper"
-			>
-				<input bind:value={userInput} placeholder="Ask the expert..." spellcheck="false" />
-				<button type="submit" disabled={!userInput.trim()} aria-label="Send message">
-					<svg viewBox="0 0 24 24" width="18" height="18"
-						><path fill="currentColor" d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" /></svg
-					>
-				</button>
-			</form>
+			{#if inputActions}
+				{@render inputActions({
+					engine,
+					activeNode: engine.nodes.find((n) => n.id === engine.activeNodeId) ?? null,
+					userInput,
+					setUserInput: (value: string) => (userInput = value),
+					sendMessage
+				})}
+			{:else}
+				<div class="context-info">
+					{#if engine.activeNodeId}
+						<span class="dot"></span> Reply linked to selected message
+					{:else}
+						<span class="dot gray"></span> New thread in center
+					{/if}
+				</div>
+				<form
+					onsubmit={(e) => {
+						e.preventDefault();
+						sendMessage();
+					}}
+					class="input-wrapper"
+				>
+					<input bind:value={userInput} placeholder="Ask the expert..." spellcheck="false" />
+					<button type="submit" disabled={!userInput.trim()} aria-label="Send message">
+						<svg viewBox="0 0 24 24" width="18" height="18"
+							><path fill="currentColor" d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" /></svg
+						>
+					</button>
+				</form>
+			{/if}
 		</div>
 
 		<div class="stats">
