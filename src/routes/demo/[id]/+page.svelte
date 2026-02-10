@@ -30,7 +30,8 @@
 	const TOOL_OPTIONS = [
 		{ id: 'debug', label: 'Debug node', icon: '🧪' },
 		{ id: 'image', label: 'Image', icon: '🖼️' },
-		{ id: 'repeat', label: 'Just repeat', icon: '🔁' }
+		{ id: 'repeat', label: 'Just repeat', icon: '🔁' },
+		{ id: 'exploration', label: 'Exploration (2 branches)', icon: '🧭' }
 	] as const;
 	type ToolId = (typeof TOOL_OPTIONS)[number]['id'];
 	let selectedActions = $state<ToolId[]>([]);
@@ -231,81 +232,92 @@
 			});
 		}
 
-		// --- Main chat completion path (unchanged) ---
+		// --- Main chat completion path ---
+		// When "exploration" is selected, run the default chat flow 2 times
+		// to create three parallel branches from the same user message.
+		const explorationRuns = selected.includes('exploration') ? 2 : 1;
 		const path = pathToUserNode(eng, userNode);
 		const messages = path.map((n) => ({
 			role: n.role,
 			content: (n.content ?? '').trim()
 		}));
 
-		const responseNode = eng.addNode('', 'assistant', {
-			parentId: userNode.id,
-			autofocus: true
-		});
-		const thoughtNode = eng.addNode('Thinking...', 'assistant', {
-			type: 'thought',
-			parentId: responseNode.id
-		});
-		eng.updateNode(responseNode.id, { status: 'streaming' });
-
-		function setThinkingDone() {
-			eng?.updateNode(thoughtNode.id, { content: 'Done' });
+		// Create all response + thought nodes up front (so parallel runs don't race on addNode).
+		const branches: { responseNodeId: string; thoughtNodeId: string }[] = [];
+		for (let i = 0; i < explorationRuns; i += 1) {
+			const responseNode = eng.addNode('', 'assistant', {
+				parentId: userNode.id,
+				autofocus: i === 0
+			});
+			const thoughtNode = eng.addNode('Thinking...', 'assistant', {
+				type: 'thought',
+				parentId: responseNode.id
+			});
+			eng.updateNode(responseNode.id, { status: 'streaming' });
+			branches.push({ responseNodeId: responseNode.id, thoughtNodeId: thoughtNode.id });
 		}
 
-		try {
-			const res = await fetch('/api/chat', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ messages })
-			});
+		// Each addNode set activeNodeId to the new node; we want selection on the first branch (the one we center on).
+		if (branches.length > 0) {
+			eng.activeNodeId = branches[0].responseNodeId;
+		}
 
-			if (!res.ok) {
-				setThinkingDone();
-				const err = await res.json().catch(() => ({ error: res.statusText }));
-				const data = err as { error?: string; retryAfter?: number };
-				let msg = data.error ?? 'Request failed';
-				if (res.status === 429 && data.retryAfter != null) {
-					const hours = Math.ceil(data.retryAfter / 3600);
-					msg += hours > 0 ? ` Try again in ${hours} hour(s).` : ' Try again later.';
-				}
-				eng.updateNode(responseNode.id, {
-					status: 'error',
-					errorMessage: msg
+		async function runOneBranch(responseNodeId: string, thoughtNodeId: string) {
+			function setThinkingDone() {
+				eng?.updateNode(thoughtNodeId, { content: 'Done' });
+			}
+			try {
+				const res = await fetch('/api/chat', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ messages })
 				});
-				persist(eng);
-				return;
-			}
 
-			const reader = res.body?.getReader();
-			if (!reader) {
-				setThinkingDone();
-				eng.updateNode(responseNode.id, { status: 'done' });
-				persist(eng);
-				return;
-			}
-
-			const decoder = new TextDecoder();
-			let content = '';
-			let thinkingDone = false;
-			while (true) {
-				const { done, value } = await reader.read();
-				if (done) break;
-				content += decoder.decode(value, { stream: true });
-				if (!thinkingDone && content.length > 0) {
-					thinkingDone = true;
+				if (!res.ok) {
 					setThinkingDone();
+					const err = await res.json().catch(() => ({ error: res.statusText }));
+					const data = err as { error?: string; retryAfter?: number };
+					let msg = data.error ?? 'Request failed';
+					if (res.status === 429 && data.retryAfter != null) {
+						const hours = Math.ceil(data.retryAfter / 3600);
+						msg += hours > 0 ? ` Try again in ${hours} hour(s).` : ' Try again later.';
+					}
+					eng.updateNode(responseNodeId, { status: 'error', errorMessage: msg });
+					return;
 				}
-				eng.updateNode(responseNode.id, { content });
+
+				const reader = res.body?.getReader();
+				if (!reader) {
+					setThinkingDone();
+					eng.updateNode(responseNodeId, { status: 'done' });
+					return;
+				}
+
+				const decoder = new TextDecoder();
+				let content = '';
+				let thinkingDone = false;
+				while (true) {
+					const { done, value } = await reader.read();
+					if (done) break;
+					content += decoder.decode(value, { stream: true });
+					if (!thinkingDone && content.length > 0) {
+						thinkingDone = true;
+						setThinkingDone();
+					}
+					eng.updateNode(responseNodeId, { content });
+				}
+				if (!thinkingDone) setThinkingDone();
+				eng.updateNode(responseNodeId, { status: 'done' });
+			} catch (e) {
+				setThinkingDone();
+				eng.updateNode(responseNodeId, {
+					status: 'error',
+					errorMessage: e instanceof Error ? e.message : 'Stream failed'
+				});
 			}
-			if (!thinkingDone) setThinkingDone();
-			eng.updateNode(responseNode.id, { status: 'done' });
-		} catch (e) {
-			setThinkingDone();
-			eng.updateNode(responseNode.id, {
-				status: 'error',
-				errorMessage: e instanceof Error ? e.message : 'Stream failed'
-			});
 		}
+
+		await Promise.all(branches.map((b) => runOneBranch(b.responseNodeId, b.thoughtNodeId)));
 		persist(eng);
 	}
 </script>
@@ -403,11 +415,7 @@
 							placeholder="Ask the expert…"
 							spellcheck="false"
 						/>
-						<button
-							type="submit"
-							disabled={!ctx.userInput.trim() || selectedActions.length === 0}
-							aria-label="Send message"
-						>
+						<button type="submit" disabled={!ctx.userInput.trim()} aria-label="Send message">
 							<svg viewBox="0 0 24 24" width="18" height="18"
 								><path fill="currentColor" d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" /></svg
 							>

@@ -172,7 +172,7 @@
 		const hasNodes = engine.nodes.length > 0;
 		const hasActive = !!engine.activeNodeId;
 		const hasPendingFocus = !!engine.pendingFocusNodeId;
-		if (hasNodes && !hasActive && !hasPendingFocus) {
+		if (!hasActive && !hasPendingFocus) {
 			showIntroOverlay = false;
 		}
 	});
