@@ -121,7 +121,7 @@ træk keeps everything **navigable and coherent**.
 Install the package:
 
 ```bash
-npm install @eweren/traek
+npm install traek
 ```
 
 Create a spatial AI chat:
@@ -133,7 +133,7 @@ Create a spatial AI chat:
     TraekEngine,
     DEFAULT_TRACK_ENGINE_CONFIG,
     type MessageNode
-  } from '@eweren/traek';
+  } from 'traek';
 
   const engine = new TraekEngine(DEFAULT_TRACK_ENGINE_CONFIG);
 

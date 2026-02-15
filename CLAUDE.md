@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Træk (`@eweren/traek`) is a Svelte 5 UI library for building spatial, tree-structured AI conversation interfaces. Instead of linear chat, messages are nodes on a pannable/zoomable canvas with branching support.
+Træk (`traek`) is a Svelte 5 UI library for building spatial, tree-structured AI conversation interfaces. Instead of linear chat, messages are nodes on a pannable/zoomable canvas with branching support.
 
 ## Commands
 
