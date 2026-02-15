@@ -33,7 +33,7 @@
 			</div>
 			<div class="debug-node__row">
 				<span>Parent</span>
-				<code>{node.parentId ?? 'root'}</code>
+				<code>{node.parentIds.length > 0 ? node.parentIds.join(', ') : 'root'}</code>
 			</div>
 			<div class="debug-node__row">
 				<span>Position</span>

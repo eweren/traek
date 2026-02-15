@@ -44,7 +44,7 @@
 	const payloads: AddNodePayload[] = [
 		{
 			id: rootId,
-			parentId: null,
+			parentIds: [],
 			content: rootMsg,
 			role: 'user',
 			metadata: { x: 0, y: 0 }
@@ -55,7 +55,7 @@
 			if (i % 3 === 0) content += benchmarkImageMarkdown(i);
 			return {
 				id,
-				parentId: rootId,
+				parentIds: [rootId],
 				content,
 				role: 'assistant' as const,
 				metadata: { x: (-(level1Ids.length / 2) + i) * 132, y: 6 }
@@ -70,7 +70,7 @@
 			if (idx % 4 === 0) content += benchmarkImageMarkdown(idx);
 			return {
 				id,
-				parentId: level1Ids[parentIndex] as string | null,
+				parentIds: level1Ids[parentIndex] ? [level1Ids[parentIndex] as string] : [],
 				content,
 				role: 'assistant' as const,
 				metadata: { x: (-(level2Ids.length / 2) + i) * 44 - 44, y: 15 }
@@ -85,7 +85,7 @@
 			if (leafIdx % 5 === 0) content += benchmarkImageMarkdown(leafIdx);
 			return {
 				id,
-				parentId: level2Ids[parentIndex] as string | null,
+				parentIds: level2Ids[parentIndex] ? [level2Ids[parentIndex] as string] : [],
 				content,
 				role: 'assistant' as const,
 				metadata: { x: (-(level2Ids.length / 2) + i) * 22 - 385, y: 35 }

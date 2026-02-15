@@ -7,6 +7,7 @@ export { default as DefaultLoadingOverlay } from './DefaultLoadingOverlay.svelte
 export {
 	TraekEngine,
 	DEFAULT_TRACK_ENGINE_CONFIG,
+	wouldCreateCycle,
 	type TraekEngineConfig,
 	type MessageNode,
 	type Node,

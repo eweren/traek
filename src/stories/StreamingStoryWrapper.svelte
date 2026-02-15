@@ -19,7 +19,7 @@ Want to refine the question together or get a quick recommendation from here?`;
 	engine.updateNode(responseNode.id, { status: 'streaming' });
 	engine.addNode('Thinking...', 'assistant', {
 		type: 'thought',
-		parentId: responseNode.id,
+		parentIds: [responseNode.id],
 		x: 1,
 		y: -1,
 		data: {
@@ -47,7 +47,7 @@ Want to refine the question together or get a quick recommendation from here?`;
 				clearInterval(streamInterval);
 				engine.updateNode(responseNode.id, { status: 'done' });
 				const thoughtNode = engine.nodes.find(
-					(n) => n.parentId === responseNode.id && n.type === 'thought'
+					(n) => n.parentIds.includes(responseNode.id) && n.type === 'thought'
 				);
 				if (thoughtNode) engine.updateNode(thoughtNode.id, { content: 'Done' });
 			}

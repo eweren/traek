@@ -19,7 +19,7 @@ export const traekEngineConfigSchema = z.object({
 
 export const addNodePayloadSchema = z.object({
 	id: z.string().optional(),
-	parentId: z.string().nullable(),
+	parentIds: z.array(z.string()),
 	content: z.string(),
 	role: z.enum(['user', 'assistant', 'system']),
 	type: z.string().optional(),

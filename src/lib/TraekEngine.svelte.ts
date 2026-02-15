@@ -12,7 +12,7 @@ export enum BasicNodeTypes {
 
 export interface Node {
 	id: string;
-	parentId: string | null;
+	parentIds: string[];
 	role: 'user' | 'assistant' | 'system';
 	type: BasicNodeTypes | string;
 	status?: NodeStatus;
@@ -25,6 +25,28 @@ export interface Node {
 		[key: string]: unknown;
 	};
 	data?: unknown;
+}
+
+/** Check whether adding an edge from parentId → childId would create a cycle. */
+export function wouldCreateCycle(nodes: Node[], parentId: string, childId: string): boolean {
+	// If parentId === childId, it's a self-loop
+	if (parentId === childId) return true;
+	// DFS from parentId upward: if we reach childId, it would create a cycle
+	const visited = new Set<string>();
+	const stack = [parentId];
+	while (stack.length > 0) {
+		const current = stack.pop()!;
+		if (current === childId) return true;
+		if (visited.has(current)) continue;
+		visited.add(current);
+		const node = nodes.find((n) => n.id === current);
+		if (node) {
+			for (const pid of node.parentIds) {
+				stack.push(pid);
+			}
+		}
+	}
+	return false;
 }
 
 export type CustomTraekNode = Node & {
@@ -51,10 +73,10 @@ export interface MessageNode extends Node {
 	content: string;
 }
 
-/** Payload for bulk add; id optional (for saved projects). Parent must appear earlier in list or be already in engine. */
+/** Payload for bulk add; id optional (for saved projects). Parents must appear earlier in list or be already in engine. */
 export interface AddNodePayload {
 	id?: string;
-	parentId: string | null;
+	parentIds: string[];
 	content: string;
 	role: 'user' | 'assistant' | 'system';
 	type?: MessageNode['type'];
@@ -115,7 +137,8 @@ export class TraekEngine {
 		this.config = { ...DEFAULT_TRACK_ENGINE_CONFIG, ...config };
 	}
 
-	// Der "Context Path" - Gibt nur die relevanten Knoten für den aktuellen Branch zurück
+	// Der "Context Path" - Gibt nur die relevanten Knoten für den aktuellen Branch zurück.
+	// Follows the primary parent (first in parentIds) for a single linear path.
 	contextPath = $derived(() => {
 		if (!this.activeNodeId) return [];
 		const path: Node[] = [];
@@ -123,7 +146,8 @@ export class TraekEngine {
 
 		while (current) {
 			path.unshift(current);
-			current = this.nodes.find((n) => n.id === current?.parentId);
+			const primaryParentId = current.parentIds[0];
+			current = primaryParentId ? this.nodes.find((n) => n.id === primaryParentId) : undefined;
 		}
 		return path;
 	});
@@ -137,7 +161,7 @@ export class TraekEngine {
 		role: 'user' | 'assistant' | 'system' = 'user',
 		options: {
 			type?: Node['type'];
-			parentId?: string | null;
+			parentIds?: string[];
 			autofocus?: boolean;
 			x?: number;
 			y?: number;
@@ -146,13 +170,13 @@ export class TraekEngine {
 			deferLayout?: boolean;
 		} = {}
 	) {
-		const parentId = options.parentId ?? this.activeNodeId;
+		const parentIds = options.parentIds ?? (this.activeNodeId ? [this.activeNodeId] : []);
 		const hasExplicitPosition = options.x !== undefined || options.y !== undefined;
 		const newNode: CustomTraekNode = {
 			component,
 			props,
 			id: crypto.randomUUID(),
-			parentId,
+			parentIds,
 			role,
 			type: options.type ?? 'text',
 			createdAt: Date.now(),
@@ -171,8 +195,9 @@ export class TraekEngine {
 			this.activeNodeId = newNode.id;
 		}
 
-		if (parentId && !options.deferLayout) {
-			this.layoutChildren(parentId);
+		const primaryParentId = parentIds[0];
+		if (primaryParentId && !options.deferLayout) {
+			this.layoutChildren(primaryParentId);
 		}
 
 		this.onNodeCreated?.(newNode);
@@ -191,7 +216,7 @@ export class TraekEngine {
 		role: 'user' | 'assistant' | 'system',
 		options: {
 			type?: Node['type'];
-			parentId?: string | null;
+			parentIds?: string[];
 			autofocus?: boolean;
 			x?: number;
 			y?: number;
@@ -200,11 +225,11 @@ export class TraekEngine {
 			deferLayout?: boolean;
 		} = {}
 	) {
-		const parentId = options.parentId ?? this.activeNodeId;
+		const parentIds = options.parentIds ?? (this.activeNodeId ? [this.activeNodeId] : []);
 		const hasExplicitPosition = options.x !== undefined || options.y !== undefined;
 		const newNode: MessageNode = {
 			id: crypto.randomUUID(),
-			parentId,
+			parentIds,
 			role,
 			content,
 			type: options.type ?? 'text',
@@ -224,8 +249,9 @@ export class TraekEngine {
 			this.activeNodeId = newNode.id;
 		}
 
-		if (parentId && !options.deferLayout) {
-			this.layoutChildren(parentId);
+		const primaryParentId = parentIds[0];
+		if (primaryParentId && !options.deferLayout) {
+			this.layoutChildren(primaryParentId);
 		}
 
 		this.onNodeCreated?.(newNode);
@@ -253,6 +279,7 @@ export class TraekEngine {
 			id: p.id ?? crypto.randomUUID()
 		}));
 
+		// Topological sort: ensure all parents are added before children
 		// eslint-disable-next-line svelte/prefer-svelte-reactivity
 		const added = new Set<string>(this.nodes.map((n) => n.id));
 		const sorted: typeof withIds = [];
@@ -260,8 +287,8 @@ export class TraekEngine {
 		while (sorted.length < withIds.length) {
 			for (const p of withIds) {
 				if (added.has(p.id!)) continue;
-				const parentIn = p.parentId == null || added.has(p.parentId);
-				if (parentIn) {
+				const allParentsIn = p.parentIds.length === 0 || p.parentIds.every((pid) => added.has(pid));
+				if (allParentsIn) {
 					sorted.push(p);
 					added.add(p.id!);
 				}
@@ -279,7 +306,7 @@ export class TraekEngine {
 				typeof p.metadata?.x === 'number' || typeof p.metadata?.y === 'number';
 			return {
 				id: p.id!,
-				parentId: p.parentId,
+				parentIds: p.parentIds,
 				role: p.role,
 				content: p.content,
 				type: p.type ?? 'text',
@@ -301,7 +328,7 @@ export class TraekEngine {
 		for (const n of newNodes) {
 			this.onNodeCreated?.(n);
 		}
-		const firstRoot = newNodes.find((n) => n.parentId == null);
+		const firstRoot = newNodes.find((n) => n.parentIds.length === 0);
 		if (firstRoot) this.activeNodeId = firstRoot.id;
 
 		this.flushLayoutFromRoot();
@@ -316,9 +343,9 @@ export class TraekEngine {
 		}
 	}
 
-	/** Run layout from every root (parentId null). Use after adding nodes with deferLayout. */
+	/** Run layout from every root (no parents). Use after adding nodes with deferLayout. */
 	flushLayoutFromRoot() {
-		const roots = this.nodes.filter((n) => n.parentId == null);
+		const roots = this.nodes.filter((n) => n.parentIds.length === 0);
 		const childrenMap = this.buildChildrenMap();
 		// eslint-disable-next-line svelte/prefer-svelte-reactivity
 		const subtreeHeightCache = new Map<string, number>();
@@ -333,11 +360,16 @@ export class TraekEngine {
 		}
 	}
 
+	/**
+	 * Build a map from parent id → children.
+	 * For layout purposes, each node is assigned to its primary parent (first in parentIds).
+	 * Nodes with no parents are keyed under null.
+	 */
 	private buildChildrenMap(): Map<string | null, Node[]> {
 		// eslint-disable-next-line svelte/prefer-svelte-reactivity
 		const map = new Map<string | null, Node[]>();
 		for (const n of this.nodes) {
-			const key = n.parentId;
+			const key = n.parentIds[0] ?? null;
 			const list = map.get(key) ?? [];
 			list.push(n);
 			map.set(key, list);
@@ -522,7 +554,7 @@ export class TraekEngine {
 		if (!node) return 0;
 		const step = this.config.gridStep;
 		const nodeWidthGrid = this.config.nodeWidth / step;
-		const children = this.nodes.filter((n) => n.parentId === nodeId && n.type !== 'thought');
+		const children = this.nodes.filter((n) => n.parentIds[0] === nodeId && n.type !== 'thought');
 		if (children.length === 0) return nodeWidthGrid;
 		const gapXGrid = this.config.layoutGapX / step;
 		const total =
@@ -538,7 +570,7 @@ export class TraekEngine {
 		const defaultH = this.config.nodeHeightDefault;
 		const gapYGrid = this.config.layoutGapY / step;
 		const nodeHGrid = (node.metadata?.height ?? defaultH) / step;
-		const children = this.nodes.filter((n) => n.parentId === nodeId && n.type !== 'thought');
+		const children = this.nodes.filter((n) => n.parentIds[0] === nodeId && n.type !== 'thought');
 		if (children.length === 0) return nodeHGrid;
 		const maxChildHeight = Math.max(0, ...children.map((c) => this.getSubtreeLayoutHeight(c.id)));
 		return nodeHGrid + gapYGrid + maxChildHeight;
@@ -552,7 +584,7 @@ export class TraekEngine {
 		const parent = this.nodes.find((n) => n.id === parentId);
 		if (!parent) return;
 
-		const children = this.nodes.filter((n) => n.parentId === parentId);
+		const children = this.nodes.filter((n) => n.parentIds[0] === parentId);
 		if (children.length === 0) return;
 
 		const step = this.config.gridStep;
@@ -594,6 +626,33 @@ export class TraekEngine {
 	}
 
 	/**
+	 * Add a parent connection to a node. Returns false if it would create a cycle.
+	 */
+	addConnection(parentId: string, childId: string): boolean {
+		const child = this.nodes.find((n) => n.id === childId);
+		const parent = this.nodes.find((n) => n.id === parentId);
+		if (!child || !parent) return false;
+		if (child.parentIds.includes(parentId)) return false;
+		if (wouldCreateCycle(this.nodes, parentId, childId)) return false;
+		child.parentIds = [...child.parentIds, parentId];
+		this.flushLayoutFromRoot();
+		return true;
+	}
+
+	/**
+	 * Remove a parent connection from a node.
+	 */
+	removeConnection(parentId: string, childId: string): boolean {
+		const child = this.nodes.find((n) => n.id === childId);
+		if (!child) return false;
+		const idx = child.parentIds.indexOf(parentId);
+		if (idx === -1) return false;
+		child.parentIds = child.parentIds.filter((id) => id !== parentId);
+		this.flushLayoutFromRoot();
+		return true;
+	}
+
+	/**
 	 * Serialize the full engine state into a JSON-safe snapshot.
 	 * Component references (from addCustomNode) are stripped — only node.type is stored.
 	 */
@@ -605,7 +664,7 @@ export class TraekEngine {
 			activeNodeId: this.activeNodeId,
 			nodes: this.nodes.map((n) => ({
 				id: n.id,
-				parentId: n.parentId,
+				parentIds: n.parentIds,
 				content: (n as MessageNode).content ?? '',
 				role: n.role,
 				type: n.type,
@@ -632,15 +691,17 @@ export class TraekEngine {
 				`Invalid snapshot: ${result.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join(', ')}`
 			);
 		}
+		// Zod transform normalizes legacy parentId → parentIds, so validated is safe
+		const validated = result.data;
 		const engine = new TraekEngine({
-			...snapshot.config,
+			...validated.config,
 			...config
 		});
-		if (snapshot.nodes.length > 0) {
+		if (validated.nodes.length > 0) {
 			engine.addNodes(
-				snapshot.nodes.map((n) => ({
+				validated.nodes.map((n) => ({
 					id: n.id,
-					parentId: n.parentId,
+					parentIds: n.parentIds,
 					content: n.content,
 					role: n.role,
 					type: n.type,
@@ -651,10 +712,10 @@ export class TraekEngine {
 				}))
 			);
 		}
-		if (snapshot.activeNodeId != null) {
-			const exists = engine.nodes.some((n) => n.id === snapshot.activeNodeId);
+		if (validated.activeNodeId != null) {
+			const exists = engine.nodes.some((n) => n.id === validated.activeNodeId);
 			if (exists) {
-				engine.activeNodeId = snapshot.activeNodeId;
+				engine.activeNodeId = validated.activeNodeId;
 			}
 		}
 		return engine;

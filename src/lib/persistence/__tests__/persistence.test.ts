@@ -1,12 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { TraekEngine } from '../../TraekEngine.svelte';
+import { TraekEngine, wouldCreateCycle } from '../../TraekEngine.svelte';
 import { ReplayController } from '../ReplayController.svelte';
 import type { ConversationSnapshot, SerializedNode } from '../types.js';
 import { serializedNodeSchema, conversationSnapshotSchema } from '../schemas.js';
 
 function makeNode(overrides: Partial<SerializedNode> & { id: string }): SerializedNode {
 	return {
-		parentId: null,
+		parentIds: [],
 		content: `Content for ${overrides.id}`,
 		role: 'user',
 		type: 'text',
@@ -69,7 +69,6 @@ describe('TraekEngine.serialize()', () => {
 		expect.assertions(3);
 		const engine = new TraekEngine();
 		const parentNode = engine.addNode('Parent', 'user');
-		// addNode auto-sets activeNodeId, so next node becomes child
 		const childNode = engine.addNode('Child', 'assistant');
 
 		const snapshot = engine.serialize();
@@ -77,8 +76,8 @@ describe('TraekEngine.serialize()', () => {
 
 		const parent = snapshot.nodes.find((n) => n.id === parentNode.id);
 		const child = snapshot.nodes.find((n) => n.id === childNode.id);
-		expect(parent?.parentId).toBeNull();
-		expect(child?.parentId).toBe(parentNode.id);
+		expect(parent?.parentIds).toEqual([]);
+		expect(child?.parentIds).toContain(parentNode.id);
 	});
 
 	it('should preserve activeNodeId', () => {
@@ -106,7 +105,7 @@ describe('TraekEngine.fromSnapshot()', () => {
 		expect.assertions(4);
 		const nodes = [
 			makeNode({ id: 'n1', createdAt: 1000 }),
-			makeNode({ id: 'n2', parentId: 'n1', role: 'assistant', createdAt: 2000 })
+			makeNode({ id: 'n2', parentIds: ['n1'], role: 'assistant', createdAt: 2000 })
 		];
 		const snapshot = makeSnapshot(nodes, { activeNodeId: 'n2' });
 		const engine = TraekEngine.fromSnapshot(snapshot);
@@ -114,7 +113,41 @@ describe('TraekEngine.fromSnapshot()', () => {
 		expect(engine.nodes).toHaveLength(2);
 		expect(engine.activeNodeId).toBe('n2');
 		expect(engine.nodes[0].id).toBe('n1');
-		expect(engine.nodes[1].parentId).toBe('n1');
+		expect(engine.nodes[1].parentIds).toContain('n1');
+	});
+
+	it('should migrate legacy parentId format', () => {
+		expect.assertions(2);
+		// Simulate old snapshot with parentId instead of parentIds
+		const legacySnapshot = {
+			version: 1,
+			createdAt: Date.now(),
+			activeNodeId: 'n2',
+			nodes: [
+				{
+					id: 'n1',
+					parentId: null,
+					content: 'Root',
+					role: 'user',
+					type: 'text',
+					createdAt: 1000,
+					metadata: { x: 0, y: 0 }
+				},
+				{
+					id: 'n2',
+					parentId: 'n1',
+					content: 'Child',
+					role: 'assistant',
+					type: 'text',
+					createdAt: 2000,
+					metadata: { x: 0, y: 0 }
+				}
+			]
+		} as unknown as ConversationSnapshot;
+
+		const engine = TraekEngine.fromSnapshot(legacySnapshot);
+		expect(engine.nodes[0].parentIds).toEqual([]);
+		expect(engine.nodes[1].parentIds).toEqual(['n1']);
 	});
 
 	it('should ignore activeNodeId if node does not exist', () => {
@@ -129,9 +162,7 @@ describe('TraekEngine.fromSnapshot()', () => {
 		expect.assertions(1);
 		const snapshot = makeSnapshot([], { config: { nodeWidth: 999 } });
 		const engine = TraekEngine.fromSnapshot(snapshot, { nodeWidth: 500 });
-		// Verify config applied by re-serializing — the engine was created with the override
 		const reserialized = engine.serialize();
-		// Just verify the engine was created without errors
 		expect(reserialized.nodes).toHaveLength(0);
 	});
 
@@ -139,7 +170,6 @@ describe('TraekEngine.fromSnapshot()', () => {
 		expect.assertions(4);
 		const original = new TraekEngine();
 		const node1 = original.addNode('First', 'user');
-		// addNode auto-sets activeNodeId
 		const node2 = original.addNode('Second', 'assistant');
 
 		const snapshot = original.serialize('Roundtrip Test');
@@ -152,6 +182,70 @@ describe('TraekEngine.fromSnapshot()', () => {
 	});
 });
 
+describe('DAG: addConnection / removeConnection / cycle detection', () => {
+	it('should add a connection between nodes', () => {
+		expect.assertions(2);
+		const engine = new TraekEngine();
+		const a = engine.addNode('A', 'user', { parentIds: [] });
+		const b = engine.addNode('B', 'user', { parentIds: [] });
+		const c = engine.addNode('C', 'assistant', { parentIds: [a.id] });
+
+		const result = engine.addConnection(b.id, c.id);
+		expect(result).toBe(true);
+		expect(c.parentIds).toEqual([a.id, b.id]);
+	});
+
+	it('should prevent duplicate connections', () => {
+		expect.assertions(1);
+		const engine = new TraekEngine();
+		const a = engine.addNode('A', 'user', { parentIds: [] });
+		const b = engine.addNode('B', 'assistant', { parentIds: [a.id] });
+
+		const result = engine.addConnection(a.id, b.id);
+		expect(result).toBe(false);
+	});
+
+	it('should detect self-loop', () => {
+		expect.assertions(1);
+		const engine = new TraekEngine();
+		const a = engine.addNode('A', 'user', { parentIds: [] });
+
+		expect(wouldCreateCycle(engine.nodes, a.id, a.id)).toBe(true);
+	});
+
+	it('should detect cycle: A→B→C, then C→A', () => {
+		expect.assertions(1);
+		const engine = new TraekEngine();
+		const a = engine.addNode('A', 'user', { parentIds: [] });
+		const b = engine.addNode('B', 'assistant', { parentIds: [a.id] });
+		const c = engine.addNode('C', 'user', { parentIds: [b.id] });
+
+		const result = engine.addConnection(c.id, a.id);
+		expect(result).toBe(false);
+	});
+
+	it('should remove a connection', () => {
+		expect.assertions(2);
+		const engine = new TraekEngine();
+		const a = engine.addNode('A', 'user', { parentIds: [] });
+		const b = engine.addNode('B', 'user', { parentIds: [] });
+		const c = engine.addNode('C', 'assistant', { parentIds: [a.id, b.id] });
+
+		const result = engine.removeConnection(a.id, c.id);
+		expect(result).toBe(true);
+		expect(c.parentIds).toEqual([b.id]);
+	});
+
+	it('should return false when removing non-existent connection', () => {
+		expect.assertions(1);
+		const engine = new TraekEngine();
+		const a = engine.addNode('A', 'user', { parentIds: [] });
+		const b = engine.addNode('B', 'user', { parentIds: [] });
+
+		expect(engine.removeConnection(a.id, b.id)).toBe(false);
+	});
+});
+
 describe('Zod Schema Validation', () => {
 	it('should accept a valid SerializedNode', () => {
 		const result = serializedNodeSchema.safeParse(makeNode({ id: 'valid', status: 'done' }));
@@ -160,7 +254,7 @@ describe('Zod Schema Validation', () => {
 
 	it('should reject a SerializedNode with missing id', () => {
 		const result = serializedNodeSchema.safeParse({
-			parentId: null,
+			parentIds: [],
 			content: 'test',
 			role: 'user',
 			type: 'text',
@@ -173,7 +267,7 @@ describe('Zod Schema Validation', () => {
 	it('should reject a SerializedNode with invalid role', () => {
 		const result = serializedNodeSchema.safeParse({
 			id: 'x',
-			parentId: null,
+			parentIds: [],
 			content: 'test',
 			role: 'invalid',
 			type: 'text',
@@ -186,6 +280,27 @@ describe('Zod Schema Validation', () => {
 	it('should accept a valid ConversationSnapshot', () => {
 		const snapshot = makeSnapshot([makeNode({ id: 'a' })]);
 		const result = conversationSnapshotSchema.safeParse(snapshot);
+		expect(result.success).toBe(true);
+	});
+
+	it('should accept legacy parentId format in snapshot', () => {
+		const legacySnapshot = {
+			version: 1,
+			createdAt: Date.now(),
+			activeNodeId: null,
+			nodes: [
+				{
+					id: 'a',
+					parentId: null,
+					content: 'test',
+					role: 'user',
+					type: 'text',
+					createdAt: Date.now(),
+					metadata: { x: 0, y: 0 }
+				}
+			]
+		};
+		const result = conversationSnapshotSchema.safeParse(legacySnapshot);
 		expect(result.success).toBe(true);
 	});
 
@@ -222,8 +337,8 @@ describe('ReplayController', () => {
 	beforeEach(() => {
 		snapshot = makeSnapshot([
 			makeNode({ id: 'a', createdAt: 100 }),
-			makeNode({ id: 'b', parentId: 'a', role: 'assistant', createdAt: 200 }),
-			makeNode({ id: 'c', parentId: 'b', createdAt: 300 })
+			makeNode({ id: 'b', parentIds: ['a'], role: 'assistant', createdAt: 200 }),
+			makeNode({ id: 'c', parentIds: ['b'], createdAt: 300 })
 		]);
 	});
 
@@ -357,7 +472,7 @@ describe('ReplayController', () => {
 		const unorderedSnapshot = makeSnapshot([
 			makeNode({ id: 'z', createdAt: 300 }),
 			makeNode({ id: 'a', createdAt: 100 }),
-			makeNode({ id: 'm', parentId: 'a', createdAt: 200 })
+			makeNode({ id: 'm', parentIds: ['a'], createdAt: 200 })
 		]);
 		const ctrl = new ReplayController(unorderedSnapshot);
 

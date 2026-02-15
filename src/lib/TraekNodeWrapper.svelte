@@ -42,8 +42,9 @@
 	const placeholderHeight = $derived(node.metadata?.height ?? DEFAULT_PLACEHOLDER_HEIGHT);
 
 	const thoughtChild = $derived(
-		(engine?.nodes.find((n) => n.parentId === node.id && n.type === 'thought') as MessageNode) ??
-			null
+		(engine?.nodes.find(
+			(n) => n.parentIds.includes(node.id) && n.type === 'thought'
+		) as MessageNode) ?? null
 	);
 	const thoughtSteps = $derived((thoughtChild?.data as { steps?: string[] })?.steps ?? []);
 	const thoughtPillLabel = $derived(

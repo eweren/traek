@@ -844,18 +844,17 @@
 			<svg class="connections">
 				<g transform="translate(25000, 25000)">
 					{#each engine.nodes as node}
-						{#if node.parentId}
-							{@const parent = engine.nodes.find((n) => n.id === node.parentId)}
-							{#if parent}
-								{@const isThought = node.type === 'thought'}
-								{@const step = config.gridStep}
-								{@const parentX = (parent.metadata?.x ?? 0) * step}
-								{@const parentY = (parent.metadata?.y ?? 0) * step}
-								{@const parentH = parent.metadata?.height ?? config.nodeHeightDefault}
-								{@const nodeX = (node.metadata?.x ?? 0) * step}
-								{@const nodeY = (node.metadata?.y ?? 0) * step}
-								{@const nodeH = node.metadata?.height ?? config.nodeHeightDefault}
-								{#if !isThought}
+						{#if node.parentIds.length > 0 && node.type !== 'thought'}
+							{@const nodeX = (node.metadata?.x ?? 0) * config.gridStep}
+							{@const nodeY = (node.metadata?.y ?? 0) * config.gridStep}
+							{@const nodeH = node.metadata?.height ?? config.nodeHeightDefault}
+							{@const ancestorPath = engine.contextPath()}
+							{#each node.parentIds as pid}
+								{@const parent = engine.nodes.find((n) => n.id === pid)}
+								{#if parent}
+									{@const parentX = (parent.metadata?.x ?? 0) * config.gridStep}
+									{@const parentY = (parent.metadata?.y ?? 0) * config.gridStep}
+									{@const parentH = parent.metadata?.height ?? config.nodeHeightDefault}
 									{@const pathD = getConnectionPath(
 										parentX,
 										parentY,
@@ -866,7 +865,6 @@
 										config.nodeWidth,
 										nodeH
 									)}
-									{@const ancestorPath = engine.contextPath()}
 									{@const isOnAncestorPath =
 										ancestorPath.length >= 2 &&
 										ancestorPath.some(
@@ -876,27 +874,25 @@
 												ancestorPath[i + 1].id === node.id
 										)}
 									{#if !isOnAncestorPath}
-										<!-- Non-marked connection -->
 										<path class="connection" d={pathD} />
 									{/if}
 								{/if}
-							{/if}
+							{/each}
 						{/if}
 					{/each}
 
 					{#each engine.nodes as node}
-						{#if node.parentId}
-							{@const parent = engine.nodes.find((n) => n.id === node.parentId)}
-							{#if parent}
-								{@const isThought = node.type === 'thought'}
-								{@const step = config.gridStep}
-								{@const parentX = (parent.metadata?.x ?? 0) * step}
-								{@const parentY = (parent.metadata?.y ?? 0) * step}
-								{@const parentH = parent.metadata?.height ?? config.nodeHeightDefault}
-								{@const nodeX = (node.metadata?.x ?? 0) * step}
-								{@const nodeY = (node.metadata?.y ?? 0) * step}
-								{@const nodeH = node.metadata?.height ?? config.nodeHeightDefault}
-								{#if !isThought}
+						{#if node.parentIds.length > 0 && node.type !== 'thought'}
+							{@const nodeX = (node.metadata?.x ?? 0) * config.gridStep}
+							{@const nodeY = (node.metadata?.y ?? 0) * config.gridStep}
+							{@const nodeH = node.metadata?.height ?? config.nodeHeightDefault}
+							{@const ancestorPath = engine.contextPath()}
+							{#each node.parentIds as pid}
+								{@const parent = engine.nodes.find((n) => n.id === pid)}
+								{#if parent}
+									{@const parentX = (parent.metadata?.x ?? 0) * config.gridStep}
+									{@const parentY = (parent.metadata?.y ?? 0) * config.gridStep}
+									{@const parentH = parent.metadata?.height ?? config.nodeHeightDefault}
 									{@const pathD = getConnectionPath(
 										parentX,
 										parentY,
@@ -907,7 +903,6 @@
 										config.nodeWidth,
 										nodeH
 									)}
-									{@const ancestorPath = engine.contextPath()}
 									{@const isOnAncestorPath =
 										ancestorPath.length >= 2 &&
 										ancestorPath.some(
@@ -917,11 +912,10 @@
 												ancestorPath[i + 1].id === node.id
 										)}
 									{#if isOnAncestorPath}
-										<!-- Marked connection (always rendered on top) -->
 										<path class="connection connection--highlight" d={pathD} />
 									{/if}
 								{/if}
-							{/if}
+							{/each}
 						{/if}
 					{/each}
 				</g>

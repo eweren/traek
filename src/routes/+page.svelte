@@ -31,7 +31,7 @@ npm install traek
   // and the node they're replying from (for branching).
   function onSendMessage(input, fromNode) {
     const userNode = engine.addNode(input, 'user', {
-      parentId: fromNode?.id ?? null
+      parentIds: fromNode?.id ? [fromNode.id] : []
     });
 
     const assistantNode = engine.addNode('', 'assistant', {

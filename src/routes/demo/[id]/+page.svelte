@@ -167,7 +167,10 @@
 		let current: MessageNode | undefined = userNode;
 		while (current) {
 			path.unshift(current);
-			current = eng.nodes.find((n) => n.id === current!.parentId) as MessageNode | undefined;
+			const primaryParentId = current!.parentIds[0];
+			current = primaryParentId
+				? (eng.nodes.find((n) => n.id === primaryParentId) as MessageNode | undefined)
+				: undefined;
 		}
 		return path;
 	}
@@ -175,7 +178,7 @@
 	function nodesToPayloads(nodes: MessageNode[]): AddNodePayload[] {
 		return nodes.map((n) => ({
 			id: n.id,
-			parentId: n.parentId,
+			parentIds: n.parentIds,
 			content: n.content ?? '',
 			role: n.role,
 			type: n.type,
@@ -222,14 +225,14 @@
 		// --- Demo-only actions based on selected tools ---
 		if (selected.includes('debug')) {
 			eng.addCustomNode(ExampleCustomComponent, {}, 'system', {
-				parentId: userNode.id,
+				parentIds: [userNode.id],
 				type: 'debugNode'
 			});
 		}
 
 		if (selected.includes('image')) {
 			const imageNode = eng.addCustomNode(ImageDemoNode, {}, 'assistant', {
-				parentId: userNode.id,
+				parentIds: [userNode.id],
 				type: 'image',
 				data: {
 					prompt: input,
@@ -296,7 +299,7 @@
 
 		if (selected.includes('repeat')) {
 			eng.addNode(`🔁 ${input}`, 'assistant', {
-				parentId: userNode.id
+				parentIds: [userNode.id]
 			});
 		}
 
@@ -314,12 +317,12 @@
 		const branches: { responseNodeId: string; thoughtNodeId: string }[] = [];
 		for (let i = 0; i < explorationRuns; i += 1) {
 			const responseNode = eng.addNode('', 'assistant', {
-				parentId: userNode.id,
+				parentIds: [userNode.id],
 				autofocus: i === 0
 			});
 			const thoughtNode = eng.addNode('Thinking...', 'assistant', {
 				type: 'thought',
-				parentId: responseNode.id
+				parentIds: [responseNode.id]
 			});
 			eng.updateNode(responseNode.id, { status: 'streaming' });
 			branches.push({ responseNodeId: responseNode.id, thoughtNodeId: thoughtNode.id });

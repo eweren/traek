@@ -68,7 +68,7 @@ export class ReplayController {
 		this.engine.addNodes([
 			{
 				id: node.id,
-				parentId: node.parentId,
+				parentIds: node.parentIds,
 				content: node.content,
 				role: node.role,
 				type: node.type,
@@ -114,7 +114,7 @@ export class ReplayController {
 			this.engine.addNodes(
 				nodesToAdd.map((n) => ({
 					id: n.id,
-					parentId: n.parentId,
+					parentIds: n.parentIds,
 					content: n.content,
 					role: n.role,
 					type: n.type,

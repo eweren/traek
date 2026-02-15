@@ -109,7 +109,7 @@ Here’s how to make your chat with the expert effective.
 
 				const thoughtNode = engine.addNode('Thinking...', 'assistant', {
 					type: 'thought',
-					parentId: responseNode.id,
+					parentIds: [responseNode.id],
 					autofocus: true,
 					x: 1,
 					y: -1,
@@ -192,7 +192,7 @@ Here’s how to make your chat with the expert effective.
 		);
 		engine.addNode('Done', 'assistant', {
 			type: 'thought',
-			parentId: responseNode.id,
+			parentIds: [responseNode.id],
 			data: {
 				steps: [
 					'Analyzing input: identified intent (how to ask the expert). Loaded conversation context.',
