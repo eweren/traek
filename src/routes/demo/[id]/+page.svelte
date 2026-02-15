@@ -7,9 +7,10 @@
 		DEFAULT_TRACK_ENGINE_CONFIG,
 		type MessageNode,
 		type AddNodePayload,
-		type NodeComponentMap,
 		type ActionDefinition,
-		type ResolveActions
+		type ResolveActions,
+		type Node,
+		createDefaultRegistry
 	} from '$lib';
 	import ExampleCustomComponent from '$lib/ExampleCustomComponent.svelte';
 	import ImageDemoNode from '$lib/ImageDemoNode.svelte';
@@ -24,11 +25,35 @@
 
 	const id = $derived(page.params.id);
 
-	/** Type-safe map: only 'debugNode' | 'image' keys, values must accept TraekNodeComponentProps. */
-	const componentMap: NodeComponentMap<'debugNode' | 'image'> = {
-		debugNode: ExampleCustomComponent,
-		image: ImageDemoNode
-	};
+	const registry = createDefaultRegistry();
+	registry.register({
+		type: 'debugNode',
+		label: 'Debug',
+		component: ExampleCustomComponent,
+		icon: '🧪',
+		actions: [
+			{
+				id: 'delete',
+				label: 'Delete',
+				icon: '🗑️',
+				handler: (node: Node, engine: TraekEngine) => engine.deleteNode(node.id)
+			}
+		]
+	});
+	registry.register({
+		type: 'image',
+		label: 'Image',
+		component: ImageDemoNode,
+		icon: '🖼️',
+		actions: [
+			{
+				id: 'delete',
+				label: 'Delete',
+				icon: '🗑️',
+				handler: (node: Node, engine: TraekEngine) => engine.deleteNode(node.id)
+			}
+		]
+	});
 
 	let engine = $state<TraekEngine | null>(null);
 	let conv = $state<SavedConversation | null>(null);
@@ -376,7 +401,7 @@
 			<TraekCanvas
 				{engine}
 				config={DEFAULT_TRACK_ENGINE_CONFIG}
-				{componentMap}
+				{registry}
 				actions={TOOL_OPTIONS}
 				{resolveActions}
 				initialScale={conv?.viewport?.scale}

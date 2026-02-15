@@ -4,37 +4,37 @@ import type { SvelteComponent } from 'svelte';
 export type NodeStatus = 'streaming' | 'done' | 'error';
 
 export enum BasicNodeTypes {
-  TEXT = 'text',
-  CODE = 'code',
-  THOUGHT = 'thought',
+	TEXT = 'text',
+	CODE = 'code',
+	THOUGHT = 'thought'
 }
 
 export interface Node {
-  id: string;
-  parentId: string | null;
-  role: 'user' | 'assistant' | 'system';
-  type: BasicNodeTypes | string;
-  status?: NodeStatus;
-  errorMessage?: string;
-  metadata?: {
-    x: number;
-    y: number;
-    height?: number;
-    [key: string]: unknown;
-  };
-  data?: unknown;
+	id: string;
+	parentId: string | null;
+	role: 'user' | 'assistant' | 'system';
+	type: BasicNodeTypes | string;
+	status?: NodeStatus;
+	errorMessage?: string;
+	metadata?: {
+		x: number;
+		y: number;
+		height?: number;
+		[key: string]: unknown;
+	};
+	data?: unknown;
 }
 
 export type CustomTraekNode = Node & {
-  component: typeof SvelteComponent;
-  props?: Record<string, unknown>;
+	component: typeof SvelteComponent;
+	props?: Record<string, unknown>;
 };
 
 /** Props every custom node component receives from the canvas. Use this to type your component's $props(). */
 export type TraekNodeComponentProps = {
-  node: Node;
-  engine: TraekEngine;
-  isActive: boolean;
+	node: Node;
+	engine: TraekEngine;
+	isActive: boolean;
 };
 
 /**
@@ -42,570 +42,548 @@ export type TraekNodeComponentProps = {
  * Use with a union of your custom types for type-safe keys: NodeComponentMap<'debugNode' | 'image'>.
  */
 export type NodeComponentMap<T extends string = string> = Partial<
-  Record<T, SvelteComponent<TraekNodeComponentProps & Record<string, unknown>>>
+	Record<T, SvelteComponent<TraekNodeComponentProps & Record<string, unknown>>>
 >;
 
 export interface MessageNode extends Node {
-  content: string;
+	content: string;
 }
 
 /** Payload for bulk add; id optional (for saved projects). Parent must appear earlier in list or be already in engine. */
 export interface AddNodePayload {
-  id?: string;
-  parentId: string | null;
-  content: string;
-  role: 'user' | 'assistant' | 'system';
-  type?: MessageNode['type'];
-  status?: NodeStatus;
-  errorMessage?: string;
-  metadata?: Partial<NonNullable<MessageNode['metadata']>>;
-  data?: unknown;
+	id?: string;
+	parentId: string | null;
+	content: string;
+	role: 'user' | 'assistant' | 'system';
+	type?: MessageNode['type'];
+	status?: NodeStatus;
+	errorMessage?: string;
+	metadata?: Partial<NonNullable<MessageNode['metadata']>>;
+	data?: unknown;
 }
 
 export interface TraekEngineConfig {
-  focusDurationMs: number;
-  zoomSpeed: number;
-  zoomLineModeBoost: number;
-  scaleMin: number;
-  scaleMax: number;
-  nodeWidth: number;
-  nodeHeightDefault: number;
-  streamIntervalMs: number;
-  rootNodeOffsetX: number;
-  rootNodeOffsetY: number;
-  layoutGapX: number;
-  layoutGapY: number;
-  heightChangeThreshold: number;
-  /** Pixels per grid unit; positions (metadata.x, metadata.y) are in grid units. */
-  gridStep: number;
+	focusDurationMs: number;
+	zoomSpeed: number;
+	zoomLineModeBoost: number;
+	scaleMin: number;
+	scaleMax: number;
+	nodeWidth: number;
+	nodeHeightDefault: number;
+	streamIntervalMs: number;
+	rootNodeOffsetX: number;
+	rootNodeOffsetY: number;
+	layoutGapX: number;
+	layoutGapY: number;
+	heightChangeThreshold: number;
+	/** Pixels per grid unit; positions (metadata.x, metadata.y) are in grid units. */
+	gridStep: number;
 }
 
 export const DEFAULT_TRACK_ENGINE_CONFIG: TraekEngineConfig = {
-  focusDurationMs: 280,
-  zoomSpeed: 0.004,
-  zoomLineModeBoost: 20,
-  scaleMin: 0.05,
-  scaleMax: 8,
-  nodeWidth: 350,
-  nodeHeightDefault: 100,
-  streamIntervalMs: 30,
-  rootNodeOffsetX: -175,
-  rootNodeOffsetY: -50,
-  layoutGapX: 35,
-  layoutGapY: 50,
-  heightChangeThreshold: 5,
-  gridStep: 20,
+	focusDurationMs: 280,
+	zoomSpeed: 0.004,
+	zoomLineModeBoost: 20,
+	scaleMin: 0.05,
+	scaleMax: 8,
+	nodeWidth: 350,
+	nodeHeightDefault: 100,
+	streamIntervalMs: 30,
+	rootNodeOffsetX: -175,
+	rootNodeOffsetY: -50,
+	layoutGapX: 35,
+	layoutGapY: 50,
+	heightChangeThreshold: 5,
+	gridStep: 20
 };
 
 export class TraekEngine {
-  nodes = $state<Node[]>([]);
-  activeNodeId = $state<string | null>(null);
-  private config: TraekEngineConfig;
-  private pendingHeightLayoutRafId: number | null = null;
+	nodes = $state<Node[]>([]);
+	activeNodeId = $state<string | null>(null);
+	private config: TraekEngineConfig;
+	private pendingHeightLayoutRafId: number | null = null;
 
-  constructor(config?: Partial<TraekEngineConfig>) {
-    this.config = { ...DEFAULT_TRACK_ENGINE_CONFIG, ...config };
-  }
+	/** Lifecycle callback: fired after a node is added. Wired by TraekCanvas when a registry is present. */
+	public onNodeCreated?: (node: Node) => void;
+	/** Lifecycle callback: fired before a node is removed. Wired by TraekCanvas when a registry is present. */
+	public onNodeDeleting?: (node: Node) => void;
 
-  // Der "Context Path" - Gibt nur die relevanten Knoten für den aktuellen Branch zurück
-  contextPath = $derived(() => {
-    if (!this.activeNodeId) return [];
-    const path: Node[] = [];
-    let current = this.nodes.find((n) => n.id === this.activeNodeId);
+	constructor(config?: Partial<TraekEngineConfig>) {
+		this.config = { ...DEFAULT_TRACK_ENGINE_CONFIG, ...config };
+	}
 
-    while (current) {
-      path.unshift(current);
-      current = this.nodes.find((n) => n.id === current?.parentId);
-    }
-    return path;
-  });
+	// Der "Context Path" - Gibt nur die relevanten Knoten für den aktuellen Branch zurück
+	contextPath = $derived(() => {
+		if (!this.activeNodeId) return [];
+		const path: Node[] = [];
+		let current = this.nodes.find((n) => n.id === this.activeNodeId);
 
-  /** Set by addNode when options.autofocus is true; canvas should center on this node and then clear. */
-  public pendingFocusNodeId = $state<string | null>(null);
+		while (current) {
+			path.unshift(current);
+			current = this.nodes.find((n) => n.id === current?.parentId);
+		}
+		return path;
+	});
 
-  addCustomNode(
-    component: typeof SvelteComponent,
-    props?: Record<string, unknown>,
-    role: 'user' | 'assistant' | 'system' = "user",
-    options: {
-      type?: Node['type'];
-      parentId?: string | null;
-      autofocus?: boolean;
-      x?: number;
-      y?: number;
-      data?: unknown;
-      /** When true, skip layout for this add; call flushLayoutFromRoot() after a batch. */
-      deferLayout?: boolean;
-    } = {},
-  ) {
-    const parentId = options.parentId ?? this.activeNodeId;
-    const hasExplicitPosition =
-      options.x !== undefined || options.y !== undefined;
-    const newNode: CustomTraekNode = {
-      component,
-      props,
-      id: crypto.randomUUID(),
-      parentId,
-      role,
-      type: options.type ?? 'text',
-      metadata: {
-        x: options.x ?? 0,
-        y: options.y ?? 0,
-        height: this.config.nodeHeightDefault,
-        ...(hasExplicitPosition && { manualPosition: true }),
-      },
-      data: options.data,
-    };
+	/** Set by addNode when options.autofocus is true; canvas should center on this node and then clear. */
+	public pendingFocusNodeId = $state<string | null>(null);
 
-    this.nodes.push(newNode);
-    // New node is active unless it's a thought (keep parent/current active so the main new node stays selected)
-    if (options.type !== 'thought') {
-      this.activeNodeId = newNode.id;
-    }
+	addCustomNode(
+		component: typeof SvelteComponent,
+		props?: Record<string, unknown>,
+		role: 'user' | 'assistant' | 'system' = 'user',
+		options: {
+			type?: Node['type'];
+			parentId?: string | null;
+			autofocus?: boolean;
+			x?: number;
+			y?: number;
+			data?: unknown;
+			/** When true, skip layout for this add; call flushLayoutFromRoot() after a batch. */
+			deferLayout?: boolean;
+		} = {}
+	) {
+		const parentId = options.parentId ?? this.activeNodeId;
+		const hasExplicitPosition = options.x !== undefined || options.y !== undefined;
+		const newNode: CustomTraekNode = {
+			component,
+			props,
+			id: crypto.randomUUID(),
+			parentId,
+			role,
+			type: options.type ?? 'text',
+			metadata: {
+				x: options.x ?? 0,
+				y: options.y ?? 0,
+				height: this.config.nodeHeightDefault,
+				...(hasExplicitPosition && { manualPosition: true })
+			},
+			data: options.data
+		};
 
-    if (parentId && !options.deferLayout) {
-      this.layoutChildren(parentId);
-    }
+		this.nodes.push(newNode);
+		// New node is active unless it's a thought (keep parent/current active so the main new node stays selected)
+		if (options.type !== 'thought') {
+			this.activeNodeId = newNode.id;
+		}
 
-    if (options.autofocus && browser) {
-      requestAnimationFrame(() => {
-        this.pendingFocusNodeId = newNode.id;
-      });
-    }
+		if (parentId && !options.deferLayout) {
+			this.layoutChildren(parentId);
+		}
 
-    return newNode;
-  }
+		this.onNodeCreated?.(newNode);
 
-  addNode(
-    content: string,
-    role: 'user' | 'assistant' | 'system',
-    options: {
-      type?: Node['type'];
-      parentId?: string | null;
-      autofocus?: boolean;
-      x?: number;
-      y?: number;
-      data?: unknown;
-      /** When true, skip layout for this add; call flushLayoutFromRoot() after a batch. */
-      deferLayout?: boolean;
-    } = {},
-  ) {
-    const parentId = options.parentId ?? this.activeNodeId;
-    const hasExplicitPosition =
-      options.x !== undefined || options.y !== undefined;
-    const newNode: MessageNode = {
-      id: crypto.randomUUID(),
-      parentId,
-      role,
-      content,
-      type: options.type ?? 'text',
-      metadata: {
-        x: options.x ?? 0,
-        y: options.y ?? 0,
-        height: this.config.nodeHeightDefault,
-        ...(hasExplicitPosition && { manualPosition: true }),
-      },
-      data: options.data,
-    };
+		if (options.autofocus && browser) {
+			requestAnimationFrame(() => {
+				this.pendingFocusNodeId = newNode.id;
+			});
+		}
 
-    this.nodes.push(newNode);
-    // New node is active unless it's a thought (keep parent/current active so the main new node stays selected)
-    if (options.type !== 'thought') {
-      this.activeNodeId = newNode.id;
-    }
+		return newNode;
+	}
 
-    if (parentId && !options.deferLayout) {
-      this.layoutChildren(parentId);
-    }
+	addNode(
+		content: string,
+		role: 'user' | 'assistant' | 'system',
+		options: {
+			type?: Node['type'];
+			parentId?: string | null;
+			autofocus?: boolean;
+			x?: number;
+			y?: number;
+			data?: unknown;
+			/** When true, skip layout for this add; call flushLayoutFromRoot() after a batch. */
+			deferLayout?: boolean;
+		} = {}
+	) {
+		const parentId = options.parentId ?? this.activeNodeId;
+		const hasExplicitPosition = options.x !== undefined || options.y !== undefined;
+		const newNode: MessageNode = {
+			id: crypto.randomUUID(),
+			parentId,
+			role,
+			content,
+			type: options.type ?? 'text',
+			metadata: {
+				x: options.x ?? 0,
+				y: options.y ?? 0,
+				height: this.config.nodeHeightDefault,
+				...(hasExplicitPosition && { manualPosition: true })
+			},
+			data: options.data
+		};
 
-    if (options.autofocus && browser) {
-      requestAnimationFrame(() => {
-        this.pendingFocusNodeId = newNode.id;
-      });
-    }
+		this.nodes.push(newNode);
+		// New node is active unless it's a thought (keep parent/current active so the main new node stays selected)
+		if (options.type !== 'thought') {
+			this.activeNodeId = newNode.id;
+		}
 
-    return newNode;
-  }
+		if (parentId && !options.deferLayout) {
+			this.layoutChildren(parentId);
+		}
 
-  /**
-   * Add many nodes at once (e.g. loading a saved project). Uses one layout pass.
-   * Payloads may include id for round-trip; parentId must reference an id in the same batch or an existing node.
-   * Order is normalized so parents are added before children.
-   */
-  addNodes(payloads: AddNodePayload[]): MessageNode[] {
-    if (payloads.length === 0) return [];
+		this.onNodeCreated?.(newNode);
 
-    const defaultH = this.config.nodeHeightDefault;
-    const withIds = payloads.map((p) => ({
-      ...p,
-      id: p.id ?? crypto.randomUUID(),
-    }));
+		if (options.autofocus && browser) {
+			requestAnimationFrame(() => {
+				this.pendingFocusNodeId = newNode.id;
+			});
+		}
 
-    // eslint-disable-next-line svelte/prefer-svelte-reactivity
-    const added = new Set<string>(this.nodes.map((n) => n.id));
-    const sorted: typeof withIds = [];
-    let prevSize = 0;
-    while (sorted.length < withIds.length) {
-      for (const p of withIds) {
-        if (added.has(p.id!)) continue;
-        const parentIn = p.parentId == null || added.has(p.parentId);
-        if (parentIn) {
-          sorted.push(p);
-          added.add(p.id!);
-        }
-      }
-      if (sorted.length === prevSize) {
-        const remaining = withIds.filter((p) => !added.has(p.id!));
-        sorted.push(...remaining);
-        break;
-      }
-      prevSize = sorted.length;
-    }
+		return newNode;
+	}
 
-    const newNodes: MessageNode[] = sorted.map((p) => {
-      const hasExplicitPosition =
-        typeof p.metadata?.x === 'number' || typeof p.metadata?.y === 'number';
-      return {
-        id: p.id!,
-        parentId: p.parentId,
-        role: p.role,
-        content: p.content,
-        type: p.type ?? 'text',
-        status: p.status,
-        errorMessage: p.errorMessage,
-        metadata: {
-          x: p.metadata?.x ?? 0,
-          y: p.metadata?.y ?? 0,
-          height: p.metadata?.height ?? defaultH,
-          ...p.metadata,
-          ...(hasExplicitPosition && { manualPosition: true }),
-        },
-        data: p.data,
-      };
-    });
+	/**
+	 * Add many nodes at once (e.g. loading a saved project). Uses one layout pass.
+	 * Payloads may include id for round-trip; parentId must reference an id in the same batch or an existing node.
+	 * Order is normalized so parents are added before children.
+	 */
+	addNodes(payloads: AddNodePayload[]): MessageNode[] {
+		if (payloads.length === 0) return [];
 
-    this.nodes = [...this.nodes, ...newNodes];
-    const firstRoot = newNodes.find((n) => n.parentId == null);
-    if (firstRoot) this.activeNodeId = firstRoot.id;
+		const defaultH = this.config.nodeHeightDefault;
+		const withIds = payloads.map((p) => ({
+			...p,
+			id: p.id ?? crypto.randomUUID()
+		}));
 
-    this.flushLayoutFromRoot();
-    return newNodes;
-  }
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity
+		const added = new Set<string>(this.nodes.map((n) => n.id));
+		const sorted: typeof withIds = [];
+		let prevSize = 0;
+		while (sorted.length < withIds.length) {
+			for (const p of withIds) {
+				if (added.has(p.id!)) continue;
+				const parentIn = p.parentId == null || added.has(p.parentId);
+				if (parentIn) {
+					sorted.push(p);
+					added.add(p.id!);
+				}
+			}
+			if (sorted.length === prevSize) {
+				const remaining = withIds.filter((p) => !added.has(p.id!));
+				sorted.push(...remaining);
+				break;
+			}
+			prevSize = sorted.length;
+		}
 
-  /** Focuses on a node and centers the canvas on it. */
-  focusOnNode(nodeId: string) {
-    const node = this.nodes.find((n) => n.id === nodeId);
-    if (node) {
-      this.pendingFocusNodeId = nodeId;
-    }
-  }
+		const newNodes: MessageNode[] = sorted.map((p) => {
+			const hasExplicitPosition =
+				typeof p.metadata?.x === 'number' || typeof p.metadata?.y === 'number';
+			return {
+				id: p.id!,
+				parentId: p.parentId,
+				role: p.role,
+				content: p.content,
+				type: p.type ?? 'text',
+				status: p.status,
+				errorMessage: p.errorMessage,
+				metadata: {
+					x: p.metadata?.x ?? 0,
+					y: p.metadata?.y ?? 0,
+					height: p.metadata?.height ?? defaultH,
+					...p.metadata,
+					...(hasExplicitPosition && { manualPosition: true })
+				},
+				data: p.data
+			};
+		});
 
-  /** Run layout from every root (parentId null). Use after adding nodes with deferLayout. */
-  flushLayoutFromRoot() {
-    const roots = this.nodes.filter((n) => n.parentId == null);
-    const childrenMap = this.buildChildrenMap();
-    // eslint-disable-next-line svelte/prefer-svelte-reactivity
-    const subtreeHeightCache = new Map<string, number>();
-    // eslint-disable-next-line svelte/prefer-svelte-reactivity
-    const subtreeWidthCache = new Map<string, number>();
-    for (const root of roots) {
-      this.fillSubtreeHeightCache(root.id, childrenMap, subtreeHeightCache);
-      this.fillSubtreeWidthCache(root.id, childrenMap, subtreeWidthCache);
-    }
-    for (const root of roots) {
-      this.layoutChildrenWithCache(
-        root.id,
-        childrenMap,
-        subtreeHeightCache,
-        subtreeWidthCache,
-      );
-    }
-  }
+		this.nodes = [...this.nodes, ...newNodes];
+		for (const n of newNodes) {
+			this.onNodeCreated?.(n);
+		}
+		const firstRoot = newNodes.find((n) => n.parentId == null);
+		if (firstRoot) this.activeNodeId = firstRoot.id;
 
-  private buildChildrenMap(): Map<string | null, Node[]> {
-    // eslint-disable-next-line svelte/prefer-svelte-reactivity
-    const map = new Map<string | null, Node[]>();
-    for (const n of this.nodes) {
-      const key = n.parentId;
-      const list = map.get(key) ?? [];
-      list.push(n);
-      map.set(key, list);
-    }
-    return map;
-  }
+		this.flushLayoutFromRoot();
+		return newNodes;
+	}
 
-  private fillSubtreeHeightCache(
-    nodeId: string,
-    childrenMap: Map<string | null, Node[]>,
-    cache: Map<string, number>,
-  ): void {
-    const children = childrenMap.get(nodeId) ?? [];
-    const otherChildren = children.filter((c) => c.type !== 'thought');
-    for (const c of otherChildren)
-      this.fillSubtreeHeightCache(c.id, childrenMap, cache);
-    const node = this.nodes.find((n) => n.id === nodeId);
-    if (!node) return;
-    const step = this.config.gridStep;
-    const defaultH = this.config.nodeHeightDefault;
-    const gapYGrid = this.config.layoutGapY / step;
-    const nodeHGrid = (node.metadata?.height ?? defaultH) / step;
-    if (otherChildren.length === 0) {
-      cache.set(nodeId, nodeHGrid);
-      return;
-    }
-    const maxChildH = Math.max(
-      0,
-      ...otherChildren.map((c) => cache.get(c.id) ?? 0),
-    );
-    cache.set(nodeId, nodeHGrid + gapYGrid + maxChildH);
-  }
+	/** Focuses on a node and centers the canvas on it. */
+	focusOnNode(nodeId: string) {
+		const node = this.nodes.find((n) => n.id === nodeId);
+		if (node) {
+			this.pendingFocusNodeId = nodeId;
+		}
+	}
 
-  private fillSubtreeWidthCache(
-    nodeId: string,
-    childrenMap: Map<string | null, Node[]>,
-    cache: Map<string, number>,
-  ): void {
-    const children = childrenMap.get(nodeId) ?? [];
-    const otherChildren = children.filter((c) => c.type !== 'thought');
-    for (const c of otherChildren)
-      this.fillSubtreeWidthCache(c.id, childrenMap, cache);
-    const node = this.nodes.find((n) => n.id === nodeId);
-    if (!node) return;
-    const step = this.config.gridStep;
-    const nodeWidthGrid = this.config.nodeWidth / step;
-    const gapXGrid = this.config.layoutGapX / step;
-    if (otherChildren.length === 0) {
-      cache.set(nodeId, nodeWidthGrid);
-      return;
-    }
-    const total =
-      otherChildren.reduce(
-        (sum, c) => sum + (cache.get(c.id) ?? 0) + gapXGrid,
-        0,
-      ) - gapXGrid;
-    cache.set(nodeId, total);
-  }
+	/** Run layout from every root (parentId null). Use after adding nodes with deferLayout. */
+	flushLayoutFromRoot() {
+		const roots = this.nodes.filter((n) => n.parentId == null);
+		const childrenMap = this.buildChildrenMap();
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity
+		const subtreeHeightCache = new Map<string, number>();
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity
+		const subtreeWidthCache = new Map<string, number>();
+		for (const root of roots) {
+			this.fillSubtreeHeightCache(root.id, childrenMap, subtreeHeightCache);
+			this.fillSubtreeWidthCache(root.id, childrenMap, subtreeWidthCache);
+		}
+		for (const root of roots) {
+			this.layoutChildrenWithCache(root.id, childrenMap, subtreeHeightCache, subtreeWidthCache);
+		}
+	}
 
-  private layoutChildrenWithCache(
-    parentId: string,
-    childrenMap: Map<string | null, Node[]>,
-    subtreeHeightCache: Map<string, number>,
-    subtreeWidthCache: Map<string, number>,
-  ): void {
-    const parent = this.nodes.find((n) => n.id === parentId);
-    if (!parent) return;
-    const children = childrenMap.get(parentId) ?? [];
-    const otherChildren = children.filter((c) => c.type !== 'thought');
-    if (otherChildren.length === 0) return;
-    const step = this.config.gridStep;
-    const gapXGrid = this.config.layoutGapX / step;
-    const gapYGrid = this.config.layoutGapY / step;
-    const defaultH = this.config.nodeHeightDefault;
-    const nodeWidthGrid = this.config.nodeWidth / step;
-    const parentX = parent.metadata?.x ?? 0;
-    const parentY = parent.metadata?.y ?? 0;
-    const parentHeightGrid = (parent.metadata?.height ?? defaultH) / step;
-    const totalRowWidth =
-      otherChildren.reduce(
-        (sum, child) => sum + (subtreeWidthCache.get(child.id) ?? 0) + gapXGrid,
-        0,
-      ) - gapXGrid;
-    const parentCenterX = parentX + nodeWidthGrid / 2;
-    const childY = parentY + parentHeightGrid + gapYGrid;
-    let currentX = parentCenterX - totalRowWidth / 2;
-    for (const child of otherChildren) {
-      if (!child.metadata) child.metadata = { x: 0, y: 0 };
-      const childSubtreeW = subtreeWidthCache.get(child.id) ?? 0;
-      const offsetInSlot = (childSubtreeW - nodeWidthGrid) / 2;
-      if (!child.metadata.manualPosition) {
-        child.metadata.x = Math.round(currentX + offsetInSlot);
-        child.metadata.y = Math.round(childY);
-      }
-      this.layoutChildrenWithCache(
-        child.id,
-        childrenMap,
-        subtreeHeightCache,
-        subtreeWidthCache,
-      );
-      currentX += childSubtreeW + gapXGrid;
-    }
-  }
+	private buildChildrenMap(): Map<string | null, Node[]> {
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity
+		const map = new Map<string | null, Node[]>();
+		for (const n of this.nodes) {
+			const key = n.parentId;
+			const list = map.get(key) ?? [];
+			list.push(n);
+			map.set(key, list);
+		}
+		return map;
+	}
 
-  clearPendingFocus() {
-    this.pendingFocusNodeId = null;
-  }
+	private fillSubtreeHeightCache(
+		nodeId: string,
+		childrenMap: Map<string | null, Node[]>,
+		cache: Map<string, number>
+	): void {
+		const children = childrenMap.get(nodeId) ?? [];
+		const otherChildren = children.filter((c) => c.type !== 'thought');
+		for (const c of otherChildren) this.fillSubtreeHeightCache(c.id, childrenMap, cache);
+		const node = this.nodes.find((n) => n.id === nodeId);
+		if (!node) return;
+		const step = this.config.gridStep;
+		const defaultH = this.config.nodeHeightDefault;
+		const gapYGrid = this.config.layoutGapY / step;
+		const nodeHGrid = (node.metadata?.height ?? defaultH) / step;
+		if (otherChildren.length === 0) {
+			cache.set(nodeId, nodeHGrid);
+			return;
+		}
+		const maxChildH = Math.max(0, ...otherChildren.map((c) => cache.get(c.id) ?? 0));
+		cache.set(nodeId, nodeHGrid + gapYGrid + maxChildH);
+	}
 
-  updateNode(nodeId: string, updates: Partial<MessageNode>) {
-    const node = this.nodes.find((n) => n.id === nodeId);
-    if (node) {
-      Object.assign(node, updates);
-    }
-  }
+	private fillSubtreeWidthCache(
+		nodeId: string,
+		childrenMap: Map<string | null, Node[]>,
+		cache: Map<string, number>
+	): void {
+		const children = childrenMap.get(nodeId) ?? [];
+		const otherChildren = children.filter((c) => c.type !== 'thought');
+		for (const c of otherChildren) this.fillSubtreeWidthCache(c.id, childrenMap, cache);
+		const node = this.nodes.find((n) => n.id === nodeId);
+		if (!node) return;
+		const step = this.config.gridStep;
+		const nodeWidthGrid = this.config.nodeWidth / step;
+		const gapXGrid = this.config.layoutGapX / step;
+		if (otherChildren.length === 0) {
+			cache.set(nodeId, nodeWidthGrid);
+			return;
+		}
+		const total =
+			otherChildren.reduce((sum, c) => sum + (cache.get(c.id) ?? 0) + gapXGrid, 0) - gapXGrid;
+		cache.set(nodeId, total);
+	}
 
-  updateNodeHeight(nodeId: string, height: number) {
-    const node = this.nodes.find((n) => n.id === nodeId);
-    if (!node) return;
-    if (!node.metadata) node.metadata = { x: 0, y: 0 };
+	private layoutChildrenWithCache(
+		parentId: string,
+		childrenMap: Map<string | null, Node[]>,
+		subtreeHeightCache: Map<string, number>,
+		subtreeWidthCache: Map<string, number>
+	): void {
+		const parent = this.nodes.find((n) => n.id === parentId);
+		if (!parent) return;
+		const children = childrenMap.get(parentId) ?? [];
+		const otherChildren = children.filter((c) => c.type !== 'thought');
+		if (otherChildren.length === 0) return;
+		const step = this.config.gridStep;
+		const gapXGrid = this.config.layoutGapX / step;
+		const gapYGrid = this.config.layoutGapY / step;
+		const defaultH = this.config.nodeHeightDefault;
+		const nodeWidthGrid = this.config.nodeWidth / step;
+		const parentX = parent.metadata?.x ?? 0;
+		const parentY = parent.metadata?.y ?? 0;
+		const parentHeightGrid = (parent.metadata?.height ?? defaultH) / step;
+		const totalRowWidth =
+			otherChildren.reduce(
+				(sum, child) => sum + (subtreeWidthCache.get(child.id) ?? 0) + gapXGrid,
+				0
+			) - gapXGrid;
+		const parentCenterX = parentX + nodeWidthGrid / 2;
+		const childY = parentY + parentHeightGrid + gapYGrid;
+		let currentX = parentCenterX - totalRowWidth / 2;
+		for (const child of otherChildren) {
+			if (!child.metadata) child.metadata = { x: 0, y: 0 };
+			const childSubtreeW = subtreeWidthCache.get(child.id) ?? 0;
+			const offsetInSlot = (childSubtreeW - nodeWidthGrid) / 2;
+			if (!child.metadata.manualPosition) {
+				child.metadata.x = Math.round(currentX + offsetInSlot);
+				child.metadata.y = Math.round(childY);
+			}
+			this.layoutChildrenWithCache(child.id, childrenMap, subtreeHeightCache, subtreeWidthCache);
+			currentX += childSubtreeW + gapXGrid;
+		}
+	}
 
-    const currentHeight = node.metadata.height ?? this.config.nodeHeightDefault;
-    if (Math.abs(currentHeight - height) < this.config.heightChangeThreshold)
-      return;
+	clearPendingFocus() {
+		this.pendingFocusNodeId = null;
+	}
 
-    node.metadata.height = height;
+	updateNode(nodeId: string, updates: Partial<MessageNode>) {
+		const node = this.nodes.find((n) => n.id === nodeId);
+		if (node) {
+			Object.assign(node, updates);
+		}
+	}
 
-    if (this.pendingHeightLayoutRafId == null) {
-      this.pendingHeightLayoutRafId = requestAnimationFrame(() => {
-        this.pendingHeightLayoutRafId = null;
-        this.flushLayoutFromRoot();
-      });
-    }
-  }
+	updateNodeHeight(nodeId: string, height: number) {
+		const node = this.nodes.find((n) => n.id === nodeId);
+		if (!node) return;
+		if (!node.metadata) node.metadata = { x: 0, y: 0 };
 
-  deleteNode(nodeId: string) {
-    const index = this.nodes.findIndex((n) => n.id === nodeId);
-    if (index !== -1) {
-      this.nodes.splice(index, 1);
-      if (this.activeNodeId === nodeId) {
-        this.activeNodeId = null;
-      }
-    }
-  }
+		const currentHeight = node.metadata.height ?? this.config.nodeHeightDefault;
+		if (Math.abs(currentHeight - height) < this.config.heightChangeThreshold) return;
 
-  /** Move a node by (dx, dy) in canvas pixels; converts to grid and re-layouts subtree. */
-  moveNodeAndDescendants(nodeId: string, dx: number, dy: number) {
-    const node = this.nodes.find((n) => n.id === nodeId);
-    if (!node) return;
-    if (!node.metadata) node.metadata = { x: 0, y: 0 };
-    const step = this.config.gridStep;
-    node.metadata.x = (node.metadata.x ?? 0) + dx / step;
-    node.metadata.y = (node.metadata.y ?? 0) + dy / step;
-    node.metadata.manualPosition = true;
-    this.layoutChildren(nodeId);
-  }
+		node.metadata.height = height;
 
-  /**
-   * Set a node's position from canvas pixel coordinates (e.g. drag).
-   * When snapThreshold (pixels) is set, snaps to grid when within that distance.
-   */
-  setNodePosition(
-    nodeId: string,
-    xPx: number,
-    yPx: number,
-    snapThresholdPx?: number,
-  ) {
-    const node = this.nodes.find((n) => n.id === nodeId);
-    if (!node) return;
-    if (!node.metadata) node.metadata = { x: 0, y: 0 };
-    const step = this.config.gridStep;
-    let xGrid = xPx / step;
-    let yGrid = yPx / step;
-    if (snapThresholdPx != null && snapThresholdPx > 0) {
-      const thresholdGrid = snapThresholdPx / step;
-      const snapX = Math.round(xGrid);
-      const snapY = Math.round(yGrid);
-      if (Math.abs(xGrid - snapX) <= thresholdGrid) xGrid = snapX;
-      if (Math.abs(yGrid - snapY) <= thresholdGrid) yGrid = snapY;
-    }
-    node.metadata.x = xGrid;
-    node.metadata.y = yGrid;
-    node.metadata.manualPosition = true;
-    this.layoutChildren(nodeId);
-  }
+		if (this.pendingHeightLayoutRafId == null) {
+			this.pendingHeightLayoutRafId = requestAnimationFrame(() => {
+				this.pendingHeightLayoutRafId = null;
+				this.flushLayoutFromRoot();
+			});
+		}
+	}
 
-  /** Snap a node's position to integer grid (e.g. on drop). Re-layouts subtree. */
-  snapNodeToGrid(nodeId: string) {
-    const node = this.nodes.find((n) => n.id === nodeId);
-    if (!node) return;
-    if (!node.metadata) node.metadata = { x: 0, y: 0 };
-    node.metadata.x = Math.round(node.metadata.x ?? 0);
-    node.metadata.y = Math.round(node.metadata.y ?? 0);
-    this.layoutChildren(nodeId);
-  }
+	deleteNode(nodeId: string) {
+		const index = this.nodes.findIndex((n) => n.id === nodeId);
+		if (index !== -1) {
+			const node = this.nodes[index];
+			if (node) this.onNodeDeleting?.(node);
+			this.nodes.splice(index, 1);
+			if (this.activeNodeId === nodeId) {
+				this.activeNodeId = null;
+			}
+		}
+	}
 
-  /** Subtree width in grid units: width of the horizontal row of children. */
-  private getSubtreeLayoutWidth(nodeId: string): number {
-    const node = this.nodes.find((n) => n.id === nodeId);
-    if (!node) return 0;
-    const step = this.config.gridStep;
-    const nodeWidthGrid = this.config.nodeWidth / step;
-    const children = this.nodes.filter(
-      (n) => n.parentId === nodeId && n.type !== 'thought',
-    );
-    if (children.length === 0) return nodeWidthGrid;
-    const gapXGrid = this.config.layoutGapX / step;
-    const total =
-      children.reduce(
-        (sum, c) => sum + this.getSubtreeLayoutWidth(c.id) + gapXGrid,
-        0,
-      ) - gapXGrid;
-    return total;
-  }
+	/** Move a node by (dx, dy) in canvas pixels; converts to grid and re-layouts subtree. */
+	moveNodeAndDescendants(nodeId: string, dx: number, dy: number) {
+		const node = this.nodes.find((n) => n.id === nodeId);
+		if (!node) return;
+		if (!node.metadata) node.metadata = { x: 0, y: 0 };
+		const step = this.config.gridStep;
+		node.metadata.x = (node.metadata.x ?? 0) + dx / step;
+		node.metadata.y = (node.metadata.y ?? 0) + dy / step;
+		node.metadata.manualPosition = true;
+		this.layoutChildren(nodeId);
+	}
 
-  /** Subtree height in grid units: node on top, then gap, then row of children (max of their subtree heights). */
-  private getSubtreeLayoutHeight(nodeId: string): number {
-    const node = this.nodes.find((n) => n.id === nodeId);
-    if (!node) return 0;
-    const step = this.config.gridStep;
-    const defaultH = this.config.nodeHeightDefault;
-    const gapYGrid = this.config.layoutGapY / step;
-    const nodeHGrid = (node.metadata?.height ?? defaultH) / step;
-    const children = this.nodes.filter(
-      (n) => n.parentId === nodeId && n.type !== 'thought',
-    );
-    if (children.length === 0) return nodeHGrid;
-    const maxChildHeight = Math.max(
-      0,
-      ...children.map((c) => this.getSubtreeLayoutHeight(c.id)),
-    );
-    return nodeHGrid + gapYGrid + maxChildHeight;
-  }
+	/**
+	 * Set a node's position from canvas pixel coordinates (e.g. drag).
+	 * When snapThreshold (pixels) is set, snaps to grid when within that distance.
+	 */
+	setNodePosition(nodeId: string, xPx: number, yPx: number, snapThresholdPx?: number) {
+		const node = this.nodes.find((n) => n.id === nodeId);
+		if (!node) return;
+		if (!node.metadata) node.metadata = { x: 0, y: 0 };
+		const step = this.config.gridStep;
+		let xGrid = xPx / step;
+		let yGrid = yPx / step;
+		if (snapThresholdPx != null && snapThresholdPx > 0) {
+			const thresholdGrid = snapThresholdPx / step;
+			const snapX = Math.round(xGrid);
+			const snapY = Math.round(yGrid);
+			if (Math.abs(xGrid - snapX) <= thresholdGrid) xGrid = snapX;
+			if (Math.abs(yGrid - snapY) <= thresholdGrid) yGrid = snapY;
+		}
+		node.metadata.x = xGrid;
+		node.metadata.y = yGrid;
+		node.metadata.manualPosition = true;
+		this.layoutChildren(nodeId);
+	}
 
-  /**
-   * Layout: parent on top, children in a row below, siblings left/right.
-   * Children share the same Y (below parent); X is centered under parent and spread horizontally.
-   */
-  layoutChildren(parentId: string) {
-    const parent = this.nodes.find((n) => n.id === parentId);
-    if (!parent) return;
+	/** Snap a node's position to integer grid (e.g. on drop). Re-layouts subtree. */
+	snapNodeToGrid(nodeId: string) {
+		const node = this.nodes.find((n) => n.id === nodeId);
+		if (!node) return;
+		if (!node.metadata) node.metadata = { x: 0, y: 0 };
+		node.metadata.x = Math.round(node.metadata.x ?? 0);
+		node.metadata.y = Math.round(node.metadata.y ?? 0);
+		this.layoutChildren(nodeId);
+	}
 
-    const children = this.nodes.filter((n) => n.parentId === parentId);
-    if (children.length === 0) return;
+	/** Subtree width in grid units: width of the horizontal row of children. */
+	private getSubtreeLayoutWidth(nodeId: string): number {
+		const node = this.nodes.find((n) => n.id === nodeId);
+		if (!node) return 0;
+		const step = this.config.gridStep;
+		const nodeWidthGrid = this.config.nodeWidth / step;
+		const children = this.nodes.filter((n) => n.parentId === nodeId && n.type !== 'thought');
+		if (children.length === 0) return nodeWidthGrid;
+		const gapXGrid = this.config.layoutGapX / step;
+		const total =
+			children.reduce((sum, c) => sum + this.getSubtreeLayoutWidth(c.id) + gapXGrid, 0) - gapXGrid;
+		return total;
+	}
 
-    const step = this.config.gridStep;
-    const gapXGrid = this.config.layoutGapX / step;
-    const gapYGrid = this.config.layoutGapY / step;
-    const defaultH = this.config.nodeHeightDefault;
-    const nodeWidthGrid = this.config.nodeWidth / step;
-    const parentX = parent.metadata?.x ?? 0;
-    const parentY = parent.metadata?.y ?? 0;
-    const parentHeightGrid = (parent.metadata?.height ?? defaultH) / step;
+	/** Subtree height in grid units: node on top, then gap, then row of children (max of their subtree heights). */
+	private getSubtreeLayoutHeight(nodeId: string): number {
+		const node = this.nodes.find((n) => n.id === nodeId);
+		if (!node) return 0;
+		const step = this.config.gridStep;
+		const defaultH = this.config.nodeHeightDefault;
+		const gapYGrid = this.config.layoutGapY / step;
+		const nodeHGrid = (node.metadata?.height ?? defaultH) / step;
+		const children = this.nodes.filter((n) => n.parentId === nodeId && n.type !== 'thought');
+		if (children.length === 0) return nodeHGrid;
+		const maxChildHeight = Math.max(0, ...children.map((c) => this.getSubtreeLayoutHeight(c.id)));
+		return nodeHGrid + gapYGrid + maxChildHeight;
+	}
 
-    const otherChildren = children.filter((c) => c.type !== 'thought');
-    if (otherChildren.length === 0) return;
+	/**
+	 * Layout: parent on top, children in a row below, siblings left/right.
+	 * Children share the same Y (below parent); X is centered under parent and spread horizontally.
+	 */
+	layoutChildren(parentId: string) {
+		const parent = this.nodes.find((n) => n.id === parentId);
+		if (!parent) return;
 
-    const totalRowWidth =
-      otherChildren.reduce(
-        (sum, child) => sum + this.getSubtreeLayoutWidth(child.id) + gapXGrid,
-        0,
-      ) - gapXGrid;
-    const parentCenterX = parentX + nodeWidthGrid / 2;
-    const childY = parentY + parentHeightGrid + gapYGrid;
-    let currentX = parentCenterX - totalRowWidth / 2;
+		const children = this.nodes.filter((n) => n.parentId === parentId);
+		if (children.length === 0) return;
 
-    for (const child of otherChildren) {
-      if (!child.metadata) child.metadata = { x: 0, y: 0 };
-      const childSubtreeW = this.getSubtreeLayoutWidth(child.id);
-      const offsetInSlot = (childSubtreeW - nodeWidthGrid) / 2;
-      if (!child.metadata.manualPosition) {
-        child.metadata.x = Math.round(currentX + offsetInSlot);
-        child.metadata.y = Math.round(childY);
-      }
-      this.layoutChildren(child.id);
-      currentX += childSubtreeW + gapXGrid;
-    }
-  }
+		const step = this.config.gridStep;
+		const gapXGrid = this.config.layoutGapX / step;
+		const gapYGrid = this.config.layoutGapY / step;
+		const defaultH = this.config.nodeHeightDefault;
+		const nodeWidthGrid = this.config.nodeWidth / step;
+		const parentX = parent.metadata?.x ?? 0;
+		const parentY = parent.metadata?.y ?? 0;
+		const parentHeightGrid = (parent.metadata?.height ?? defaultH) / step;
 
-  branchFrom(nodeId: string) {
-    this.activeNodeId = nodeId;
-  }
+		const otherChildren = children.filter((c) => c.type !== 'thought');
+		if (otherChildren.length === 0) return;
+
+		const totalRowWidth =
+			otherChildren.reduce(
+				(sum, child) => sum + this.getSubtreeLayoutWidth(child.id) + gapXGrid,
+				0
+			) - gapXGrid;
+		const parentCenterX = parentX + nodeWidthGrid / 2;
+		const childY = parentY + parentHeightGrid + gapYGrid;
+		let currentX = parentCenterX - totalRowWidth / 2;
+
+		for (const child of otherChildren) {
+			if (!child.metadata) child.metadata = { x: 0, y: 0 };
+			const childSubtreeW = this.getSubtreeLayoutWidth(child.id);
+			const offsetInSlot = (childSubtreeW - nodeWidthGrid) / 2;
+			if (!child.metadata.manualPosition) {
+				child.metadata.x = Math.round(currentX + offsetInSlot);
+				child.metadata.y = Math.round(childY);
+			}
+			this.layoutChildren(child.id);
+			currentX += childSubtreeW + gapXGrid;
+		}
+	}
+
+	branchFrom(nodeId: string) {
+		this.activeNodeId = nodeId;
+	}
 }

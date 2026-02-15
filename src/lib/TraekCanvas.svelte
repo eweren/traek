@@ -16,6 +16,8 @@
 	import { ActionResolver } from './actions/ActionResolver.svelte.js';
 	import ActionBadges from './actions/ActionBadges.svelte';
 	import SlashCommandDropdown from './actions/SlashCommandDropdown.svelte';
+	import type { NodeTypeRegistry } from './node-types/NodeTypeRegistry.svelte.js';
+	import NodeToolbar from './NodeToolbar.svelte';
 
 	type InputActionsContext = {
 		engine: TraekEngine;
@@ -43,7 +45,8 @@
 		// while still delegating message creation to the canvas.
 		inputActions,
 		actions: actionsProp,
-		resolveActions: resolveActionsProp
+		resolveActions: resolveActionsProp,
+		registry
 	}: {
 		engine?: TraekEngine | null;
 		config?: Partial<TraekEngineConfig>;
@@ -78,6 +81,8 @@
 		actions?: ActionDefinition[];
 		/** Async callback for stage-2 semantic action resolution (e.g. LLM). */
 		resolveActions?: ResolveActions;
+		/** Node type registry. When provided, replaces componentMap for node rendering and enables lifecycle hooks. */
+		registry?: NodeTypeRegistry;
 	} = $props();
 
 	const config = $derived({
@@ -92,6 +97,23 @@
 		}
 	});
 	const engine = $derived(engineProp ?? (defaultEngine as TraekEngine));
+
+	// Wire registry lifecycle hooks into the engine
+	$effect(() => {
+		if (!engine || !registry) return;
+		engine.onNodeCreated = (node) => {
+			const def = registry.get(node.type);
+			def?.onCreate?.(node, engine);
+		};
+		engine.onNodeDeleting = (node) => {
+			const def = registry.get(node.type);
+			def?.onDestroy?.(node, engine);
+		};
+		return () => {
+			engine.onNodeCreated = undefined;
+			engine.onNodeDeleting = undefined;
+		};
+	});
 
 	$effect(() => {
 		const id = engine.pendingFocusNodeId;
@@ -907,9 +929,39 @@
 
 			{#each engine.nodes as node (node.id)}
 				{@const isActive = engine.activeNodeId === node.id}
-				{#if node.type === 'text'}
-					<!-- Default text node rendering -->
-					<TextNode
+				{@const typeDef = registry?.get(node.type)}
+				{@const uiData = node as CustomTraekNode}
+				{@const ResolvedComponent =
+					typeDef?.component ?? uiData?.component ?? componentMap[node.type]}
+				{#if ResolvedComponent}
+					{#if typeDef?.selfWrapping}
+						<!-- Self-wrapping registry component (e.g. TextNode) -->
+						<ResolvedComponent
+							{node}
+							{isActive}
+							{engine}
+							viewportRoot={viewportEl}
+							gridStep={config.gridStep}
+							nodeWidth={config.nodeWidth}
+							{viewportResizeVersion}
+						/>
+					{:else}
+						<!-- Wrapped component (registry, node.component, or componentMap) -->
+						<TraekNodeWrapper
+							{node}
+							{isActive}
+							{engine}
+							viewportRoot={viewportEl}
+							gridStep={config.gridStep}
+							nodeWidth={config.nodeWidth}
+							{viewportResizeVersion}
+						>
+							<ResolvedComponent {node} {engine} {isActive} {...uiData?.props ?? {}} />
+						</TraekNodeWrapper>
+					{/if}
+				{:else if node.type !== 'thought'}
+					<!-- Fallback if no component found -->
+					<TraekNodeWrapper
 						{node}
 						{isActive}
 						{engine}
@@ -917,42 +969,32 @@
 						gridStep={config.gridStep}
 						nodeWidth={config.nodeWidth}
 						{viewportResizeVersion}
-					/>
-				{:else}
-					<!-- Custom UI component: from node.component (live) or componentMap[node.type] (e.g. after hydration) -->
-					{@const uiData = node as CustomTraekNode}
-					{@const Component = uiData?.component ?? componentMap[node.type]}
-					{#if Component}
-						<TraekNodeWrapper
-							{node}
-							{isActive}
-							{engine}
-							viewportRoot={viewportEl}
-							gridStep={config.gridStep}
-							nodeWidth={config.nodeWidth}
-							{viewportResizeVersion}
-						>
-							<Component {node} {engine} {isActive} {...uiData?.props ?? {}} />
-						</TraekNodeWrapper>
-					{:else if node.type !== 'thought'}
-						<!-- Fallback if no component on node and not in componentMap -->
-						<TraekNodeWrapper
-							{node}
-							{isActive}
-							{engine}
-							viewportRoot={viewportEl}
-							gridStep={config.gridStep}
-							nodeWidth={config.nodeWidth}
-							{viewportResizeVersion}
-						>
-							<div class="node-card error">
-								<div class="role-tag">{node.type}</div>
-								<div class="node-card-content">Missing component for {node.type} node.</div>
-							</div>
-						</TraekNodeWrapper>
-					{/if}
+					>
+						<div class="node-card error">
+							<div class="role-tag">{node.type}</div>
+							<div class="node-card-content">Missing component for {node.type} node.</div>
+						</div>
+					</TraekNodeWrapper>
 				{/if}
 			{/each}
+
+			{#if engine.activeNodeId && registry}
+				{@const activeNode = engine.nodes.find((n) => n.id === engine.activeNodeId)}
+				{#if activeNode}
+					{@const activeDef = registry.get(activeNode.type)}
+					{#if activeDef?.actions && activeDef.actions.length > 0}
+						{@const step = config.gridStep}
+						<NodeToolbar
+							actions={activeDef.actions}
+							node={activeNode}
+							{engine}
+							x={(activeNode.metadata?.x ?? 0) * step}
+							y={(activeNode.metadata?.y ?? 0) * step - 40}
+							nodeWidth={config.nodeWidth}
+						/>
+					{/if}
+				{/if}
+			{/if}
 		</div>
 
 		{#if showIntroOverlay && initialOverlay}

@@ -21,3 +21,12 @@ export { default as ActionBadges } from './actions/ActionBadges.svelte';
 export { default as SlashCommandDropdown } from './actions/SlashCommandDropdown.svelte';
 export { ActionResolver } from './actions/ActionResolver.svelte';
 export type { ActionDefinition, ResolveActions } from './actions/types.js';
+
+// Node type system
+export {
+	NodeTypeRegistry,
+	createDefaultRegistry,
+	textNodeDefinition,
+	thoughtNodeDefinition
+} from './node-types/index.js';
+export type { NodeTypeDefinition, NodeTypeAction } from './node-types/index.js';
