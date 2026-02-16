@@ -5,6 +5,7 @@
 	import Ghost from './Ghost.svelte';
 	import { getDetailLevel } from './canvas/AdaptiveRenderer.svelte';
 	import TagBadges from './tags/TagBadges.svelte';
+	import { detailLevelTransition } from './transitions';
 
 	const DEFAULT_PLACEHOLDER_HEIGHT = 100;
 
@@ -85,8 +86,9 @@
 	);
 
 	// Collapse & branch info
+	// Use direct filtering over nodes array for reactivity instead of getChildren
 	const nodeChildren = $derived(
-		engine?.getChildren(node.id).filter((c) => c.type !== 'thought') ?? []
+		engine?.nodes.filter((n) => n.parentIds[0] === node.id && n.type !== 'thought') ?? []
 	);
 	const hasChildren = $derived(nodeChildren.length > 0);
 	const hasBranches = $derived(nodeChildren.length > 1);
@@ -323,19 +325,21 @@
 			{/if}
 		</div>
 	{/if}
-	{#if detailLevel === 'full' || detailLevel === 'compact'}
-		<div class="message-node-content">
-			{#if detailLevel === 'compact'}
-				<div class="compact-text">{firstLine}</div>
-			{:else}
-				{@render children()}
-			{/if}
-		</div>
-	{:else if detailLevel === 'minimal'}
-		<div class="minimal-content">
-			<span class="minimal-role-icon">{node.role === 'user' ? '●' : '◆'}</span>
-		</div>
-	{/if}
+	{#key detailLevel}
+		{#if detailLevel === 'full' || detailLevel === 'compact'}
+			<div class="message-node-content" transition:detailLevelTransition>
+				{#if detailLevel === 'compact'}
+					<div class="compact-text">{firstLine}</div>
+				{:else}
+					{@render children()}
+				{/if}
+			</div>
+		{:else if detailLevel === 'minimal'}
+			<div class="minimal-content" transition:detailLevelTransition>
+				<span class="minimal-role-icon">{node.role === 'user' ? '●' : '◆'}</span>
+			</div>
+		{/if}
+	{/key}
 
 	{#if hasBranches && !isCollapsed}
 		<div class="branch-badge">
@@ -1045,6 +1049,12 @@
 
 		.detail-compact {
 			max-height: 100px;
+		}
+
+		/* Content container for smooth transitions */
+		.message-node-content,
+		.minimal-content {
+			will-change: transform, opacity;
 		}
 
 		/* Respect prefers-reduced-motion */

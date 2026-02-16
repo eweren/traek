@@ -734,9 +734,12 @@
 				</div>
 			{/if}
 
+			<div class="top-right-controls">
+				<ThemePicker compact={true} />
+			</div>
+
 			<ZoomControls {viewport} nodes={engine.nodes} {config} />
 			<Minimap {viewport} nodes={engine.nodes} {config} />
-			<ThemePicker compact={true} />
 
 			{#if showSearchBar}
 				<SearchBar
@@ -948,6 +951,15 @@
 				opacity: 1;
 				transform: translateY(0);
 			}
+		}
+
+		.top-right-controls {
+			position: absolute;
+			top: 20px;
+			right: 20px;
+			z-index: 50;
+			display: flex;
+			gap: 10px;
 		}
 	}
 </style>

@@ -90,7 +90,7 @@
 <style>
 	.breadcrumbs {
 		position: fixed;
-		top: 20px;
+		top: 70px;
 		left: 20px;
 		z-index: 90;
 		max-width: calc(100vw - 80px);
@@ -233,7 +233,7 @@
 	/* Responsive: auf kleinen Viewports kompakter */
 	@media (max-width: 768px) {
 		.breadcrumbs {
-			top: 12px;
+			top: 64px;
 			left: 12px;
 			max-width: calc(100vw - 48px);
 			padding: 6px 10px;

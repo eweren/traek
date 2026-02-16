@@ -68,6 +68,39 @@
 		}
 		return false;
 	}
+
+	/**
+	 * Get all ancestor IDs for a node (following ALL parentIds, full DAG).
+	 */
+	function getAncestorIds(nodeId: string): Set<string> {
+		const visited = new Set<string>();
+		const stack = [nodeId];
+		while (stack.length > 0) {
+			const currentId = stack.pop()!;
+			if (visited.has(currentId)) continue;
+			visited.add(currentId);
+			const node = nodeMap.get(currentId);
+			if (node) {
+				for (const pid of node.parentIds) {
+					stack.push(pid);
+				}
+			}
+		}
+		return visited;
+	}
+
+	/**
+	 * Get direct children IDs of a node.
+	 */
+	function getDirectChildrenIds(nodeId: string): Set<string> {
+		const childIds = new Set<string>();
+		for (const node of nodes) {
+			if (node.parentIds.includes(nodeId) && node.type !== 'thought') {
+				childIds.add(node.id);
+			}
+		}
+		return childIds;
+	}
 </script>
 
 <!-- SVG defs for gradients -->
@@ -120,8 +153,13 @@
 						activeAncestorIds !== null &&
 						activeAncestorIds.has(parent.id) &&
 						activeAncestorIds.has(node.id)}
+					{@const hoveredAncestors = hoveredNodeId ? getAncestorIds(hoveredNodeId) : new Set()}
+					{@const hoveredChildren = hoveredNodeId ? getDirectChildrenIds(hoveredNodeId) : new Set()}
 					{@const isHoverAdjacent =
-						hoveredNodeId !== null && (parent.id === hoveredNodeId || node.id === hoveredNodeId)}
+						hoveredNodeId !== null &&
+						(hoveredAncestors.has(parent.id) ||
+							hoveredAncestors.has(node.id) ||
+							hoveredChildren.has(node.id))}
 					{@const gradientId = `gradient-${pid}-${node.id}`}
 					{@const isChildCollapsed = collapsedNodes.has(node.id)}
 					{@const isParentCollapsed = collapsedNodes.has(pid)}

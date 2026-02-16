@@ -16,7 +16,7 @@
 	import ExampleCustomComponent from '$lib/ExampleCustomComponent.svelte';
 	import ImageDemoNode from '$lib/ImageDemoNode.svelte';
 	import { ConversationStore } from '$lib/persistence/ConversationStore.svelte.js';
-	import SaveIndicator from '$lib/persistence/SaveIndicator.svelte';
+	import HeaderBar from '$lib/conversation/HeaderBar.svelte';
 	import { track } from '$lib/umami';
 
 	const id = $derived(page.params.id);
@@ -356,11 +356,7 @@
 
 {#if engine}
 	<div class="chat-layout">
-		<div class="header-controls">
-			<a href={resolve('/demo')} class="back" data-umami-event="demo-back-to-list">← Back to list</a
-			>
-			<SaveIndicator {store} />
-		</div>
+		<HeaderBar backHref={resolve('/demo')} {store} />
 		<div class="canvas-wrap">
 			<TraekCanvas
 				{engine}
@@ -396,52 +392,17 @@
 		flex-direction: column;
 		background: var(--traek-conv-bg, #fafafa);
 	}
-	.header-controls {
-		position: absolute;
-		top: 0.75rem;
-		left: 1rem;
-		right: 1rem;
-		z-index: 10;
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		pointer-events: none;
-	}
 
-	.header-controls > * {
-		pointer-events: auto;
-	}
-
-	.back {
-		padding: 0.4rem 0.75rem;
-		background: var(--traek-conv-back-bg, #0b0b0b);
-		border: 1px solid var(--traek-conv-back-border, transparent);
-		border-radius: 0.25rem;
-		color: var(--traek-conv-back-text, #dddddd);
-		text-decoration: none;
-		font-size: 0.9rem;
-		backdrop-filter: blur(8px);
-	}
-
-	@media (max-width: 768px) {
-		.header-controls {
-			top: auto;
-			bottom: max(0.5rem, env(safe-area-inset-bottom));
-			left: 0.5rem;
-			right: 0.5rem;
-			z-index: 30;
-		}
-
-		.back {
-			padding: 0.3rem 0.6rem;
-			font-size: 0.75rem;
-			opacity: 0.7;
-			border-radius: 1rem;
-		}
-	}
 	.canvas-wrap {
 		flex: 1;
 		min-height: 0;
+		padding-top: 56px;
+	}
+
+	@media (max-width: 768px) {
+		.canvas-wrap {
+			padding-top: 52px;
+		}
 	}
 	.error {
 		color: var(--traek-error-text, #cc0000);

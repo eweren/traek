@@ -58,6 +58,9 @@ export type {
 	SaveState
 } from './persistence/types';
 
+// Conversation UI
+export { default as HeaderBar } from './conversation/HeaderBar.svelte';
+
 // Tag System
 export { default as TagBadges } from './tags/TagBadges.svelte';
 export { default as TagDropdown } from './tags/TagDropdown.svelte';

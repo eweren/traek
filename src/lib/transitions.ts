@@ -1,4 +1,4 @@
-import { cubicOut } from 'svelte/easing';
+import { cubicOut, cubicInOut } from 'svelte/easing';
 import type { EasingFunction, TransitionConfig } from 'svelte/transition';
 
 export interface FadedSlideParams {
@@ -7,6 +7,12 @@ export interface FadedSlideParams {
 	easing?: EasingFunction;
 	axis?: 'x' | 'y';
 	opacity?: number;
+}
+
+export interface DetailLevelTransitionParams {
+	delay?: number;
+	duration?: number;
+	easing?: EasingFunction;
 }
 
 /**
@@ -59,5 +65,39 @@ export function fadedSlide(
 			`border-${secondary_properties[0]}-width: ${t * border_width_start_value}px;` +
 			`border-${secondary_properties[1]}-width: ${t * border_width_end_value}px;` +
 			`min-${primary_property}: 0`
+	};
+}
+
+/**
+ * Check if user prefers reduced motion
+ */
+function prefersReducedMotion(): boolean {
+	if (typeof window === 'undefined') return false;
+	return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
+/**
+ * Transition for detail level changes: fade + slight scale
+ * Respects prefers-reduced-motion by using instant or very short duration
+ */
+export function detailLevelTransition(
+	node: Element,
+	{ delay = 0, duration = 250, easing = cubicInOut }: DetailLevelTransitionParams = {}
+): TransitionConfig {
+	const reducedMotion = prefersReducedMotion();
+	const actualDuration = reducedMotion ? 50 : duration;
+
+	return {
+		delay,
+		duration: actualDuration,
+		easing,
+		css: (t) => {
+			const opacity = t;
+			const scale = reducedMotion ? 1 : 0.98 + 0.02 * t;
+			return `
+				opacity: ${opacity};
+				transform: scale(${scale});
+			`;
+		}
 	};
 }
