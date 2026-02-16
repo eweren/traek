@@ -46,7 +46,17 @@ export type { DefaultNodeActionCallbacks } from './defaultNodeActions';
 // Persistence & Replay
 export { ReplayController } from './persistence/ReplayController.svelte';
 export { default as ReplayControls } from './persistence/ReplayControls.svelte';
-export type { ConversationSnapshot, SerializedNode } from './persistence/types';
+export { ConversationStore } from './persistence/ConversationStore.svelte';
+export { default as SaveIndicator } from './persistence/SaveIndicator.svelte';
+export { default as ChatList } from './persistence/ChatList.svelte';
+export { snapshotToJSON, snapshotToMarkdown, downloadFile } from './persistence/exportUtils';
+export type {
+	ConversationSnapshot,
+	SerializedNode,
+	StoredConversation,
+	ConversationListItem,
+	SaveState
+} from './persistence/types';
 
 // Toast system
 export { default as ToastContainer } from './toast/ToastContainer.svelte';
@@ -73,7 +83,13 @@ export { focusModeConfigSchema, DEFAULT_FOCUS_MODE_CONFIG } from './mobile/focus
 export type { FocusModeConfig, SwipeDirection } from './mobile/focusModeTypes';
 
 // Schemas (Zod)
-export { serializedNodeSchema, conversationSnapshotSchema } from './persistence/schemas';
+export {
+	serializedNodeSchema,
+	conversationSnapshotSchema,
+	saveStateSchema,
+	storedConversationSchema,
+	conversationListItemSchema
+} from './persistence/schemas';
 export { traekEngineConfigSchema, addNodePayloadSchema } from './schemas';
 export { actionDefinitionSchema } from './actions/schemas';
 export { nodeTypeActionSchema, nodeTypeDefinitionSchema } from './node-types/schemas';

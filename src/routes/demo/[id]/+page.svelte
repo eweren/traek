@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { page } from '$app/state';
 	import { resolve } from '$app/paths';
 	import TraekCanvas from '$lib/TraekCanvas.svelte';
@@ -7,23 +8,19 @@
 		TraekEngine,
 		DEFAULT_TRACK_ENGINE_CONFIG,
 		type MessageNode,
-		type AddNodePayload,
 		type ActionDefinition,
 		type ResolveActions,
-		createDefaultRegistry
+		createDefaultRegistry,
+		type ConversationSnapshot
 	} from '$lib';
 	import ExampleCustomComponent from '$lib/ExampleCustomComponent.svelte';
 	import ImageDemoNode from '$lib/ImageDemoNode.svelte';
-	import {
-		getConversation,
-		saveConversation,
-		titleFromNodes,
-		type SavedConversation,
-		type SavedViewport
-	} from '$lib/demo-persistence';
+	import { ConversationStore } from '$lib/persistence/ConversationStore.svelte.js';
+	import SaveIndicator from '$lib/persistence/SaveIndicator.svelte';
 	import { track } from '$lib/umami';
 
 	const id = $derived(page.params.id);
+	const store = new ConversationStore();
 
 	const registry = createDefaultRegistry();
 	registry.register({
@@ -40,11 +37,8 @@
 	});
 
 	let engine = $state<TraekEngine | null>(null);
-	let conv = $state<SavedConversation | null>(null);
+	let snapshot = $state<ConversationSnapshot | null>(null);
 	let error = $state<string | null>(null);
-	/** Latest viewport from TraekCanvas (for persist). */
-	let lastViewport = $state<SavedViewport | null>(null);
-	let viewportPersistTimeout = 0;
 	// Demo: action definitions with keywords and slash commands
 	const TOOL_OPTIONS: ActionDefinition[] = [
 		{
@@ -102,48 +96,48 @@
 		}
 	};
 
-	function scheduleViewportPersist() {
-		if (viewportPersistTimeout) clearTimeout(viewportPersistTimeout);
-		viewportPersistTimeout = window.setTimeout(() => {
-			viewportPersistTimeout = 0;
-			if (engine) persist(engine);
-		}, 600);
-	}
+	// Initialize store and load conversation
+	onMount(() => {
+		(async () => {
+			await store.init();
 
-	// Load or create conversation and hydrate engine
-	$effect(() => {
-		const currentId = id;
-		if (!currentId) return;
-		const data = getConversation(currentId);
-		if (data) {
-			conv = data;
-			const e = new TraekEngine(DEFAULT_TRACK_ENGINE_CONFIG);
-			if (data.nodes.length > 0) {
-				e.addNodes(data.nodes);
+			const currentId = id;
+			if (!currentId) {
+				error = 'No conversation ID provided';
+				return;
 			}
-			// Restore last focused node (reply context)
-			if (data.activeNodeId != null) {
-				const exists = data.nodes.some((n) => n.id === data.activeNodeId);
-				if (exists) {
-					e.activeNodeId = data.activeNodeId;
-					e.focusOnNode(data.activeNodeId);
+
+			const loaded = await store.load(currentId);
+
+			if (loaded) {
+				snapshot = loaded;
+				engine = TraekEngine.fromSnapshot(loaded, DEFAULT_TRACK_ENGINE_CONFIG);
+			} else {
+				// Create new conversation
+				const newId = await store.create('New chat');
+				if (newId !== currentId) {
+					// Redirect case: ID mismatch
+					console.warn(`Created ID ${newId} doesn't match requested ${currentId}`);
 				}
+				snapshot = {
+					version: 1,
+					createdAt: Date.now(),
+					title: 'New chat',
+					activeNodeId: null,
+					nodes: []
+				};
+				engine = new TraekEngine(DEFAULT_TRACK_ENGINE_CONFIG);
 			}
-			engine = e;
-			error = null;
-		} else {
-			const now = Date.now();
-			conv = {
-				id: currentId,
-				title: 'New chat',
-				createdAt: now,
-				updatedAt: now,
-				nodes: []
-			};
-			saveConversation(conv);
-			engine = new TraekEngine(DEFAULT_TRACK_ENGINE_CONFIG);
-			error = null;
-		}
+
+			// Enable auto-save
+			if (engine) {
+				store.enableAutoSave(engine, currentId);
+			}
+		})();
+
+		return () => {
+			store.destroy();
+		};
 	});
 
 	function pathToUserNode(eng: TraekEngine, userNode: MessageNode): MessageNode[] {
@@ -157,42 +151,6 @@
 				: undefined;
 		}
 		return path;
-	}
-
-	function nodesToPayloads(nodes: MessageNode[]): AddNodePayload[] {
-		return nodes.map((n) => ({
-			id: n.id,
-			parentIds: n.parentIds,
-			content: n.content ?? '',
-			role: n.role,
-			type: n.type,
-			status: n.status,
-			errorMessage: n.errorMessage,
-			metadata: n.metadata,
-			data: n.data
-		}));
-	}
-
-	function persist(eng: TraekEngine) {
-		if (!conv || !id) return;
-		const nodes = nodesToPayloads(eng.nodes as MessageNode[]);
-		const title = titleFromNodes(nodes);
-		saveConversation({
-			...conv,
-			title,
-			updatedAt: Date.now(),
-			nodes,
-			viewport: lastViewport ?? conv.viewport,
-			activeNodeId: eng.activeNodeId
-		});
-		conv = {
-			...conv,
-			title,
-			updatedAt: Date.now(),
-			nodes,
-			viewport: lastViewport ?? conv.viewport,
-			activeNodeId: eng.activeNodeId
-		};
 	}
 
 	function handleRetry(nodeId: string) {
@@ -215,7 +173,7 @@
 
 	async function onSendMessage(input: string, userNode: MessageNode, action?: string | string[]) {
 		const eng = engine;
-		if (!eng || !conv || !id) return;
+		if (!eng || !id) return;
 
 		const selected = Array.isArray(action) ? (action as string[]) : action ? [action] : [];
 		track('demo-send-message', {
@@ -261,7 +219,6 @@
 								error: message
 							}
 						});
-						persist(eng);
 						return;
 					}
 
@@ -274,7 +231,6 @@
 								error: 'No image URL returned'
 							}
 						});
-						persist(eng);
 						return;
 					}
 
@@ -285,7 +241,6 @@
 							status: 'done'
 						}
 					});
-					persist(eng);
 				} catch (e) {
 					eng.updateNode(imageNode.id, {
 						data: {
@@ -294,7 +249,6 @@
 							error: e instanceof Error ? e.message : 'Unexpected error while generating image'
 						}
 					});
-					persist(eng);
 				}
 			})();
 		}
@@ -393,7 +347,6 @@
 		}
 
 		await Promise.all(branches.map((b) => runOneBranch(b.responseNodeId, b.thoughtNodeId)));
-		persist(eng);
 	}
 </script>
 
@@ -403,7 +356,11 @@
 
 {#if engine}
 	<div class="chat-layout">
-		<a href={resolve('/demo')} class="back" data-umami-event="demo-back-to-list">← Back to list</a>
+		<div class="header-controls">
+			<a href={resolve('/demo')} class="back" data-umami-event="demo-back-to-list">← Back to list</a
+			>
+			<SaveIndicator {store} />
+		</div>
 		<div class="canvas-wrap">
 			<TraekCanvas
 				{engine}
@@ -411,17 +368,12 @@
 				{registry}
 				actions={TOOL_OPTIONS}
 				{resolveActions}
-				initialScale={conv?.viewport?.scale}
-				initialOffset={conv?.viewport
-					? { x: conv.viewport.offsetX, y: conv.viewport.offsetY }
+				initialScale={snapshot?.viewport?.scale}
+				initialOffset={snapshot?.viewport
+					? { x: snapshot.viewport.offsetX, y: snapshot.viewport.offsetY }
 					: undefined}
 				{onSendMessage}
 				onRetry={handleRetry}
-				onNodesChanged={() => engine && persist(engine)}
-				onViewportChange={(v) => {
-					lastViewport = { scale: v.scale, offsetX: v.offset.x, offsetY: v.offset.y };
-					scheduleViewportPersist();
-				}}
 			>
 				{#snippet initialOverlay()}
 					<DefaultLoadingOverlay />
@@ -444,11 +396,23 @@
 		flex-direction: column;
 		background: var(--traek-conv-bg, #fafafa);
 	}
-	.back {
+	.header-controls {
 		position: absolute;
 		top: 0.75rem;
 		left: 1rem;
+		right: 1rem;
 		z-index: 10;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		pointer-events: none;
+	}
+
+	.header-controls > * {
+		pointer-events: auto;
+	}
+
+	.back {
 		padding: 0.4rem 0.75rem;
 		background: var(--traek-conv-back-bg, #0b0b0b);
 		border-radius: 0.25rem;
@@ -458,15 +422,19 @@
 	}
 
 	@media (max-width: 768px) {
-		.back {
+		.header-controls {
 			top: auto;
 			bottom: max(0.5rem, env(safe-area-inset-bottom));
 			left: 0.5rem;
+			right: 0.5rem;
+			z-index: 30;
+		}
+
+		.back {
 			padding: 0.3rem 0.6rem;
 			font-size: 0.75rem;
 			opacity: 0.7;
 			border-radius: 1rem;
-			z-index: 30;
 		}
 	}
 	.canvas-wrap {

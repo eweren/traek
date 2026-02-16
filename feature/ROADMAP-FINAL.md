@@ -1,6 +1,7 @@
 # Traek — Neue Roadmap (Team-Workshop-Ergebnis)
 
 **Erstellt:** 2026-02-15
+**Zuletzt aktualisiert:** 2026-02-16
 **Input von:** UX Designer + Endnutzer, Dev / Tech Lead, UI Designer
 **Status:** VERBINDLICH — Dies ist die Roadmap die das Entwicklerteam umsetzt.
 
@@ -13,6 +14,9 @@
 - Phase -2: Zod Integration ✅
 - Phase -1: DAG-Migration (Multi-Parent Nodes) ✅
 - Phase 0: Quick Wins (Touch Targets, Multi-Line Input, Action Badges, Connection Fading, Error Visibility, Empty State) ✅
+- Phase 1: Vertrauen + Foundation ✅ (alle 6 Items)
+- Mobile Focus Mode ✅ (vorgezogen aus Phase 4.4, UX-Score 9.2/10)
+- Mobile Onboarding ✅ (teilweise vorgezogen aus Phase 4.1)
 
 ---
 
@@ -136,6 +140,7 @@
 - **Aufwand**: S (1-2 Tage)
 - **Abhängigkeiten**: Keine (kann parallel laufen)
 - **Dateien**: Neue Datei `src/lib/canvas/ContextBreadcrumb.svelte`, `src/lib/TraekCanvas.svelte` (Integration)
+- **Hinweis**: Mobile-Version (Breadcrumbs.svelte) existiert bereits im Focus Mode. Desktop-Portierung steht aus.
 
 ---
 
@@ -161,13 +166,15 @@
 
 ---
 
-### 2.6 Conversation Persistence UI
+### 2.6 Conversation Persistence UI ← NAECHSTES FEATURE
 
 - **Was**: ConversationStore mit IndexedDB, Auto-Save, Chat-Liste, Speicher-Indikator, Export.
 - **Warum**: Nutzer verlieren alles bei Page Reload. Speichern ist die #1 Vertrauens-Grundlage.
 - **Aufwand**: M (4-5 Tage)
 - **Abhängigkeiten**: Keine harten (serialize/fromSnapshot existieren)
-- **Dateien**: Neue Dateien `src/lib/persistence/ConversationStore.svelte.ts`, `src/lib/persistence/ChatList.svelte`, `src/lib/persistence/AutoSave.svelte.ts`
+- **Dateien**: Neue Dateien `src/lib/persistence/ConversationStore.svelte.ts`, `src/lib/persistence/ChatList.svelte`, `src/lib/persistence/SaveIndicator.svelte`, `src/lib/persistence/indexedDBAdapter.ts`, `src/lib/persistence/exportUtils.ts`
+- **PRD**: `feature/conversation-persistence-ui.md`
+- **Status**: In Arbeit
 
 ---
 
@@ -225,9 +232,10 @@
 
 **Ziel**: Traek fühlt sich wie ein Premium-Produkt an und funktioniert auf jedem Gerät.
 
-### 4.1 Onboarding Tour
+### 4.1 Onboarding Tour (Desktop)
 
 - **Aufwand**: M (3-4 Tage)
+- **Hinweis**: Mobile-Onboarding (OnboardingOverlay.svelte) ist bereits implementiert. Hier geht es um die Desktop-Canvas-Tour.
 
 ### 4.2 Design-Token-System
 
@@ -238,9 +246,10 @@
 - **Aufwand**: M (3-4 Tage)
 - **Abhängigkeiten**: 3.2
 
-### 4.4 Mobile/Touch-Optimierung
+### ~~4.4 Mobile/Touch-Optimierung~~ ✅
 
-- **Aufwand**: L (5-7 Tage)
+- **Status**: ✅ Vorgezogen und abgeschlossen (Mobile Focus Mode, 10 Komponenten, UX-Score 9.2/10)
+- **Commits**: `5666327`, `42162df`, `b55a146`, `26004da`, `5519d2d`
 
 ### 4.5 Backlog (nach Phase 4, priorisiert)
 
@@ -259,30 +268,30 @@
 
 ## Gesamtplan-Übersicht
 
-| Phase | Item                                    | Aufwand  | Abhängig von  | Status |
-| ----- | --------------------------------------- | -------- | ------------- | ------ |
-| **1** | 1.1 Engine Unit-Tests                   | M (3-5d) | -             | ✅     |
-| **1** | 1.2 Node-ID-Map + Children-Map          | M (3-4d) | -             | ✅     |
-| **1** | 1.3 Undo + Toast-System                 | M (3-4d) | -             | ✅     |
-| **1** | 1.4 Inline-Edit (statt window.prompt)   | S (2-3d) | -             | ✅     |
-| **1** | 1.5 Header-Cleanup + Micro-Interactions | S (2-3d) | -             | ✅     |
-| **1** | 1.6 Contextual Branching Hint           | S (1-2d) | -             | ✅     |
-| **2** | 2.1 Canvas-Dekomposition                | L (5-7d) | 1.1           |        |
-| **2** | 2.2 Zoom-to-Fit + Minimap + Controls    | M (4-5d) | 2.1           |        |
-| **2** | 2.3 Context-Path Breadcrumb             | S (1-2d) | -             |        |
-| **2** | 2.4 Subtree Collapse + Branch-Badge     | M (3-4d) | 1.2           |        |
-| **2** | 2.5 Keyboard Navigation + ARIA          | L (5-7d) | 2.1           |        |
-| **2** | 2.6 Persistence UI + Auto-Save + Export | M (4-5d) | -             |        |
-| **2** | 2.7 Smart Search (Ctrl+F)               | M (3-4d) | 2.4           |        |
-| **3** | 3.1 ConnectionLayer + Markdown Optim.   | M (3-4d) | 1.2           |        |
-| **3** | 3.2 DOM-Virtualisierung                 | L (5-7d) | 1.2, 3.1, 2.4 |        |
-| **3** | 3.3 Branch-Vergleich Side-by-Side       | M (4-5d) | 2.4           |        |
-| **3** | 3.4 Copy Branch to Clipboard            | S (1-2d) | 1.3           |        |
-| **3** | 3.5 Performance-Benchmarks CI           | S (2d)   | 3.2           |        |
-| **4** | 4.1 Onboarding Tour                     | M (3-4d) | Phase 2       |        |
-| **4** | 4.2 Design-Token-System                 | M (3-4d) | -             |        |
-| **4** | 4.3 Adaptives Zoom-Rendering            | M (3-4d) | 3.2           |        |
-| **4** | 4.4 Mobile/Touch-Optimierung            | L (5-7d) | -             |        |
+| Phase | Item                                    | Aufwand  | Abhängig von   | Status     |
+| ----- | --------------------------------------- | -------- | -------------- | ---------- |
+| **1** | 1.1 Engine Unit-Tests                   | M (3-5d) | -              | ✅         |
+| **1** | 1.2 Node-ID-Map + Children-Map          | M (3-4d) | -              | ✅         |
+| **1** | 1.3 Undo + Toast-System                 | M (3-4d) | -              | ✅         |
+| **1** | 1.4 Inline-Edit (statt window.prompt)   | S (2-3d) | -              | ✅         |
+| **1** | 1.5 Header-Cleanup + Micro-Interactions | S (2-3d) | -              | ✅         |
+| **1** | 1.6 Contextual Branching Hint           | S (1-2d) | -              | ✅         |
+| **2** | 2.1 Canvas-Dekomposition                | L (5-7d) | 1.1            |            |
+| **2** | 2.2 Zoom-to-Fit + Minimap + Controls    | M (4-5d) | 2.1            |            |
+| **2** | 2.3 Context-Path Breadcrumb (Desktop)   | S (1-2d) | -              | Mobile ✅  |
+| **2** | 2.4 Subtree Collapse + Branch-Badge     | M (3-4d) | 1.2            |            |
+| **2** | 2.5 Keyboard Navigation + ARIA          | L (5-7d) | 2.1            |            |
+| **2** | **2.6 Persistence UI + Auto-Save**      | M (4-5d) | -              | **In Arbeit** |
+| **2** | 2.7 Smart Search (Ctrl+F)               | M (3-4d) | 2.4            |            |
+| **3** | 3.1 ConnectionLayer + Markdown Optim.   | M (3-4d) | 1.2            |            |
+| **3** | 3.2 DOM-Virtualisierung                 | L (5-7d) | 1.2, 3.1, 2.4 |            |
+| **3** | 3.3 Branch-Vergleich Side-by-Side       | M (4-5d) | 2.4            |            |
+| **3** | 3.4 Copy Branch to Clipboard            | S (1-2d) | 1.3            |            |
+| **3** | 3.5 Performance-Benchmarks CI           | S (2d)   | 3.2            |            |
+| **4** | 4.1 Onboarding Tour (Desktop)           | M (3-4d) | Phase 2        |            |
+| **4** | 4.2 Design-Token-System                 | M (3-4d) | -              |            |
+| **4** | 4.3 Adaptives Zoom-Rendering            | M (3-4d) | 3.2            |            |
+| **4** | ~~4.4 Mobile Focus Mode~~               | L (5-7d) | -              | ✅         |
 
 ---
 

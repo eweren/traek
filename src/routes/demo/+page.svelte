@@ -1,25 +1,23 @@
 <script lang="ts">
-	import { afterNavigate } from '$app/navigation';
+	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import GravityDotsBackground from '$lib/GravityDotsBackground.svelte';
-	import {
-		listConversations,
-		createConversation,
-		type ConversationMeta
-	} from '$lib/demo-persistence.js';
+	import ChatList from '$lib/persistence/ChatList.svelte';
+	import { ConversationStore } from '$lib/persistence/ConversationStore.svelte.js';
 	import { track } from '$lib/umami';
 
-	let conversations = $state<ConversationMeta[]>([]);
+	const store = new ConversationStore();
 
-	afterNavigate(() => {
-		conversations = listConversations();
+	onMount(() => {
+		store.init();
+		return () => store.destroy();
 	});
 
-	function newChat() {
+	async function newChat() {
 		track('demo-new-chat');
-		const conv = createConversation();
-		goto(resolve(`/demo/${conv.id}`));
+		const id = await store.create('New chat');
+		goto(resolve(`/demo/${id}`));
 	}
 
 	function open(id: string) {
@@ -36,34 +34,19 @@
 			<p class="header-desc">Follow ideas, not threads.</p>
 			<div class="info-box" role="status">
 				<p>
-					<strong>Everything is stored directly on your device.</strong> Chats and layout live in this
-					browser only (localStorage). Nothing is sent anywhere except your messages to the OpenAI API
-					(via the demo backend).
+					<strong>Everything is stored directly on your device.</strong> Chats and layout are persisted
+					locally (IndexedDB with localStorage fallback). Nothing is sent anywhere except your messages
+					to the OpenAI API (via the demo backend).
 				</p>
 				<p>
 					This demo showcases <strong>træk</strong> — a spatial conversation engine for building non‑linear
 					AI chat UIs in Svelte.
 				</p>
 			</div>
-			<button type="button" onclick={newChat}>New chat</button>
 		</header>
-		<ul>
-			{#each conversations as conv (conv.id)}
-				<li>
-					<button type="button" onclick={() => open(conv.id)}>
-						<span class="title">{conv.title}</span>
-						<span class="meta">
-							{conv.nodeCount ?? '—'}
-							{conv.nodeCount === 1 ? 'node' : 'nodes'}
-							<span class="meta-sep">·</span>
-							{new Date(conv.updatedAt).toLocaleString()}
-						</span>
-					</button>
-				</li>
-			{:else}
-				<li class="empty">No conversations yet. Start a new chat.</li>
-			{/each}
-		</ul>
+		<div class="chatlist-wrap">
+			<ChatList {store} onSelect={open} onCreate={newChat} />
+		</div>
 		<p class="home">
 			<a href={resolve('/')} data-umami-event="demo-nav-home">← Home</a>
 		</p>
@@ -124,75 +107,14 @@
 		color: var(--traek-demo-text-muted-3, #f4f4f5);
 		font-weight: 600;
 	}
-	button {
-		padding: 0.55rem 1.1rem;
-		background: var(--traek-demo-button-bg, rgba(255, 255, 255, 0.1));
-		color: var(--traek-demo-text-strong, #fafafa);
-		border: 1px solid var(--traek-demo-border-strong, rgba(255, 255, 255, 0.15));
-		border-radius: 0.375rem;
-		cursor: pointer;
-		font-size: 0.9rem;
-		font-weight: 500;
-		transition:
-			background 0.15s,
-			border-color 0.15s;
-	}
-	button:hover {
-		background: var(--traek-demo-button-bg-hover, rgba(255, 255, 255, 0.16));
-		border-color: rgba(255, 255, 255, 0.22);
-	}
-	ul {
-		list-style: none;
-		padding: 0;
-		margin: 0;
-	}
-	li {
-		margin-bottom: 0.5rem;
-	}
-	li button {
-		width: 100%;
-		text-align: left;
-		display: flex;
-		flex-direction: column;
-		align-items: flex-start;
-		gap: 0.35rem;
-		padding: 0.9rem 1.1rem;
-		background: var(--traek-demo-panel-bg-2, rgba(24, 24, 27, 0.8));
-		color: var(--traek-demo-text-muted-3, #f4f4f5);
+	.chatlist-wrap {
+		margin-bottom: 1.5rem;
+		border-radius: 0.5rem;
+		overflow: hidden;
 		border: 1px solid var(--traek-demo-border-soft, rgba(255, 255, 255, 0.1));
-		border-radius: 0.5rem;
-		backdrop-filter: blur(6px);
-		box-shadow: var(--traek-shadow-demo-list-item);
-		transition:
-			background 0.15s,
-			border-color 0.15s,
-			box-shadow 0.15s;
-	}
-	li button:hover {
-		background: var(--traek-demo-list-bg-hover, rgba(39, 39, 42, 0.9));
-		border-color: var(--traek-demo-border-hover, rgba(255, 255, 255, 0.16));
-		box-shadow: var(--traek-shadow-demo-list-item-hover);
-	}
-	.title {
-		font-weight: 600;
-		color: var(--traek-demo-text-strong, #fafafa);
-		font-size: 0.95rem;
-	}
-	.meta {
-		font-size: 0.8rem;
-		color: var(--traek-demo-text-muted-1, #a1a1aa);
-	}
-	.meta-sep {
-		margin: 0 0.35em;
-		opacity: 0.7;
-	}
-	li.empty {
-		padding: 1.5rem 1.1rem;
-		color: var(--traek-demo-text-muted-4, #71717a);
-		font-style: italic;
-		background: var(--traek-demo-panel-bg-empty, rgba(24, 24, 27, 0.5));
-		border: 1px dashed var(--traek-demo-border-dashed, rgba(255, 255, 255, 0.08));
-		border-radius: 0.5rem;
+		background: var(--traek-demo-panel-bg-1, rgba(24, 24, 27, 0.85));
+		backdrop-filter: blur(8px);
+		max-height: 60vh;
 	}
 	.home {
 		margin-top: 2rem;

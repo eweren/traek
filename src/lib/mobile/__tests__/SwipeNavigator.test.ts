@@ -6,7 +6,7 @@ vi.mock('../../canvas/scrollUtils', () => ({
 	findScrollable: () => null,
 	scrollableCanConsumeWheel: () => false,
 	ScrollBoundaryGuard: class {
-		recordScrollInside() { }
+		recordScrollInside() {}
 		shouldSuppressCanvasWheel() {
 			return false;
 		}
@@ -235,7 +235,7 @@ describe('SwipeNavigator', () => {
 	describe('state management', () => {
 		it('should set isGestureActive during touch', () => {
 			expect.assertions(2);
-			const nav = new SwipeNavigator({}, () => { });
+			const nav = new SwipeNavigator({}, () => {});
 
 			expect(nav.isGestureActive).toBe(false);
 			nav.handleTouchStart(createTouchEvent('touchstart', [{ clientX: 200, clientY: 200 }]));
@@ -244,7 +244,7 @@ describe('SwipeNavigator', () => {
 
 		it('should reset state after touch end', () => {
 			expect.assertions(3);
-			const nav = new SwipeNavigator({}, () => { });
+			const nav = new SwipeNavigator({}, () => {});
 
 			nav.handleTouchStart(createTouchEvent('touchstart', [{ clientX: 200, clientY: 200 }]));
 			advanceTime(200);
@@ -258,7 +258,7 @@ describe('SwipeNavigator', () => {
 
 		it('should reset state on cancel', () => {
 			expect.assertions(1);
-			const nav = new SwipeNavigator({}, () => { });
+			const nav = new SwipeNavigator({}, () => {});
 
 			nav.handleTouchStart(createTouchEvent('touchstart', [{ clientX: 200, clientY: 200 }]));
 			nav.handleTouchCancel();
@@ -270,7 +270,7 @@ describe('SwipeNavigator', () => {
 	describe('drag delta tracking', () => {
 		it('should track horizontal drag delta', () => {
 			expect.assertions(1);
-			const nav = new SwipeNavigator({}, () => { });
+			const nav = new SwipeNavigator({}, () => {});
 
 			nav.handleTouchStart(createTouchEvent('touchstart', [{ clientX: 200, clientY: 200 }]));
 			advanceTime(50);
@@ -382,7 +382,7 @@ describe('SwipeNavigator', () => {
 	describe('overscroll threshold', () => {
 		it('should track overscrollY state during vertical movement', () => {
 			expect.assertions(1);
-			const nav = new SwipeNavigator({ overscrollThreshold: 40 }, () => { });
+			const nav = new SwipeNavigator({ overscrollThreshold: 40 }, () => {});
 
 			nav.handleTouchStart(createTouchEvent('touchstart', [{ clientX: 200, clientY: 200 }]));
 			advanceTime(100);
@@ -448,7 +448,7 @@ describe('SwipeNavigator', () => {
 
 		it('should reset state completely between swipes', () => {
 			expect.assertions(4);
-			const nav = new SwipeNavigator({}, () => { });
+			const nav = new SwipeNavigator({}, () => {});
 
 			// First swipe
 			nav.handleTouchStart(createTouchEvent('touchstart', [{ clientX: 200, clientY: 200 }]));
@@ -503,7 +503,7 @@ describe('SwipeNavigator', () => {
 	describe('bind method', () => {
 		it('should return a cleanup function', () => {
 			expect.assertions(1);
-			const nav = new SwipeNavigator({}, () => { });
+			const nav = new SwipeNavigator({}, () => {});
 			const mockElement = {
 				addEventListener: vi.fn(),
 				removeEventListener: vi.fn()
@@ -516,7 +516,7 @@ describe('SwipeNavigator', () => {
 
 		it('should add event listeners when binding', () => {
 			expect.assertions(4);
-			const nav = new SwipeNavigator({}, () => { });
+			const nav = new SwipeNavigator({}, () => {});
 			const mockElement = {
 				addEventListener: vi.fn(),
 				removeEventListener: vi.fn()
@@ -544,7 +544,7 @@ describe('SwipeNavigator', () => {
 
 		it('should remove event listeners when cleanup is called', () => {
 			expect.assertions(4);
-			const nav = new SwipeNavigator({}, () => { });
+			const nav = new SwipeNavigator({}, () => {});
 			const mockElement = {
 				addEventListener: vi.fn(),
 				removeEventListener: vi.fn()

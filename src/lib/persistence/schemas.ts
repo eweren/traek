@@ -71,3 +71,22 @@ export const conversationSnapshotSchema = z.object({
 
 export type SerializedNode = z.infer<typeof serializedNodeSchema>;
 export type ConversationSnapshot = z.infer<typeof conversationSnapshotSchema>;
+
+export const saveStateSchema = z.enum(['idle', 'saving', 'saved', 'error']);
+
+export const storedConversationSchema = z.object({
+	id: z.string(),
+	title: z.string(),
+	createdAt: z.number(),
+	updatedAt: z.number(),
+	snapshot: conversationSnapshotSchema
+});
+
+export const conversationListItemSchema = z.object({
+	id: z.string(),
+	title: z.string(),
+	createdAt: z.number(),
+	updatedAt: z.number(),
+	nodeCount: z.number(),
+	preview: z.string()
+});
