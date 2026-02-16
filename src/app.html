@@ -11,9 +11,10 @@
 		></script>
 		<script>
 			(function () {
-				var t = localStorage.getItem('traek-theme');
+				// Use the new localStorage key for ThemeProvider/ThemePicker system
+				var t = localStorage.getItem('traek-selected-theme');
 				var theme =
-					t === 'light' || t === 'dark'
+					t === 'light' || t === 'dark' || t === 'highContrast'
 						? t
 						: window.matchMedia('(prefers-color-scheme: light)').matches
 							? 'light'

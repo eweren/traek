@@ -27,10 +27,15 @@
 	/**
 	 * Apply a theme by setting CSS custom properties on :root
 	 */
-	export function applyThemeToRoot(theme: TraekTheme): void {
+	export function applyThemeToRoot(theme: TraekTheme, themeName?: ThemeName): void {
 		if (typeof document === 'undefined') return;
 
 		const root = document.documentElement;
+
+		// Set data-theme attribute for backward compatibility
+		if (themeName) {
+			root.setAttribute('data-theme', themeName);
+		}
 
 		// Colors
 		root.style.setProperty('--traek-canvas-bg', theme.colors.canvasBg);
@@ -141,7 +146,7 @@
 
 		currentThemeName = themeName;
 		currentTheme = themes[themeName];
-		applyThemeToRoot(currentTheme);
+		applyThemeToRoot(currentTheme, themeName);
 	}
 
 	/**
@@ -178,7 +183,7 @@
 
 	// Apply initial theme on mount
 	onMount(() => {
-		applyThemeToRoot(currentTheme);
+		applyThemeToRoot(currentTheme, currentThemeName);
 	});
 </script>
 

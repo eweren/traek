@@ -1,9 +1,12 @@
 <script lang="ts">
 	import { markdownToHtml } from '../lib/utils.ts';
-	import { theme } from '$lib/theme';
+	import { useTheme } from '$lib/theme/ThemeProvider.svelte';
 	import highlightDarkUrl from 'highlight.js/styles/github-dark.css?url';
 	import highlightLightUrl from 'highlight.js/styles/github.css?url';
 	import { resolve } from '$app/paths';
+
+	const themeContext = useTheme();
+	const currentTheme = $derived(themeContext.currentThemeName());
 
 	import { DEFAULT_TRACK_ENGINE_CONFIG, TraekCanvas, DefaultLoadingOverlay } from '$lib';
 	import { createHeroEngine } from '$lib/heroDemoEngine';
@@ -54,7 +57,7 @@ npm install traek
 </script>
 
 <svelte:head>
-	<link rel="stylesheet" href={$theme === 'dark' ? highlightDarkUrl : highlightLightUrl} />
+	<link rel="stylesheet" href={currentTheme === 'light' ? highlightLightUrl : highlightDarkUrl} />
 </svelte:head>
 
 <main class="landing">

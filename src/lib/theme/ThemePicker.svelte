@@ -37,7 +37,11 @@
 		const baseTheme = themes[themeName];
 		const customTheme =
 			accent !== DEFAULT_ACCENT ? createCustomTheme(baseTheme, accent) : baseTheme;
-		themeContext.applyTheme(customTheme);
+		themeContext.setTheme(themeName);
+		// Apply accent customization after setting the base theme
+		if (accent !== DEFAULT_ACCENT) {
+			themeContext.applyTheme(customTheme);
+		}
 		selectedThemeName = themeName;
 	}
 
