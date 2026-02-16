@@ -71,17 +71,21 @@
 
 	/**
 	 * Get all ancestor IDs for a node (following ALL parentIds, full DAG).
+	 * Does NOT include the node itself.
 	 */
 	function getAncestorIds(nodeId: string): Set<string> {
 		const visited = new Set<string>();
-		const stack = [nodeId];
+		const node = nodeMap.get(nodeId);
+		if (!node) return visited;
+
+		const stack = [...node.parentIds];
 		while (stack.length > 0) {
 			const currentId = stack.pop()!;
 			if (visited.has(currentId)) continue;
 			visited.add(currentId);
-			const node = nodeMap.get(currentId);
-			if (node) {
-				for (const pid of node.parentIds) {
+			const currentNode = nodeMap.get(currentId);
+			if (currentNode) {
+				for (const pid of currentNode.parentIds) {
 					stack.push(pid);
 				}
 			}
@@ -100,6 +104,35 @@
 			}
 		}
 		return childIds;
+	}
+
+	/**
+	 * Compute hover-related sets ONCE per render, outside the connection loop.
+	 * A connection should be highlighted if:
+	 * 1. Both parent and child are on the ancestor path to the hovered node, OR
+	 * 2. The parent is the hovered node and the child is a direct child
+	 */
+	const hoveredAncestors = $derived(hoveredNodeId ? getAncestorIds(hoveredNodeId) : null);
+	const hoveredChildren = $derived(hoveredNodeId ? getDirectChildrenIds(hoveredNodeId) : null);
+
+	function isConnectionHighlighted(parentId: string, childId: string): boolean {
+		if (!hoveredNodeId || !hoveredAncestors || !hoveredChildren) return false;
+
+		// Case 1: Connection on ancestor path (both parent and child are ancestors OR child is hovered node)
+		const parentIsAncestor = hoveredAncestors.has(parentId);
+		const childIsAncestor = hoveredAncestors.has(childId);
+		const childIsHovered = childId === hoveredNodeId;
+
+		if (parentIsAncestor && (childIsAncestor || childIsHovered)) {
+			return true;
+		}
+
+		// Case 2: Direct child connection (parent is hovered, child is direct child)
+		if (parentId === hoveredNodeId && hoveredChildren.has(childId)) {
+			return true;
+		}
+
+		return false;
 	}
 </script>
 
@@ -153,13 +186,7 @@
 						activeAncestorIds !== null &&
 						activeAncestorIds.has(parent.id) &&
 						activeAncestorIds.has(node.id)}
-					{@const hoveredAncestors = hoveredNodeId ? getAncestorIds(hoveredNodeId) : new Set()}
-					{@const hoveredChildren = hoveredNodeId ? getDirectChildrenIds(hoveredNodeId) : new Set()}
-					{@const isHoverAdjacent =
-						hoveredNodeId !== null &&
-						(hoveredAncestors.has(parent.id) ||
-							hoveredAncestors.has(node.id) ||
-							hoveredChildren.has(node.id))}
+					{@const isHoverAdjacent = isConnectionHighlighted(pid, node.id)}
 					{@const gradientId = `gradient-${pid}-${node.id}`}
 					{@const isChildCollapsed = collapsedNodes.has(node.id)}
 					{@const isParentCollapsed = collapsedNodes.has(pid)}
