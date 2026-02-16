@@ -108,7 +108,7 @@
   - `ViewportManager.svelte.ts` — Scale/Offset/Clamping/CenterOnNode (~150 Zeilen)
   - `NodeRenderer.svelte` — `{#each}` Loop mit Registry-Resolution (~80 Zeilen)
   - `TraekCanvas.svelte` bleibt als Kompositions-Root (~200 Zeilen)
-  Keine funktionalen Änderungen — rein strukturelles Refactoring.
+    Keine funktionalen Änderungen — rein strukturelles Refactoring.
 - **Warum**: Die God-Component ist nicht testbar und macht jede Änderung riskant. Canvas-Dekomposition ist Voraussetzung für Keyboard-Nav, Minimap, Search-Bar.
 - **Aufwand**: L (5-7 Tage)
 - **Abhängigkeiten**: 1.1 (Tests sichern Regressionen ab)
@@ -244,51 +244,52 @@
 
 ### 4.5 Backlog (nach Phase 4, priorisiert)
 
-| Item | Aufwand | Abhängig von |
-|------|---------|--------------|
-| Keyboard Phase 2: Chords, Quick-Jump, Fuzzy-Suche | S (2d) | 2.5 |
-| Tag-System + Filter | M (3d) | 2.6, 2.7 |
-| Replay-Modus UI | S (2-3d) | 2.6 |
-| Ghost-Preview | S (1-2d) | - |
-| Theme-Presets + Custom Accent-Farbe | M (3d) | 4.2 |
-| Node Edit & Re-Generate | M (3d) | 1.3 |
-| Connection-Lines aufwerten | S (2d) | 3.1 |
-| Storybook-Grundausstattung | M (3d) | 2.1 |
+| Item                                              | Aufwand  | Abhängig von |
+| ------------------------------------------------- | -------- | ------------ |
+| Keyboard Phase 2: Chords, Quick-Jump, Fuzzy-Suche | S (2d)   | 2.5          |
+| Tag-System + Filter                               | M (3d)   | 2.6, 2.7     |
+| Replay-Modus UI                                   | S (2-3d) | 2.6          |
+| Ghost-Preview                                     | S (1-2d) | -            |
+| Theme-Presets + Custom Accent-Farbe               | M (3d)   | 4.2          |
+| Node Edit & Re-Generate                           | M (3d)   | 1.3          |
+| Connection-Lines aufwerten                        | S (2d)   | 3.1          |
+| Storybook-Grundausstattung                        | M (3d)   | 2.1          |
 
 ---
 
 ## Gesamtplan-Übersicht
 
-| Phase | Item | Aufwand | Abhängig von | Status |
-|-------|------|---------|--------------|--------|
-| **1** | 1.1 Engine Unit-Tests | M (3-5d) | - | ✅ |
-| **1** | 1.2 Node-ID-Map + Children-Map | M (3-4d) | - | ✅ |
-| **1** | 1.3 Undo + Toast-System | M (3-4d) | - | ✅ |
-| **1** | 1.4 Inline-Edit (statt window.prompt) | S (2-3d) | - | ✅ |
-| **1** | 1.5 Header-Cleanup + Micro-Interactions | S (2-3d) | - | ✅ |
-| **1** | 1.6 Contextual Branching Hint | S (1-2d) | - | ✅ |
-| **2** | 2.1 Canvas-Dekomposition | L (5-7d) | 1.1 | |
-| **2** | 2.2 Zoom-to-Fit + Minimap + Controls | M (4-5d) | 2.1 | |
-| **2** | 2.3 Context-Path Breadcrumb | S (1-2d) | - | |
-| **2** | 2.4 Subtree Collapse + Branch-Badge | M (3-4d) | 1.2 | |
-| **2** | 2.5 Keyboard Navigation + ARIA | L (5-7d) | 2.1 | |
-| **2** | 2.6 Persistence UI + Auto-Save + Export | M (4-5d) | - | |
-| **2** | 2.7 Smart Search (Ctrl+F) | M (3-4d) | 2.4 | |
-| **3** | 3.1 ConnectionLayer + Markdown Optim. | M (3-4d) | 1.2 | |
-| **3** | 3.2 DOM-Virtualisierung | L (5-7d) | 1.2, 3.1, 2.4 | |
-| **3** | 3.3 Branch-Vergleich Side-by-Side | M (4-5d) | 2.4 | |
-| **3** | 3.4 Copy Branch to Clipboard | S (1-2d) | 1.3 | |
-| **3** | 3.5 Performance-Benchmarks CI | S (2d) | 3.2 | |
-| **4** | 4.1 Onboarding Tour | M (3-4d) | Phase 2 | |
-| **4** | 4.2 Design-Token-System | M (3-4d) | - | |
-| **4** | 4.3 Adaptives Zoom-Rendering | M (3-4d) | 3.2 | |
-| **4** | 4.4 Mobile/Touch-Optimierung | L (5-7d) | - | |
+| Phase | Item                                    | Aufwand  | Abhängig von  | Status |
+| ----- | --------------------------------------- | -------- | ------------- | ------ |
+| **1** | 1.1 Engine Unit-Tests                   | M (3-5d) | -             | ✅     |
+| **1** | 1.2 Node-ID-Map + Children-Map          | M (3-4d) | -             | ✅     |
+| **1** | 1.3 Undo + Toast-System                 | M (3-4d) | -             | ✅     |
+| **1** | 1.4 Inline-Edit (statt window.prompt)   | S (2-3d) | -             | ✅     |
+| **1** | 1.5 Header-Cleanup + Micro-Interactions | S (2-3d) | -             | ✅     |
+| **1** | 1.6 Contextual Branching Hint           | S (1-2d) | -             | ✅     |
+| **2** | 2.1 Canvas-Dekomposition                | L (5-7d) | 1.1           |        |
+| **2** | 2.2 Zoom-to-Fit + Minimap + Controls    | M (4-5d) | 2.1           |        |
+| **2** | 2.3 Context-Path Breadcrumb             | S (1-2d) | -             |        |
+| **2** | 2.4 Subtree Collapse + Branch-Badge     | M (3-4d) | 1.2           |        |
+| **2** | 2.5 Keyboard Navigation + ARIA          | L (5-7d) | 2.1           |        |
+| **2** | 2.6 Persistence UI + Auto-Save + Export | M (4-5d) | -             |        |
+| **2** | 2.7 Smart Search (Ctrl+F)               | M (3-4d) | 2.4           |        |
+| **3** | 3.1 ConnectionLayer + Markdown Optim.   | M (3-4d) | 1.2           |        |
+| **3** | 3.2 DOM-Virtualisierung                 | L (5-7d) | 1.2, 3.1, 2.4 |        |
+| **3** | 3.3 Branch-Vergleich Side-by-Side       | M (4-5d) | 2.4           |        |
+| **3** | 3.4 Copy Branch to Clipboard            | S (1-2d) | 1.3           |        |
+| **3** | 3.5 Performance-Benchmarks CI           | S (2d)   | 3.2           |        |
+| **4** | 4.1 Onboarding Tour                     | M (3-4d) | Phase 2       |        |
+| **4** | 4.2 Design-Token-System                 | M (3-4d) | -             |        |
+| **4** | 4.3 Adaptives Zoom-Rendering            | M (3-4d) | 3.2           |        |
+| **4** | 4.4 Mobile/Touch-Optimierung            | L (5-7d) | -             |        |
 
 ---
 
 ## Verifizierung
 
 Nach jeder Phase:
+
 1. `npm run check` — TypeScript-Fehlerfreiheit
 2. `npm run test:unit` — Alle Unit-Tests bestehen
 3. `npm run build` — Library baut erfolgreich

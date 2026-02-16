@@ -22,6 +22,7 @@ Rechts sehe ich eine Art Mini-Canvas mit ein paar verbundenen Boxen. Es sieht au
 - "Streaming-first & markdown aware"
 
 **Was denke ich:**
+
 - **Branch conversations:** Klingt gut, aber ich weiss nicht wann ich das brauchen wuerde. Bei ChatGPT scrolle ich halt hoch wenn ich was aendern will.
 - **Navigate like a map:** Verstehe ich nicht. Warum sollte ich eine Karte wollen statt einer Liste? Listen sind uebersichtlich.
 - **Streaming & markdown:** Ok, das haben ChatGPT und Claude auch. Standard.
@@ -31,10 +32,12 @@ Rechts sehe ich eine Art Mini-Canvas mit ein paar verbundenen Boxen. Es sieht au
 **Vielleicht.** Der Button "Open interactive demo" ist prominent. Wenn ich neugierig bin, klicke ich drauf. Aber ich bin skeptisch: Was kann das besser als ChatGPT?
 
 **Was mich NICHT ueberzeugt:**
+
 - Ich verstehe das Problem nicht. Meine ChatGPT-Chats funktionieren doch gut.
 - "Spatial" klingt kompliziert. Ich will eigentlich nur schnell Antworten.
 
 **Was mich zum Klicken bringen koennte:**
+
 - Wenn ich gerade bei ChatGPT frustriert war weil ich was verloren habe oder vergessen hab wo ich war.
 - Wenn jemand sagt "schau dir das mal an, ist echt cool".
 
@@ -110,6 +113,7 @@ Ich frage: "Nenne mir ein Museum dort." — und die Antwort erscheint jetzt SEIT
 **Problem:** Ich muss das erst ERLEBEN um den Nutzen zu verstehen. Am Anfang denke ich nur: "Warum kann ich nicht einfach scrollen?"
 
 **Wann brauche ich das wirklich?**
+
 - Bei komplexen Recherchen wo ich mehrere Themen parallel verfolge
 - Bei Brainstorming-Sessions
 - Bei technischen Problemen wo ich verschiedene Loesungswege vergleiche
@@ -121,6 +125,7 @@ Ich frage: "Nenne mir ein Museum dort." — und die Antwort erscheint jetzt SEIT
 **Ja, nach ein paar Minuten.** Das ist tatsaechlich das Killer-Feature. Bei ChatGPT nerv ich mich manchmal dass ich eine Konversation nicht "aufteilen" kann ohne alles zu verlieren.
 
 **Beispiele wo ich das nutzen wuerde:**
+
 - Ich frage nach Reisezielen. Die AI schlaegt Italien vor. Ich will aber auch Spanien vergleichen — ohne die Italien-Konversation zu ueberschreiben.
 - Ich schreibe Code und will zwei verschiedene Loesungsansaetze durchspielen.
 - Ich lasse mir eine Geschichte erzaehlen und will mal "Was waere wenn..." ausprobieren.
@@ -134,6 +139,7 @@ Ich frage: "Nenne mir ein Museum dort." — und die Antwort erscheint jetzt SEIT
 Ich sehe davon nichts in der Demo (laut Code gibt's das, aber ich als Nutzer sehe es nicht).
 
 **WENN ich sowas sehen wuerde wie "Image", "Debug", "Explore":**
+
 - **Intuitiv:** Ja, sieht aus wie Buttons die ich klicken kann.
 - **Verwirrend:** Was passiert wenn ich mehrere auswaehle? Kriege ich dann mehrere Antworten? Oder eine kombinierte?
 
@@ -168,6 +174,7 @@ Laut Code gibt's das fuer bestimmte Node-Typen (z.B. Delete-Button fuer Debug-No
 Bei ChatGPT ist alles automatisch gespeichert. Wenn Traek das nicht hat, ist es ein Dealbreaker.
 
 **Was ich brauche:**
+
 - Automatisches Speichern (ohne dass ich dran denken muss)
 - Liste meiner alten Chats (Sidebar wie bei ChatGPT)
 - Suche durch alte Chats
@@ -183,6 +190,7 @@ Fuer MICH als Endnutzer: **Gimmick**.
 Ich will nicht meine Chats "abspielen" wie ein Video. Das ist eher fuer Demos oder Praesentationen nuetzlich.
 
 **ABER:** Fuer bestimmte Use Cases cool:
+
 - Wenn ich jemandem zeigen will wie ich zu einer Loesung gekommen bin
 - Fuer Lehrer die einen Denkprozess demonstrieren wollen
 - Fuer Debugging ("Wo ist die Konversation schiefgelaufen?")
@@ -220,6 +228,7 @@ Wenn ich viele Branches habe und den Ueberblick verliere, ist eine Minimap super
 **Fuer mich allein:** Nicht wichtig. Ich chatte mit der AI, nicht mit anderen Menschen.
 
 **Fuer Teams:** **Game-Changer!** Stell dir vor:
+
 - Mehrere Leute arbeiten zusammen an einer Recherche
 - Jemand faengt einen Branch an, jemand anders fuehrt ihn fort
 - Echtzeit-Cursor wie bei Figma
@@ -328,6 +337,7 @@ Das koennte ChatGPT NICHT. Das waere ein echtes Alleinstellungsmerkmal.
 **Warum:** Ohne speichern nutze ich das Tool nicht. Punkt.
 
 **Was ich will:**
+
 - Automatisches Speichern
 - Sidebar mit meinen Chats (wie ChatGPT)
 - Suche durch alte Chats
@@ -337,6 +347,7 @@ Das koennte ChatGPT NICHT. Das waere ein echtes Alleinstellungsmerkmal.
 **Warum:** Ich verstehe Branching erst nach 5 Minuten Rumspielen. Das ist zu langsam.
 
 **Was ich will:**
+
 - Beim ersten Oeffnen: "Welcome to Traek! Let me show you..." (3-4 Schritte)
 - Oder: Beispiel-Konversation vorgeladen, mit Tooltips: "This is a branch. Click here to..."
 
@@ -345,6 +356,7 @@ Das koennte ChatGPT NICHT. Das waere ein echtes Alleinstellungsmerkmal.
 **Warum:** Ich will Kontrolle. Wenn ich eine Node nicht mag, will ich sie weg haben.
 
 **Was ich will:**
+
 - Rechtsklick-Menu oder Buttons auf der Node
 - Delete, Edit, Copy, Share
 
@@ -366,10 +378,12 @@ Wenn die Top 3 Prioritaeten umgesetzt sind: **Ja, fuer bestimmte Use Cases.**
 Fuer schnelle Fragen bleibe ich bei ChatGPT. Fuer Recherchen, Brainstorming, komplexe Probleme: Traek.
 
 **Zielgruppe:**
+
 - Leute die viel mit AI arbeiten (Power-User)
 - Leute die oft "was waere wenn" fragen
 - Teams die zusammen researchen
 
 **NICHT fuer:**
+
 - Gelegenheits-Nutzer die nur mal schnell was fragen wollen
 - Mobile-First Nutzer (aktuell)

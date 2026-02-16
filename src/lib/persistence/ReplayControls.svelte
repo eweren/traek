@@ -65,7 +65,7 @@
 	</div>
 
 	<div class="traek-replay-controls__speed">
-		{#each speeds as s}
+		{#each speeds as s (s)}
 			<button
 				type="button"
 				class="traek-replay-speed-btn"

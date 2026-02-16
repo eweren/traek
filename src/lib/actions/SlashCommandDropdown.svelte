@@ -23,7 +23,8 @@
 
 	// Reset active index when filtered list changes
 	$effect(() => {
-		filtered;
+		// Track filtered to trigger effect on change
+		void filtered;
 		activeIndex = 0;
 	});
 

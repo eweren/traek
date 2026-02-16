@@ -17,9 +17,7 @@ describe('ToastStore', () => {
 		it('should return a UUID string', () => {
 			expect.assertions(1);
 			const id = toastStore.addToast({ message: 'Hello', type: 'info', duration: 4000 });
-			expect(id).toMatch(
-				/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
-			);
+			expect(id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
 		});
 
 		it('should add a toast to the toasts array', () => {
@@ -203,9 +201,7 @@ describe('ToastStore', () => {
 		it('should return the toast ID', () => {
 			expect.assertions(1);
 			const id = toast('Test');
-			expect(id).toMatch(
-				/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
-			);
+			expect(id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
 		});
 
 		it('should set the message correctly', () => {
@@ -249,9 +245,7 @@ describe('ToastStore', () => {
 		it('should return the toast ID', () => {
 			expect.assertions(1);
 			const id = toastUndo('Test', () => {});
-			expect(id).toMatch(
-				/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
-			);
+			expect(id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
 		});
 
 		it('should set the message correctly', () => {

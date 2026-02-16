@@ -979,7 +979,7 @@ describe('TraekEngine', () => {
 		it('should strip metadata to x, y, height only', () => {
 			expect.assertions(3);
 			const engine = new TraekEngine();
-			const node = engine.addNode('Test', 'user', { x: 5, y: 10 });
+			engine.addNode('Test', 'user', { x: 5, y: 10 });
 			const snapshot = engine.serialize();
 			const serialized = snapshot.nodes[0];
 			expect(serialized.metadata.x).toBe(5);

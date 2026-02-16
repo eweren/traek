@@ -72,7 +72,8 @@ Here’s how to make your chat with the expert effective.
 	function createEngineWithRichBranches(): TraekEngine {
 		const engine = new TraekEngine(DEFAULT_TRACK_ENGINE_CONFIG);
 		engine.addNode('How do I get the most out of a session with an expert?', 'user');
-		const richReply = engine.addNode(RICH_BUBBLE_MARKDOWN, 'assistant');
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		const _richReply = engine.addNode(RICH_BUBBLE_MARKDOWN, 'assistant');
 
 		engine.addNode('I want to focus on framing my question first.', 'user');
 		engine.addNode(
@@ -101,6 +102,7 @@ Here’s how to make your chat with the expert effective.
 		engine: TraekEngine,
 		config: TraekEngineConfig
 	): (input: string, userNode: MessageNode) => void {
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		return (_lastInput: string, _userNode: MessageNode) => {
 			setTimeout(() => {
 				const responseNode = engine.addNode('', 'assistant', {

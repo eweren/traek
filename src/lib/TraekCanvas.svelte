@@ -272,7 +272,6 @@
 	//   - a pending focus finished (handled in centerOnNode).
 	$effect(() => {
 		if (!engine || !showIntroOverlay) return;
-		const hasNodes = engine.nodes.length > 0;
 		const hasActive = !!engine.activeNodeId;
 		const hasPendingFocus = !!engine.pendingFocusNodeId;
 		if (!hasActive && !hasPendingFocus) {
@@ -283,7 +282,8 @@
 	// Clear text selection when the active node changes (e.g. user clicked another node)
 	$effect(() => {
 		if (typeof window === 'undefined' || !engine) return;
-		engine.activeNodeId;
+		// Track activeNodeId to trigger effect on change
+		void engine.activeNodeId;
 		window.getSelection()?.removeAllRanges();
 	});
 
@@ -306,7 +306,6 @@
 				const t1 = e.touches[1];
 				if (t0 == null || t1 == null) return;
 				touchStartPan = null;
-				const rect = el.getBoundingClientRect();
 				const centerClientX = (t0.clientX + t1.clientX) / 2;
 				const centerClientY = (t0.clientY + t1.clientY) / 2;
 				pinchStart = {
@@ -1123,7 +1122,6 @@
 					<span class="stats-fps">{fps} FPS</span>
 					<span class="stats-sep">|</span>
 				{/if}
-				<!-- svelte-ignore a11y_no_static_element_interactions -->
 				<span
 					class="stats-zoom"
 					onclick={() => {

@@ -83,7 +83,7 @@
 	>
 		{#each actions as action (action.id)}
 			{#if expandedActionId === action.id && expandedVariants}
-				{#each expandedVariants as variant}
+				{#each expandedVariants as variant (variant.label)}
 					<button
 						type="button"
 						class="traek-toolbar-badge traek-toolbar-badge--variant"

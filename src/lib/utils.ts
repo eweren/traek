@@ -1,5 +1,5 @@
 import { Marked } from 'marked';
-import { markedHighlight } from "marked-highlight";
+import { markedHighlight } from 'marked-highlight';
 import hljs from 'highlight.js';
 import typescript from 'highlight.js/lib/languages/typescript';
 import bash from 'highlight.js/lib/languages/bash';
@@ -13,14 +13,14 @@ hljs.registerLanguage('bash', bash);
 hljs.registerLanguage('svelte', xml);
 
 const marked = new Marked(
-  markedHighlight({
-    emptyLangClass: 'hljs',
-    langPrefix: 'hljs language-',
-    highlight(code, lang) {
-      const language = hljs.getLanguage(lang) ? lang : 'plaintext';
-      return hljs.highlight(code, { language }).value;
-    }
-  })
+	markedHighlight({
+		emptyLangClass: 'hljs',
+		langPrefix: 'hljs language-',
+		highlight(code, lang) {
+			const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+			return hljs.highlight(code, { language }).value;
+		}
+	})
 );
 
 /**
@@ -29,7 +29,7 @@ const marked = new Marked(
  * Only use with trusted content (e.g. static strings); sanitize user input elsewhere if needed.
  */
 export function markdownToHtml(md: string): string {
-  if (!md || typeof md !== 'string') return '';
-  const raw = marked.parse(md, { async: false });
-  return typeof raw === 'string' ? raw : '';
+	if (!md || typeof md !== 'string') return '';
+	const raw = marked.parse(md, { async: false });
+	return typeof raw === 'string' ? raw : '';
 }

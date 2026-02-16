@@ -44,43 +44,43 @@ Serialisierung/Deserialisierung des gesamten Baums (JSON-Export/Import), plus ei
 
 ```typescript
 interface ConversationSnapshot {
-  version: 1;
-  createdAt: number;
-  title?: string;
-  config: Partial<TraekEngineConfig>;
-  viewport: { scale: number; offsetX: number; offsetY: number };
-  activeNodeId: string | null;
-  nodes: SerializedNode[];
+	version: 1;
+	createdAt: number;
+	title?: string;
+	config: Partial<TraekEngineConfig>;
+	viewport: { scale: number; offsetX: number; offsetY: number };
+	activeNodeId: string | null;
+	nodes: SerializedNode[];
 }
 
 interface SerializedNode {
-  id: string;
-  parentId: string | null;
-  content: string;
-  role: 'user' | 'assistant' | 'system';
-  type: string;
-  status: NodeStatus;
-  createdAt: number;
-  metadata: { x: number; y: number; height?: number };
-  data?: unknown;
+	id: string;
+	parentId: string | null;
+	content: string;
+	role: 'user' | 'assistant' | 'system';
+	type: string;
+	status: NodeStatus;
+	createdAt: number;
+	metadata: { x: number; y: number; height?: number };
+	data?: unknown;
 }
 ```
 
 ### Aenderungen an bestehenden Dateien
 
-| Datei | Aenderung |
-|-------|-----------|
+| Datei                   | Aenderung                                                     |
+| ----------------------- | ------------------------------------------------------------- |
 | `TraekEngine.svelte.ts` | `serialize()`, `static fromSnapshot()`, `createdAt` auf Nodes |
-| `TraekCanvas.svelte` | Optionaler `replayController` Prop, Replay-UI Snippet-Slot |
-| `index.ts` | Neue Exports |
+| `TraekCanvas.svelte`    | Optionaler `replayController` Prop, Replay-UI Snippet-Slot    |
+| `index.ts`              | Neue Exports                                                  |
 
 ### Neue Dateien
 
-| Datei | Beschreibung |
-|-------|-------------|
-| `src/lib/persistence/types.ts` | `ConversationSnapshot`, `SerializedNode` Types |
-| `src/lib/persistence/ReplayController.svelte.ts` | Replay-Logik mit `$state` |
-| `src/lib/persistence/ReplayControls.svelte` | Default Replay-UI |
+| Datei                                            | Beschreibung                                   |
+| ------------------------------------------------ | ---------------------------------------------- |
+| `src/lib/persistence/types.ts`                   | `ConversationSnapshot`, `SerializedNode` Types |
+| `src/lib/persistence/ReplayController.svelte.ts` | Replay-Logik mit `$state`                      |
+| `src/lib/persistence/ReplayControls.svelte`      | Default Replay-UI                              |
 
 ## Offene Fragen
 

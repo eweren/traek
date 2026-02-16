@@ -3,6 +3,7 @@ import { NodeTypeRegistry } from '../NodeTypeRegistry.svelte';
 import { createDefaultRegistry } from '../index';
 import type { NodeTypeDefinition } from '../types';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const MockComponent = {} as any;
 
 function makeDef(overrides: Partial<NodeTypeDefinition> & { type: string }): NodeTypeDefinition {

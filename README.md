@@ -4,7 +4,7 @@
 
 **træk** is a spatial conversation engine designed to go beyond traditional chat UIs for AI applications.
 
-*træk (/træk/) comes from Danish **træ** (tree) and English **track** (path).*
+_træk (/træk/) comes from Danish **træ** (tree) and English **track** (path)._
 
 Most chat interfaces force complex thinking into a linear stream of messages. træk breaks that constraint by turning conversations into **navigable structures** — paths you can branch, explore, and revisit.
 
@@ -18,11 +18,11 @@ Classic chat layouts work well for simple back-and-forth messaging.
 
 They fail when conversations become:
 
-* exploratory
-* multi-directional
-* iterative
-* agent-driven
-* reasoning-heavy
+- exploratory
+- multi-directional
+- iterative
+- agent-driven
+- reasoning-heavy
 
 Important context gets buried.
 Alternative approaches disappear.
@@ -36,11 +36,11 @@ Thinking becomes flattened.
 
 træk replaces the timeline with a **spatial mental model**:
 
-* 🌿 Branch conversations without losing history
-* 🧭 Navigate discussions like a map, not a log
-* 🧠 Keep reasoning visible but structured
-* 🔁 Revisit earlier paths instantly
-* 🔎 Compare alternative outputs side‑by‑side
+- 🌿 Branch conversations without losing history
+- 🧭 Navigate discussions like a map, not a log
+- 🧠 Keep reasoning visible but structured
+- 🔁 Revisit earlier paths instantly
+- 🔎 Compare alternative outputs side‑by‑side
 
 This is not "chat with nicer bubbles."
 It is infrastructure for **non-linear AI interaction**.
@@ -70,25 +70,25 @@ You don’t scroll conversations.
 
 ## ✨ Key Features
 
-* **Branching conversations**
+- **Branching conversations**
   Explore alternatives without overwriting the past.
 
-* **Spatial layout**
+- **Spatial layout**
   Parents stay above, replies spread horizontally — structure remains readable as complexity grows.
 
-* **Streaming-first**
+- **Streaming-first**
   Render token-by-token output in place while keeping the conversation topology intact.
 
-* **Thought nodes**
+- **Thought nodes**
   Attach reasoning steps without polluting the primary path.
 
-* **Pan & zoom canvas**
+- **Pan & zoom canvas**
   Move through large conversations like a diagram.
 
-* **Markdown support**
+- **Markdown support**
   Safe rendering with images, lists, and code blocks.
 
-* **Fully configurable engine**
+- **Fully configurable engine**
   Control layout, spacing, zoom behavior, and interaction tuning.
 
 ---
@@ -107,10 +107,10 @@ Renders the spatial UI and manages interaction.
 
 You control:
 
-* message creation
-* streaming
-* persistence
-* model orchestration
+- message creation
+- streaming
+- persistence
+- model orchestration
 
 træk keeps everything **navigable and coherent**.
 
@@ -128,30 +128,25 @@ Create a spatial AI chat:
 
 ```svelte
 <script lang="ts">
-  import {
-    TraekCanvas,
-    TraekEngine,
-    DEFAULT_TRACK_ENGINE_CONFIG,
-    type MessageNode
-  } from 'traek';
+	import { TraekCanvas, TraekEngine, DEFAULT_TRACK_ENGINE_CONFIG, type MessageNode } from 'traek';
 
-  const engine = new TraekEngine(DEFAULT_TRACK_ENGINE_CONFIG);
+	const engine = new TraekEngine(DEFAULT_TRACK_ENGINE_CONFIG);
 
-  function onSendMessage(input: string, _userNode: MessageNode) {
-    engine.addNode(input, 'user');
+	function onSendMessage(input: string, _userNode: MessageNode) {
+		engine.addNode(input, 'user');
 
-    const assistantNode = engine.addNode('', 'assistant', {
-      autofocus: true
-    });
+		const assistantNode = engine.addNode('', 'assistant', {
+			autofocus: true
+		});
 
-    engine.updateNode(assistantNode.id, { status: 'streaming' });
+		engine.updateNode(assistantNode.id, { status: 'streaming' });
 
-    // stream chunks
-    // engine.updateNode(assistantNode.id, { content });
+		// stream chunks
+		// engine.updateNode(assistantNode.id, { content });
 
-    // when finished
-    // engine.updateNode(assistantNode.id, { status: 'done' });
-  }
+		// when finished
+		// engine.updateNode(assistantNode.id, { status: 'done' });
+	}
 </script>
 
 <TraekCanvas {engine} {onSendMessage} />
@@ -163,12 +158,12 @@ Create a spatial AI chat:
 
 træk is ideal if you are building:
 
-* AI chat products
-* agent interfaces
-* prompt exploration tools
-* research assistants
-* reasoning-heavy workflows
-* multi-path generation UIs
+- AI chat products
+- agent interfaces
+- prompt exploration tools
+- research assistants
+- reasoning-heavy workflows
+- multi-path generation UIs
 
 If you only need a simple message list — træk is probably not the right tool.
 
@@ -261,9 +256,9 @@ You can override any of these in your app’s `:root` (or a scoped container) to
 
 ```css
 :root {
-  --traek-canvas-bg: #050816;
-  --traek-node-bg: #0b1020;
-  --traek-accent-cyan: #4ade80;
+	--traek-canvas-bg: #050816;
+	--traek-node-bg: #0b1020;
+	--traek-accent-cyan: #4ade80;
 }
 ```
 
