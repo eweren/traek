@@ -1,6 +1,6 @@
-import { findScrollable } from '../canvas/scrollUtils.js';
-import type { FocusModeConfig, SwipeDirection, SwipeResult, SwipeState } from './focusModeTypes.js';
-import { DEFAULT_FOCUS_MODE_CONFIG } from './focusModeTypes.js';
+import { findScrollable } from '../canvas/scrollUtils';
+import type { FocusModeConfig, SwipeDirection, SwipeResult, SwipeState } from './focusModeTypes';
+import { DEFAULT_FOCUS_MODE_CONFIG } from './focusModeTypes';
 
 interface TouchRecord {
 	startX: number;
@@ -112,7 +112,7 @@ export class SwipeNavigator {
 
 		// Horizontal is always navigation
 		if (this.touch.axisLock === 'horizontal') {
-			e.preventDefault();
+			if (e.cancelable) e.preventDefault();
 			this.dragDeltaX = dx;
 			this.dragDeltaY = 0;
 			return;
@@ -130,7 +130,7 @@ export class SwipeNavigator {
 
 			if (canOverscroll) {
 				// At boundary — show overscroll indicator
-				e.preventDefault();
+				if (e.cancelable) e.preventDefault();
 				this.overscrollY = dy;
 				this.dragDeltaX = 0;
 				this.dragDeltaY = dy;
@@ -146,7 +146,7 @@ export class SwipeNavigator {
 			}
 		} else {
 			// No scrollable context — vertical is navigation
-			e.preventDefault();
+			if (e.cancelable) e.preventDefault();
 			this.dragDeltaX = 0;
 			this.dragDeltaY = dy;
 		}

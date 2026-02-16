@@ -456,6 +456,19 @@
 		text-decoration: none;
 		font-size: 0.9rem;
 	}
+
+	@media (max-width: 768px) {
+		.back {
+			top: auto;
+			bottom: max(0.5rem, env(safe-area-inset-bottom));
+			left: 0.5rem;
+			padding: 0.3rem 0.6rem;
+			font-size: 0.75rem;
+			opacity: 0.7;
+			border-radius: 1rem;
+			z-index: 30;
+		}
+	}
 	.canvas-wrap {
 		flex: 1;
 		min-height: 0;

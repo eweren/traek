@@ -321,9 +321,13 @@ describe('SwipeNavigator', () => {
 				closest: () => null
 			} as unknown as HTMLElement;
 
-			nav.handleTouchStart(createTouchEvent('touchstart', [{ clientX: 200, clientY: 200 }], scrollable));
+			nav.handleTouchStart(
+				createTouchEvent('touchstart', [{ clientX: 200, clientY: 200 }], scrollable)
+			);
 			advanceTime(50);
-			nav.handleTouchMove(createTouchEvent('touchmove', [{ clientX: 200, clientY: 250 }], scrollable));
+			nav.handleTouchMove(
+				createTouchEvent('touchmove', [{ clientX: 200, clientY: 250 }], scrollable)
+			);
 			nav.handleTouchEnd(createTouchEvent('touchend', []));
 
 			// Wait beyond cooldown (250ms > 200ms)
@@ -403,10 +407,14 @@ describe('SwipeNavigator', () => {
 				closest: () => null
 			} as unknown as HTMLElement;
 
-			nav.handleTouchStart(createTouchEvent('touchstart', [{ clientX: 200, clientY: 200 }], scrollable));
+			nav.handleTouchStart(
+				createTouchEvent('touchstart', [{ clientX: 200, clientY: 200 }], scrollable)
+			);
 			advanceTime(200);
 			// Move down only 30px (below overscrollThreshold 60)
-			nav.handleTouchMove(createTouchEvent('touchmove', [{ clientX: 200, clientY: 230 }], scrollable));
+			nav.handleTouchMove(
+				createTouchEvent('touchmove', [{ clientX: 200, clientY: 230 }], scrollable)
+			);
 			nav.handleTouchEnd(createTouchEvent('touchend', []));
 
 			expect(result!.direction).toBeNull();
@@ -521,16 +529,12 @@ describe('SwipeNavigator', () => {
 				expect.any(Function),
 				{ passive: true }
 			);
-			expect(mockElement.addEventListener).toHaveBeenCalledWith(
-				'touchmove',
-				expect.any(Function),
-				{ passive: false }
-			);
-			expect(mockElement.addEventListener).toHaveBeenCalledWith(
-				'touchend',
-				expect.any(Function),
-				{ passive: true }
-			);
+			expect(mockElement.addEventListener).toHaveBeenCalledWith('touchmove', expect.any(Function), {
+				passive: false
+			});
+			expect(mockElement.addEventListener).toHaveBeenCalledWith('touchend', expect.any(Function), {
+				passive: true
+			});
 			expect(mockElement.addEventListener).toHaveBeenCalledWith(
 				'touchcancel',
 				expect.any(Function),
@@ -549,9 +553,18 @@ describe('SwipeNavigator', () => {
 			const cleanup = nav.bind(mockElement);
 			cleanup();
 
-			expect(mockElement.removeEventListener).toHaveBeenCalledWith('touchstart', expect.any(Function));
-			expect(mockElement.removeEventListener).toHaveBeenCalledWith('touchmove', expect.any(Function));
-			expect(mockElement.removeEventListener).toHaveBeenCalledWith('touchend', expect.any(Function));
+			expect(mockElement.removeEventListener).toHaveBeenCalledWith(
+				'touchstart',
+				expect.any(Function)
+			);
+			expect(mockElement.removeEventListener).toHaveBeenCalledWith(
+				'touchmove',
+				expect.any(Function)
+			);
+			expect(mockElement.removeEventListener).toHaveBeenCalledWith(
+				'touchend',
+				expect.any(Function)
+			);
 			expect(mockElement.removeEventListener).toHaveBeenCalledWith(
 				'touchcancel',
 				expect.any(Function)

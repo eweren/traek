@@ -21,7 +21,7 @@ export {
 export { default as ActionBadges } from './actions/ActionBadges.svelte';
 export { default as SlashCommandDropdown } from './actions/SlashCommandDropdown.svelte';
 export { ActionResolver } from './actions/ActionResolver.svelte';
-export type { ActionDefinition, ResolveActions } from './actions/types.js';
+export type { ActionDefinition, ResolveActions } from './actions/types';
 
 // Node type system
 export {
@@ -29,9 +29,9 @@ export {
 	createDefaultRegistry,
 	textNodeDefinition,
 	thoughtNodeDefinition
-} from './node-types/index.js';
-export type { NodeTypeDefinition, NodeTypeAction } from './node-types/index.js';
-export type { ActionVariant } from './node-types/types.js';
+} from './node-types/index';
+export type { NodeTypeDefinition, NodeTypeAction } from './node-types/index';
+export type { ActionVariant } from './node-types/types';
 
 // Default node actions
 export {
@@ -40,13 +40,13 @@ export {
 	createRetryAction,
 	createEditAction,
 	createDefaultNodeActions
-} from './defaultNodeActions.js';
-export type { DefaultNodeActionCallbacks } from './defaultNodeActions.js';
+} from './defaultNodeActions';
+export type { DefaultNodeActionCallbacks } from './defaultNodeActions';
 
 // Persistence & Replay
 export { ReplayController } from './persistence/ReplayController.svelte';
 export { default as ReplayControls } from './persistence/ReplayControls.svelte';
-export type { ConversationSnapshot, SerializedNode } from './persistence/types.js';
+export type { ConversationSnapshot, SerializedNode } from './persistence/types';
 
 // Toast system
 export { default as ToastContainer } from './toast/ToastContainer.svelte';
@@ -62,11 +62,18 @@ export {
 // Mobile / Focus Mode
 export { default as FocusMode } from './mobile/FocusMode.svelte';
 export { default as PositionIndicator } from './mobile/PositionIndicator.svelte';
-export { focusModeConfigSchema, DEFAULT_FOCUS_MODE_CONFIG } from './mobile/focusModeTypes.js';
-export type { FocusModeConfig, SwipeDirection } from './mobile/focusModeTypes.js';
+export { default as SwipeAffordances } from './mobile/SwipeAffordances.svelte';
+export { default as Toast } from './mobile/Toast.svelte';
+export { default as OnboardingOverlay } from './mobile/OnboardingOverlay.svelte';
+export { default as HomeButton } from './mobile/HomeButton.svelte';
+export { default as KeyboardCheatsheet } from './mobile/KeyboardCheatsheet.svelte';
+export { default as Breadcrumbs } from './mobile/Breadcrumbs.svelte';
+export { default as ChildSelector } from './mobile/ChildSelector.svelte';
+export { focusModeConfigSchema, DEFAULT_FOCUS_MODE_CONFIG } from './mobile/focusModeTypes';
+export type { FocusModeConfig, SwipeDirection } from './mobile/focusModeTypes';
 
 // Schemas (Zod)
-export { serializedNodeSchema, conversationSnapshotSchema } from './persistence/schemas.js';
-export { traekEngineConfigSchema, addNodePayloadSchema } from './schemas.js';
-export { actionDefinitionSchema } from './actions/schemas.js';
-export { nodeTypeActionSchema, nodeTypeDefinitionSchema } from './node-types/schemas.js';
+export { serializedNodeSchema, conversationSnapshotSchema } from './persistence/schemas';
+export { traekEngineConfigSchema, addNodePayloadSchema } from './schemas';
+export { actionDefinitionSchema } from './actions/schemas';
+export { nodeTypeActionSchema, nodeTypeDefinitionSchema } from './node-types/schemas';
