@@ -1,7 +1,8 @@
 <script lang="ts">
 	/**
-	 * Item 9: ChildSelector Bottom-Sheet
-	 * Zeigt alle Kinder des aktuellen Nodes zur Auswahl
+	 * ChildSelector Bottom-Sheet
+	 * Zeigt alle Kinder des aktuellen Nodes zur Auswahl.
+	 * Drag-Handle + Sheet sind nach unten ziehbar zum Schließen.
 	 */
 
 	import type { Node, MessageNode } from '../TraekEngine.svelte';
@@ -16,17 +17,84 @@
 		onClose: () => void;
 	} = $props();
 
+	/** Drag-to-dismiss state */
+	let dragY = $state(0);
+	let isDragging = $state(false);
+	let isDismissing = $state(false);
+	let sheetEl = $state<HTMLElement | null>(null);
+
+	let touchStartY = 0;
+	let touchStartTime = 0;
+
+	const DISMISS_THRESHOLD = 100;
+	const VELOCITY_THRESHOLD = 0.5; // px/ms
+
+	function handleDragStart(e: TouchEvent) {
+		if (e.touches.length !== 1) return;
+		const t = e.touches[0];
+		if (!t) return;
+		touchStartY = t.clientY;
+		touchStartTime = performance.now();
+		isDragging = true;
+		dragY = 0;
+	}
+
+	function handleDragMove(e: TouchEvent) {
+		if (!isDragging || e.touches.length !== 1) return;
+		const t = e.touches[0];
+		if (!t) return;
+		const dy = t.clientY - touchStartY;
+		// Only allow dragging downward
+		dragY = Math.max(0, dy);
+		if (dragY > 0 && e.cancelable) {
+			e.preventDefault();
+		}
+	}
+
+	function handleDragEnd() {
+		if (!isDragging) return;
+		isDragging = false;
+
+		const elapsed = performance.now() - touchStartTime;
+		const velocity = elapsed > 0 ? dragY / elapsed : 0;
+		const shouldDismiss = dragY >= DISMISS_THRESHOLD || velocity >= VELOCITY_THRESHOLD;
+
+		if (shouldDismiss) {
+			dismiss();
+		} else {
+			// Snap back
+			dragY = 0;
+		}
+	}
+
+	function dismiss() {
+		isDismissing = true;
+		// Animate to bottom then close
+		const height = sheetEl?.offsetHeight ?? 400;
+		dragY = height;
+		setTimeout(() => onClose(), 200);
+	}
+
 	function handleBackdropClick(e: MouseEvent | KeyboardEvent) {
 		if (e.target === e.currentTarget) {
-			onClose();
+			dismiss();
 		}
 	}
 
 	function handleKeydown(e: KeyboardEvent) {
 		if (e.key === 'Escape') {
-			onClose();
+			dismiss();
 		}
 	}
+
+	const sheetTransform = $derived(
+		dragY > 0 ? `translateY(${dragY}px)` : ''
+	);
+	const backdropOpacity = $derived(
+		dragY > 0 && sheetEl
+			? Math.max(0, 1 - dragY / (sheetEl.offsetHeight ?? 400))
+			: 1
+	);
 </script>
 
 <svelte:window onkeydown={handleKeydown} />
@@ -39,9 +107,27 @@
 >
 	<!-- svelte-ignore a11y_click_events_have_key_events -->
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
-	<div class="selector-backdrop" onclick={handleBackdropClick}></div>
+	<div
+		class="selector-backdrop"
+		onclick={handleBackdropClick}
+		style:opacity={backdropOpacity}
+	></div>
 
-	<div class="selector-content">
+	<!-- svelte-ignore a11y_no_static_element_interactions -->
+	<div
+		class="selector-content"
+		class:dismissing={isDismissing}
+		class:dragging={isDragging}
+		bind:this={sheetEl}
+		style:transform={sheetTransform}
+		ontouchstart={handleDragStart}
+		ontouchmove={handleDragMove}
+		ontouchend={handleDragEnd}
+		ontouchcancel={() => {
+			isDragging = false;
+			dragY = 0;
+		}}
+	>
 		<!-- Drag Handle -->
 		<div class="drag-handle" aria-hidden="true"></div>
 
@@ -107,6 +193,16 @@
 		padding-bottom: max(24px, env(safe-area-inset-bottom));
 		color: var(--traek-node-text, #dddddd);
 		animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+		transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+		touch-action: none;
+	}
+
+	.selector-content.dragging {
+		transition: none;
+	}
+
+	.selector-content.dismissing {
+		transition: transform 0.2s ease-in;
 	}
 
 	@keyframes slideUp {
@@ -120,14 +216,29 @@
 
 	.drag-handle {
 		position: absolute;
-		top: 8px;
+		top: 0;
 		left: 50%;
 		transform: translateX(-50%);
-		width: 40px;
+		width: 60px;
+		height: 20px;
+		cursor: grab;
+	}
+
+	.drag-handle::after {
+		content: '';
+		position: absolute;
+		top: 8px;
+		left: 10px;
+		right: 10px;
 		height: 4px;
 		background: var(--traek-input-context-text, #888888);
 		border-radius: 2px;
 		opacity: 0.5;
+		transition: opacity 0.15s ease;
+	}
+
+	.dragging .drag-handle::after {
+		opacity: 0.8;
 	}
 
 	.selector-content h3 {
