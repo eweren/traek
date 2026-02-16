@@ -9,8 +9,14 @@ export class KeyboardNavigator {
 	focusedNodeId = $state<string | null>(null);
 	/** Whether help overlay is shown */
 	showHelp = $state(false);
+	/** Whether fuzzy search overlay is shown */
+	showFuzzySearch = $state(false);
 	/** Last keyboard navigation direction for announcements */
 	lastDirection = $state<'parent' | 'child' | 'sibling' | 'root' | 'leaf' | null>(null);
+	/** Chord state: stores first key of chord sequence */
+	#chordState: { key: string; timestamp: number } | null = null;
+	/** Chord timeout (500ms) */
+	#chordTimeout = 500;
 
 	#engine: TraekEngine;
 	#onAnnounce?: (message: string) => void;
@@ -32,10 +38,63 @@ export class KeyboardNavigator {
 	 * Returns true if event was handled
 	 */
 	handleKeyDown(e: KeyboardEvent): boolean {
-		// Don't handle when typing in input fields
+		// Don't handle when typing in input fields (except for fuzzy search trigger)
 		const target = e.target as HTMLElement;
-		if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
+		const isInputField =
+			target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
+		if (isInputField && e.key !== '/') {
 			return false;
+		}
+
+		// Quick-Jump: Numbers 1-9 to jump to nth child
+		if (/^[1-9]$/.test(e.key)) {
+			e.preventDefault();
+			this.jumpToNthChild(parseInt(e.key, 10));
+			return true;
+		}
+
+		// Fuzzy Search: "/" opens fuzzy finder
+		if (e.key === '/') {
+			e.preventDefault();
+			this.openFuzzySearch();
+			return true;
+		}
+
+		// Handle chord sequences
+		if (this.#chordState) {
+			const secondKey = e.key.toLowerCase();
+			const firstKey = this.#chordState.key;
+			const elapsed = Date.now() - this.#chordState.timestamp;
+
+			if (elapsed > this.#chordTimeout) {
+				// Chord timeout expired, reset
+				this.#chordState = null;
+			} else {
+				// Valid chord window
+				e.preventDefault();
+				this.#chordState = null;
+
+				if (firstKey === 'g' && secondKey === 'g') {
+					this.navigateToRoot();
+					return true;
+				}
+				if (firstKey === 'g' && secondKey === 'e') {
+					this.navigateToDeepestLeaf();
+					return true;
+				}
+
+				// Unknown chord
+				this.#announce('Unknown chord sequence');
+				return true;
+			}
+		}
+
+		// Check if this is a chord starter
+		if (e.key.toLowerCase() === 'g') {
+			e.preventDefault();
+			this.#chordState = { key: 'g', timestamp: Date.now() };
+			this.#announce('Chord started: g');
+			return true;
 		}
 
 		switch (e.key) {
@@ -232,6 +291,56 @@ export class KeyboardNavigator {
 	toggleHelp(): void {
 		this.showHelp = !this.showHelp;
 		this.#announce(this.showHelp ? 'Showing keyboard shortcuts' : 'Hiding keyboard shortcuts');
+	}
+
+	/** Jump to nth child (1-9) */
+	jumpToNthChild(n: number): void {
+		if (!this.focusedNodeId) {
+			this.focusOnFirstAvailableNode();
+			return;
+		}
+
+		const children = this.#engine
+			.getChildren(this.focusedNodeId)
+			.filter((c) => c.type !== 'thought');
+
+		if (children.length === 0) {
+			this.#announce('No children available');
+			return;
+		}
+
+		if (n > children.length) {
+			this.#announce(`Only ${children.length} children available`);
+			return;
+		}
+
+		const targetChild = children[n - 1];
+		if (targetChild) {
+			this.focusedNodeId = targetChild.id;
+			this.lastDirection = 'child';
+			this.#announce(`Jumped to child ${n}: ${this.#getNodeLabel(targetChild.id)}`);
+		}
+	}
+
+	/** Open fuzzy search overlay (/) */
+	openFuzzySearch(): void {
+		this.showFuzzySearch = true;
+		this.#announce('Fuzzy search opened');
+	}
+
+	/** Close fuzzy search overlay */
+	closeFuzzySearch(): void {
+		this.showFuzzySearch = false;
+		this.#announce('Fuzzy search closed');
+	}
+
+	/** Navigate to a node from fuzzy search */
+	navigateToNodeById(nodeId: string): void {
+		if (this.#engine.getNode(nodeId)) {
+			this.focusedNodeId = nodeId;
+			this.lastDirection = null;
+			this.#announce(`Navigated to: ${this.#getNodeLabel(nodeId)}`);
+		}
 	}
 
 	/** Focus on first available node (fallback) */

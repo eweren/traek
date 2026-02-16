@@ -4,7 +4,7 @@
 **Zuletzt aktualisiert:** 2026-02-16
 **Input von:** UX Designer + Endnutzer, Dev / Tech Lead, UI Designer
 **Status:** VERBINDLICH — Dies ist die Roadmap die das Entwicklerteam umsetzt.
-**Fortschritt:** Phase 1 ✅ | Phase 2: 3/7 abgeschlossen | Phase 3–4: ausstehend
+**Fortschritt:** Phase 1 ✅ | Phase 2 ✅ | Phase 3 ✅ | Phase 4 ✅ | Backlog: ausstehend
 
 **Synthese-Prinzip**: Wir parallelisieren Quick-Wins aus allen Disziplinen in Phase 1, damit das Produkt sofort besser wird — aber investieren gleichzeitig in die technische Foundation, damit spätere Phasen sicher und schnell gebaut werden können.
 
@@ -284,21 +284,21 @@
 | **1** | 1.4 Inline-Edit (statt window.prompt)   | S (2-3d) | -              | ✅            |
 | **1** | 1.5 Header-Cleanup + Micro-Interactions | S (2-3d) | -              | ✅            |
 | **1** | 1.6 Contextual Branching Hint           | S (1-2d) | -              | ✅            |
-| **2** | **2.1 Canvas-Dekomposition**            | L (5-7d) | 1.1            | **Nächstes**  |
-| **2** | 2.2 Zoom-to-Fit + Minimap + Controls    | M (4-5d) | 2.1            |               |
-| **2** | 2.3 Context-Path Breadcrumb (Desktop)   | S (1-2d) | -              | Mobile ✅     |
-| **2** | 2.4 Subtree Collapse + Branch-Badge     | M (3-4d) | 1.2            | Bereit        |
-| **2** | 2.5 Keyboard Navigation + ARIA          | L (5-7d) | 2.1            |               |
+| **2** | 2.1 Canvas-Dekomposition                | L (5-7d) | 1.1            | ✅            |
+| **2** | 2.2 Zoom-to-Fit + Minimap + Controls    | M (4-5d) | 2.1            | ✅            |
+| **2** | 2.3 Context-Path Breadcrumb (Desktop)   | S (1-2d) | -              | ✅            |
+| **2** | 2.4 Subtree Collapse + Branch-Badge     | M (3-4d) | 1.2            | ✅            |
+| **2** | 2.5 Keyboard Navigation + ARIA          | L (5-7d) | 2.1            | ✅            |
 | **2** | 2.6 Persistence UI + Auto-Save          | M (4-5d) | -              | ✅            |
-| **2** | 2.7 Smart Search (Ctrl+F)               | M (3-4d) | 2.4            |               |
-| **3** | 3.1 ConnectionLayer + Markdown Optim.   | M (3-4d) | 1.2            |               |
-| **3** | 3.2 DOM-Virtualisierung                 | L (5-7d) | 1.2, 3.1, 2.4 |               |
-| **3** | 3.3 Branch-Vergleich Side-by-Side       | M (4-5d) | 2.4            |               |
-| **3** | 3.4 Copy Branch to Clipboard            | S (1-2d) | 1.3            |               |
-| **3** | 3.5 Performance-Benchmarks CI           | S (2d)   | 3.2            |               |
-| **4** | 4.1 Onboarding Tour (Desktop)           | M (3-4d) | Phase 2        |               |
-| **4** | 4.2 Design-Token-System                 | M (3-4d) | -              | Teilw. ✅     |
-| **4** | 4.3 Adaptives Zoom-Rendering            | M (3-4d) | 3.2            |               |
+| **2** | 2.7 Smart Search (Ctrl+F)               | M (3-4d) | 2.4            | ✅            |
+| **3** | 3.1 ConnectionLayer + Markdown Optim.   | M (3-4d) | 1.2            | ✅            |
+| **3** | 3.2 DOM-Virtualisierung                 | L (5-7d) | 1.2, 3.1, 2.4 | ✅            |
+| **3** | 3.3 Branch-Vergleich Side-by-Side       | M (4-5d) | 2.4            | ✅            |
+| **3** | 3.4 Copy Branch to Clipboard            | S (1-2d) | 1.3            | ✅            |
+| **3** | 3.5 Performance-Benchmarks CI           | S (2d)   | 3.2            | ✅            |
+| **4** | 4.1 Onboarding Tour (Desktop)           | M (3-4d) | Phase 2        | ✅            |
+| **4** | 4.2 Design-Token-System                 | M (3-4d) | -              | ✅            |
+| **4** | 4.3 Adaptives Zoom-Rendering            | M (3-4d) | 3.2            | ✅            |
 | **4** | ~~4.4 Mobile Focus Mode~~               | L (5-7d) | -              | ✅            |
 
 ### Sofort parallelisierbar (alle Dependencies erfüllt)

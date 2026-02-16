@@ -4,6 +4,7 @@
 	import type { TraekEngine, MessageNode, Node } from './TraekEngine.svelte.ts';
 	import Ghost from './Ghost.svelte';
 	import { getDetailLevel } from './canvas/AdaptiveRenderer.svelte';
+	import TagBadges from './tags/TagBadges.svelte';
 
 	const DEFAULT_PLACEHOLDER_HEIGHT = 100;
 
@@ -93,6 +94,7 @@
 	const hiddenCount = $derived(
 		isCollapsed && engine ? engine.getHiddenDescendantCount(node.id) : 0
 	);
+	const isOutdated = $derived(node.metadata?.outdated === true);
 
 	$effect(() => {
 		// Track viewportResizeVersion to trigger effect on change
@@ -148,7 +150,9 @@
 		? 'keyboard-focused'
 		: ''} {node.status === 'error' ? 'error' : ''} {!isInView
 		? 'message-node-wrapper--placeholder'
-		: ''} {showCompletePulse ? 'stream-complete' : ''} detail-{detailLevel}"
+		: ''} {showCompletePulse ? 'stream-complete' : ''} {isOutdated
+		? 'outdated'
+		: ''} detail-{detailLevel}"
 	style:left="{(node.metadata?.x ?? 0) * gridStep}px"
 	style:top="{(node.metadata?.y ?? 0) * gridStep}px"
 	style:width="{nodeWidth}px"
@@ -171,7 +175,9 @@
 		>
 			<span class="role-indicator">
 				{node.role === 'user' ? '● User' : '◆ Assistant'}
-				{#if node.status === 'streaming'}
+				{#if isOutdated}
+					<span class="header-status header-status--outdated">· Outdated</span>
+				{:else if node.status === 'streaming'}
 					<span class="header-status header-status--streaming" role="status">
 						<span class="header-status-spinner"></span>
 						Processing…
@@ -252,6 +258,7 @@
 			</div>
 		</div>
 	{/if}
+	<TagBadges {node} {engine} />
 	{#if thoughtChild}
 		<div class="thought-inline">
 			<button
@@ -504,6 +511,12 @@
 			color: var(--traek-thought-tag-orange, #ff6b4a);
 		}
 
+		.header-status--outdated {
+			color: var(--traek-thought-row-muted-4, #666666);
+			text-decoration: line-through;
+			opacity: 0.7;
+		}
+
 		.header-status-spinner {
 			width: 10px;
 			height: 10px;
@@ -724,6 +737,18 @@
 		.message-node-wrapper.error {
 			border: 2px solid var(--traek-error-border, #ff3e00);
 			box-shadow: 0 0 20px var(--traek-error-glow, rgba(255, 62, 0, 0.3));
+		}
+
+		/* Outdated state */
+		.message-node-wrapper.outdated {
+			opacity: 0.6;
+			filter: grayscale(0.3);
+		}
+
+		.message-node-wrapper.outdated .message-node-content {
+			text-decoration: line-through;
+			text-decoration-color: var(--traek-thought-row-muted-4, #666666);
+			text-decoration-thickness: 1px;
 		}
 
 		.error-banner {

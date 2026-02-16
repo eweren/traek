@@ -2,6 +2,7 @@
 	import Icon from '@iconify/svelte';
 	import type { NodeTypeAction, ActionVariant } from './node-types/types.js';
 	import type { Node, TraekEngine } from './TraekEngine.svelte';
+	import TagDropdown from './tags/TagDropdown.svelte';
 
 	let {
 		actions,
@@ -83,6 +84,9 @@
 		style:top="{y}px"
 		style:max-width="{nodeWidth}px"
 	>
+		<!-- Tag Dropdown -->
+		<TagDropdown {node} {engine} />
+
 		{#each actions as action (action.id)}
 			{#if expandedActionId === action.id && expandedVariants}
 				{#each expandedVariants as variant (variant.label)}

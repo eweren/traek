@@ -25,6 +25,15 @@
 		onDeleteConnection: (parentId: string, childId: string) => void;
 	} = $props();
 
+	/**
+	 * Get the CSS color variable for a node role.
+	 */
+	function getRoleColor(role: Node['role']): string {
+		if (role === 'user') return 'var(--traek-node-user-border-top, #00d8ff)';
+		if (role === 'assistant') return 'var(--traek-node-assistant-border-top, #ff3e00)';
+		return 'var(--traek-connection-stroke, #333333)';
+	}
+
 	// Cursor position in canvas coordinates for the delete icon
 	let hoverPos = $state<{ x: number; y: number } | null>(null);
 
@@ -61,6 +70,26 @@
 	}
 </script>
 
+<!-- SVG defs for gradients -->
+<defs>
+	{#each nodes as node (node.id)}
+		{#if node.parentIds.length > 0 && node.type !== 'thought'}
+			{#each node.parentIds as pid (pid)}
+				{@const parent = nodeMap.get(pid)}
+				{#if parent}
+					{@const gradientId = `gradient-${pid}-${node.id}`}
+					{@const parentColor = getRoleColor(parent.role)}
+					{@const childColor = getRoleColor(node.role)}
+					<linearGradient id={gradientId} x1="0%" y1="0%" x2="0%" y2="100%">
+						<stop offset="0%" stop-color={parentColor} />
+						<stop offset="100%" stop-color={childColor} />
+					</linearGradient>
+				{/if}
+			{/each}
+		{/if}
+	{/each}
+</defs>
+
 <!-- Single-pass rendering: compute path once, render all variants -->
 {#each nodes as node (node.id)}
 	{#if node.parentIds.length > 0 && node.type !== 'thought'}
@@ -93,6 +122,10 @@
 						activeAncestorIds.has(node.id)}
 					{@const isHoverAdjacent =
 						hoveredNodeId !== null && (parent.id === hoveredNodeId || node.id === hoveredNodeId)}
+					{@const gradientId = `gradient-${pid}-${node.id}`}
+					{@const isChildCollapsed = collapsedNodes.has(node.id)}
+					{@const isParentCollapsed = collapsedNodes.has(pid)}
+					{@const isCollapsedConnection = isChildCollapsed || isParentCollapsed}
 
 					<!-- Normal connection (not on active path) -->
 					{#if !isOnActivePath}
@@ -100,13 +133,22 @@
 							class="connection"
 							class:faded={activeAncestorIds !== null && !isHoverAdjacent}
 							class:hover-adjacent={isHoverAdjacent}
+							class:collapsed={isCollapsedConnection}
+							class:animated-flow={!isCollapsedConnection}
 							d={pathD}
+							stroke={`url(#${gradientId})`}
 						/>
 					{/if}
 
 					<!-- Highlighted connection (on active path) -->
 					{#if isOnActivePath}
-						<path class="connection connection--highlight" d={pathD} />
+						<path
+							class="connection connection--highlight"
+							class:collapsed={isCollapsedConnection}
+							class:animated-flow={!isCollapsedConnection}
+							d={pathD}
+							stroke={`url(#${gradientId})`}
+						/>
 					{/if}
 
 					<!-- Hit area for interaction (always rendered) -->
@@ -189,7 +231,11 @@
 
 <style>
 	.connection {
-		transition: opacity 0.2s ease;
+		transition:
+			opacity 0.2s ease,
+			stroke-width 0.2s ease;
+		stroke-width: 1.5;
+		fill: none;
 	}
 
 	.connection.faded {
@@ -197,14 +243,30 @@
 	}
 
 	.connection.hover-adjacent {
-		stroke: var(--traek-connection-hover, rgba(255, 255, 255, 0.6));
-		stroke-width: 2;
+		stroke-width: 2.5;
 		opacity: 1;
+		filter: brightness(1.4);
+	}
+
+	.connection.collapsed {
+		stroke-dasharray: 6 4;
+		opacity: 0.5;
+	}
+
+	.connection.animated-flow {
+		stroke-dasharray: 8 12;
+		animation: connection-flow 2s linear infinite;
+	}
+
+	@keyframes connection-flow {
+		to {
+			stroke-dashoffset: -20;
+		}
 	}
 
 	.connection--highlight {
-		stroke: var(--traek-connection-highlight, #00d8ff);
 		stroke-width: 2.5;
+		filter: brightness(1.3) drop-shadow(0 0 4px currentColor);
 	}
 
 	.connection--delete-highlight {

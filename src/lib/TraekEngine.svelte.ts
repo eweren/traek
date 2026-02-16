@@ -626,6 +626,32 @@ export class TraekEngine {
 		return descendants.size;
 	}
 
+	/**
+	 * Get all descendant nodes via BFS (excludes thought nodes). Returns reactive proxies.
+	 */
+	getDescendants(nodeId: string): Node[] {
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity
+		const descendants: Node[] = [];
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity
+		const visited = new Set<string>();
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity
+		const queue = [nodeId];
+		while (queue.length > 0) {
+			const currentId = queue.shift()!;
+			const children = this.getChildren(currentId);
+			for (const child of children) {
+				if (!visited.has(child.id)) {
+					if (child.type !== 'thought') {
+						visited.add(child.id);
+						descendants.push(child);
+					}
+					queue.push(child.id);
+				}
+			}
+		}
+		return descendants;
+	}
+
 	/** Delete a node and all its descendants. Navigate to the deleted node's first parent if needed. */
 	deleteNodeAndDescendants(nodeId: string) {
 		// Collect all descendants via BFS
@@ -1204,6 +1230,41 @@ export class TraekEngine {
 	}
 
 	/**
+	 * Add a tag to a node.
+	 */
+	addTag(nodeId: string, tag: string): void {
+		const node = this.getNode(nodeId);
+		if (!node) return;
+		if (!node.metadata) node.metadata = { x: 0, y: 0 };
+
+		const tags = (node.metadata.tags as string[]) ?? [];
+		if (!tags.includes(tag)) {
+			node.metadata.tags = [...tags, tag];
+		}
+	}
+
+	/**
+	 * Remove a tag from a node.
+	 */
+	removeTag(nodeId: string, tag: string): void {
+		const node = this.getNode(nodeId);
+		if (!node) return;
+		if (!node.metadata) return;
+
+		const tags = (node.metadata.tags as string[]) ?? [];
+		node.metadata.tags = tags.filter((t) => t !== tag);
+	}
+
+	/**
+	 * Get tags for a node.
+	 */
+	getTags(nodeId: string): string[] {
+		const node = this.getNode(nodeId);
+		if (!node || !node.metadata) return [];
+		return (node.metadata.tags as string[]) ?? [];
+	}
+
+	/**
 	 * Serialize the full engine state into a JSON-safe snapshot.
 	 * Component references (from addCustomNode) are stripped — only node.type is stored.
 	 */
@@ -1224,7 +1285,12 @@ export class TraekEngine {
 				metadata: {
 					x: n.metadata?.x ?? 0,
 					y: n.metadata?.y ?? 0,
-					...(n.metadata?.height != null ? { height: n.metadata.height } : {})
+					...(n.metadata?.height != null ? { height: n.metadata.height } : {}),
+					...(n.metadata?.tags != null &&
+					Array.isArray(n.metadata.tags) &&
+					n.metadata.tags.length > 0
+						? { tags: n.metadata.tags as string[] }
+						: {})
 				},
 				data: n.data
 			}))

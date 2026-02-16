@@ -385,4 +385,208 @@ describe('KeyboardNavigator', () => {
 			expect(handled).toBe(false);
 		});
 	});
+
+	describe('Chord State Machine', () => {
+		beforeEach(() => {
+			// Setup test tree: root -> child1, child2
+			//                        child1 -> grandchild1, grandchild2, grandchild3
+			engine.addNode('Root node', 'user', { x: 0, y: 0 });
+			engine.addNode('Child 1', 'assistant', { parentIds: [engine.nodes[0].id] });
+			engine.addNode('Child 2', 'assistant', { parentIds: [engine.nodes[0].id] });
+			engine.addNode('Grandchild 1', 'user', { parentIds: [engine.nodes[1].id] });
+			engine.addNode('Grandchild 2', 'user', { parentIds: [engine.nodes[1].id] });
+			engine.addNode('Grandchild 3', 'user', { parentIds: [engine.nodes[1].id] });
+			navigator.focusedNodeId = engine.nodes[0].id;
+			announcements = [];
+		});
+
+		it('should handle "g g" chord to navigate to root', () => {
+			// Navigate away from root first
+			navigator.focusedNodeId = engine.nodes[3].id; // Grandchild 1
+			announcements = [];
+
+			// First 'g'
+			const event1 = {
+				key: 'g',
+				preventDefault: vi.fn(),
+				target: { tagName: 'DIV', isContentEditable: false }
+			} as unknown as KeyboardEvent;
+			const handled1 = navigator.handleKeyDown(event1);
+			expect(handled1).toBe(true);
+			expect(announcements).toContain('Chord started: g');
+
+			// Second 'g' within timeout
+			const event2 = {
+				key: 'g',
+				preventDefault: vi.fn(),
+				target: { tagName: 'DIV', isContentEditable: false }
+			} as unknown as KeyboardEvent;
+			const handled2 = navigator.handleKeyDown(event2);
+			expect(handled2).toBe(true);
+			expect(navigator.focusedNodeId).toBe(engine.nodes[0].id);
+			expect(announcements).toContain('Navigated to root');
+		});
+
+		it('should handle "g e" chord to navigate to deepest leaf', () => {
+			// Start at root
+			navigator.focusedNodeId = engine.nodes[0].id;
+			announcements = [];
+
+			// First 'g'
+			const event1 = {
+				key: 'g',
+				preventDefault: vi.fn(),
+				target: { tagName: 'DIV', isContentEditable: false }
+			} as unknown as KeyboardEvent;
+			navigator.handleKeyDown(event1);
+
+			// Second 'e'
+			const event2 = {
+				key: 'e',
+				preventDefault: vi.fn(),
+				target: { tagName: 'DIV', isContentEditable: false }
+			} as unknown as KeyboardEvent;
+			const handled = navigator.handleKeyDown(event2);
+			expect(handled).toBe(true);
+			// Should navigate to one of the grandchildren (deepest leaf)
+			const leafIds = [engine.nodes[3].id, engine.nodes[4].id, engine.nodes[5].id];
+			expect(leafIds).toContain(navigator.focusedNodeId);
+		});
+
+		it('should timeout chord after 500ms', async () => {
+			navigator.focusedNodeId = engine.nodes[0].id;
+
+			// First 'g'
+			const event1 = {
+				key: 'g',
+				preventDefault: vi.fn(),
+				target: { tagName: 'DIV', isContentEditable: false }
+			} as unknown as KeyboardEvent;
+			navigator.handleKeyDown(event1);
+
+			// Wait for timeout
+			await new Promise((resolve) => setTimeout(resolve, 600));
+
+			// Second 'g' after timeout - should start new chord
+			announcements = [];
+			const event2 = {
+				key: 'g',
+				preventDefault: vi.fn(),
+				target: { tagName: 'DIV', isContentEditable: false }
+			} as unknown as KeyboardEvent;
+			const handled = navigator.handleKeyDown(event2);
+			expect(handled).toBe(true);
+			expect(announcements).toContain('Chord started: g');
+			// Should not navigate to root, just start new chord
+			expect(announcements).not.toContain('Navigated to root');
+		});
+	});
+
+	describe('Quick-Jump', () => {
+		beforeEach(() => {
+			// Setup test tree with multiple children
+			engine.addNode('Root', 'user', { x: 0, y: 0 });
+			engine.addNode('Child 1', 'assistant', { parentIds: [engine.nodes[0].id] });
+			engine.addNode('Grandchild 1', 'user', { parentIds: [engine.nodes[1].id] });
+			engine.addNode('Grandchild 2', 'user', { parentIds: [engine.nodes[1].id] });
+			engine.addNode('Grandchild 3', 'user', { parentIds: [engine.nodes[1].id] });
+			announcements = [];
+		});
+
+		it('should jump to first child with key "1"', () => {
+			navigator.focusedNodeId = engine.nodes[1].id; // Child 1 (has 3 grandchildren)
+			announcements = [];
+
+			const event = {
+				key: '1',
+				preventDefault: vi.fn(),
+				target: { tagName: 'DIV', isContentEditable: false }
+			} as unknown as KeyboardEvent;
+			const handled = navigator.handleKeyDown(event);
+
+			expect(handled).toBe(true);
+			expect(navigator.focusedNodeId).toBe(engine.nodes[2].id); // Grandchild 1
+			expect(announcements.some((msg) => msg.includes('Jumped to child 1'))).toBe(true);
+		});
+
+		it('should jump to third child with key "3"', () => {
+			navigator.focusedNodeId = engine.nodes[1].id; // Child 1 (has 3 grandchildren)
+			announcements = [];
+
+			const event = {
+				key: '3',
+				preventDefault: vi.fn(),
+				target: { tagName: 'DIV', isContentEditable: false }
+			} as unknown as KeyboardEvent;
+			const handled = navigator.handleKeyDown(event);
+
+			expect(handled).toBe(true);
+			expect(navigator.focusedNodeId).toBe(engine.nodes[4].id); // Grandchild 3
+			expect(announcements.some((msg) => msg.includes('Jumped to child 3'))).toBe(true);
+		});
+
+		it('should announce when child number exceeds available children', () => {
+			navigator.focusedNodeId = engine.nodes[1].id; // Child 1 (has 3 grandchildren)
+			announcements = [];
+
+			const event = {
+				key: '9',
+				preventDefault: vi.fn(),
+				target: { tagName: 'DIV', isContentEditable: false }
+			} as unknown as KeyboardEvent;
+			navigator.handleKeyDown(event);
+
+			expect(announcements).toContain('Only 3 children available');
+		});
+
+		it('should announce when node has no children', () => {
+			navigator.focusedNodeId = engine.nodes[2].id; // Grandchild 1 (leaf node)
+			announcements = [];
+
+			const event = {
+				key: '1',
+				preventDefault: vi.fn(),
+				target: { tagName: 'DIV', isContentEditable: false }
+			} as unknown as KeyboardEvent;
+			navigator.handleKeyDown(event);
+
+			expect(announcements).toContain('No children available');
+		});
+	});
+
+	describe('Fuzzy Search', () => {
+		it('should open fuzzy search with "/" key', () => {
+			const event = {
+				key: '/',
+				preventDefault: vi.fn(),
+				target: { tagName: 'DIV', isContentEditable: false }
+			} as unknown as KeyboardEvent;
+			const handled = navigator.handleKeyDown(event);
+
+			expect(handled).toBe(true);
+			expect(navigator.showFuzzySearch).toBe(true);
+			expect(announcements).toContain('Fuzzy search opened');
+		});
+
+		it('should close fuzzy search', () => {
+			navigator.showFuzzySearch = true;
+			announcements = [];
+
+			navigator.closeFuzzySearch();
+
+			expect(navigator.showFuzzySearch).toBe(false);
+			expect(announcements).toContain('Fuzzy search closed');
+		});
+
+		it('should navigate to node by id', () => {
+			const node = engine.addNode('Test node', 'user', { x: 0, y: 0 });
+			const targetNodeId = node.id;
+			announcements = [];
+
+			navigator.navigateToNodeById(targetNodeId);
+
+			expect(navigator.focusedNodeId).toBe(targetNodeId);
+			expect(announcements.some((msg) => msg.includes('Navigated to:'))).toBe(true);
+		});
+	});
 });

@@ -13,7 +13,8 @@ export const serializedNodeSchema = z.object({
 	metadata: z.object({
 		x: z.number(),
 		y: z.number(),
-		height: z.number().optional()
+		height: z.number().optional(),
+		tags: z.array(z.string()).optional()
 	}),
 	data: z.unknown().optional()
 });
@@ -34,7 +35,8 @@ const legacySerializedNodeSchema = z
 		metadata: z.object({
 			x: z.number(),
 			y: z.number(),
-			height: z.number().optional()
+			height: z.number().optional(),
+			tags: z.array(z.string()).optional()
 		}),
 		data: z.unknown().optional()
 	})

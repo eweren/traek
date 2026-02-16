@@ -1,5 +1,12 @@
 import { describe, it, expect } from 'vitest';
-import { darkTheme, lightTheme, highContrastTheme, themes, DEFAULT_THEME } from './themes';
+import {
+	darkTheme,
+	lightTheme,
+	highContrastTheme,
+	themes,
+	DEFAULT_THEME,
+	createCustomTheme
+} from './themes';
 import type { TraekTheme } from './tokens';
 
 describe('Theme Completeness', () => {
@@ -216,5 +223,80 @@ describe('Theme Completeness', () => {
 			expect(darkTheme.animation).toEqual(lightTheme.animation);
 			expect(darkTheme.animation).toEqual(highContrastTheme.animation);
 		});
+	});
+});
+
+describe('createCustomTheme', () => {
+	it('should create a custom theme with a new accent color', () => {
+		const customAccent = '#ff00ff';
+		const customTheme = createCustomTheme(darkTheme, customAccent);
+
+		expect(customTheme.colors.nodeActiveBorder).toBe(customAccent);
+		expect(customTheme.colors.nodeUserBorderTop).toBe(customAccent);
+		expect(customTheme.colors.connectionHighlight).toBe(customAccent);
+		expect(customTheme.colors.inputButtonBg).toBe(customAccent);
+		expect(customTheme.colors.inputDot).toBe(customAccent);
+		expect(customTheme.colors.thoughtPanelBorderActive).toBe(customAccent);
+		expect(customTheme.colors.thoughtTagCyan).toBe(customAccent);
+		expect(customTheme.colors.overlayPillBg).toBe(customAccent);
+	});
+
+	it('should generate lighter variations for certain colors', () => {
+		const customAccent = '#336699';
+		const customTheme = createCustomTheme(darkTheme, customAccent);
+
+		// thoughtBadgeCyan should be a lighter version (not the exact same)
+		expect(customTheme.colors.thoughtBadgeCyan).toMatch(/^#[0-9a-f]{6}$/i);
+		// It should be different from the base accent for mid-tone colors
+		expect(customTheme.colors.thoughtBadgeCyan).not.toBe(customAccent);
+	});
+
+	it('should preserve non-accent colors from base theme', () => {
+		const customAccent = '#ff00ff';
+		const customTheme = createCustomTheme(darkTheme, customAccent);
+
+		expect(customTheme.colors.canvasBg).toBe(darkTheme.colors.canvasBg);
+		expect(customTheme.colors.nodeBg).toBe(darkTheme.colors.nodeBg);
+		expect(customTheme.colors.nodeAssistantBorderTop).toBe(darkTheme.colors.nodeAssistantBorderTop);
+		expect(customTheme.spacing).toEqual(darkTheme.spacing);
+		expect(customTheme.typography).toEqual(darkTheme.typography);
+		expect(customTheme.animation).toEqual(darkTheme.animation);
+	});
+
+	it('should work with light theme as base', () => {
+		const customAccent = '#00ff00';
+		const customTheme = createCustomTheme(lightTheme, customAccent);
+
+		expect(customTheme.colors.nodeActiveBorder).toBe(customAccent);
+		expect(customTheme.colors.canvasBg).toBe(lightTheme.colors.canvasBg);
+	});
+
+	it('should handle different hex color formats', () => {
+		const shortHex = '#f0f';
+		const longHex = '#ff00ff';
+
+		const theme1 = createCustomTheme(darkTheme, shortHex);
+		const theme2 = createCustomTheme(darkTheme, longHex);
+
+		expect(theme1.colors.nodeActiveBorder).toBe(shortHex);
+		expect(theme2.colors.nodeActiveBorder).toBe(longHex);
+	});
+
+	it('should generate rgba variations with correct alpha values', () => {
+		const customAccent = '#ff0000';
+		const customTheme = createCustomTheme(darkTheme, customAccent);
+
+		expect(customTheme.colors.nodeActiveGlow).toContain('rgba(255, 0, 0');
+		expect(customTheme.colors.thoughtPanelGlow).toContain('rgba(255, 0, 0');
+		expect(customTheme.colors.overlayPillShadow).toContain('rgba(255, 0, 0');
+	});
+
+	it('should not mutate the original theme object', () => {
+		const originalAccent = darkTheme.colors.nodeActiveBorder;
+		const customAccent = '#123456';
+
+		createCustomTheme(darkTheme, customAccent);
+
+		expect(darkTheme.colors.nodeActiveBorder).toBe(originalAccent);
 	});
 });

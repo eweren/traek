@@ -80,6 +80,28 @@
 			</div>
 		</div>
 
+		<div class="shortcuts-section">
+			<h3>Advanced</h3>
+			<div class="shortcuts-grid">
+				<div class="shortcut">
+					<kbd>g</kbd><kbd>g</kbd>
+					<span>Go to root (chord)</span>
+				</div>
+				<div class="shortcut">
+					<kbd>g</kbd><kbd>e</kbd>
+					<span>Go to deepest leaf (chord)</span>
+				</div>
+				<div class="shortcut">
+					<kbd>1</kbd>-<kbd>9</kbd>
+					<span>Jump to nth child</span>
+				</div>
+				<div class="shortcut">
+					<kbd>/</kbd>
+					<span>Open fuzzy search</span>
+				</div>
+			</div>
+		</div>
+
 		<button class="close-button" onclick={onClose}>Close</button>
 	</div>
 </div>

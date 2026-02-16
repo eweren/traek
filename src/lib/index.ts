@@ -45,7 +45,7 @@ export type { DefaultNodeActionCallbacks } from './defaultNodeActions';
 
 // Persistence & Replay
 export { ReplayController } from './persistence/ReplayController.svelte';
-export { default as ReplayControls } from './persistence/ReplayControls.svelte';
+export { default as ReplayControls } from './replay/ReplayControls.svelte';
 export { ConversationStore } from './persistence/ConversationStore.svelte';
 export { default as SaveIndicator } from './persistence/SaveIndicator.svelte';
 export { default as ChatList } from './persistence/ChatList.svelte';
@@ -57,6 +57,18 @@ export type {
 	ConversationListItem,
 	SaveState
 } from './persistence/types';
+
+// Tag System
+export { default as TagBadges } from './tags/TagBadges.svelte';
+export { default as TagDropdown } from './tags/TagDropdown.svelte';
+export { default as TagFilter } from './tags/TagFilter.svelte';
+export {
+	PREDEFINED_TAGS,
+	getNodeTags,
+	getTagConfig,
+	matchesTagFilter,
+	type TagConfig
+} from './tags/tagUtils';
 
 // Toast system
 export { default as ToastContainer } from './toast/ToastContainer.svelte';
@@ -100,7 +112,15 @@ export { nodeTypeActionSchema, nodeTypeDefinitionSchema } from './node-types/sch
 
 // Theme System
 export { default as ThemeProvider, useTheme, applyThemeToRoot } from './theme/ThemeProvider.svelte';
-export { darkTheme, lightTheme, highContrastTheme, themes, DEFAULT_THEME } from './theme/themes';
+export { default as ThemePicker } from './theme/ThemePicker.svelte';
+export {
+	darkTheme,
+	lightTheme,
+	highContrastTheme,
+	themes,
+	DEFAULT_THEME,
+	createCustomTheme
+} from './theme/themes';
 export type { ThemeName } from './theme/themes';
 export type { ThemeContext } from './theme/ThemeProvider.svelte';
 export {

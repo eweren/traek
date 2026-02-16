@@ -29,12 +29,15 @@
 	import InputForm from './canvas/InputForm.svelte';
 	import { KeyboardNavigator } from './keyboard/KeyboardNavigator.svelte';
 	import KeyboardHelpOverlay from './keyboard/KeyboardHelpOverlay.svelte';
+	import FuzzySearchOverlay from './keyboard/FuzzySearchOverlay.svelte';
+	import GhostPreview from './canvas/GhostPreview.svelte';
 	import LiveRegion from './a11y/LiveRegion.svelte';
 	import SearchBar from './search/SearchBar.svelte';
 	import ZoomControls from './canvas/ZoomControls.svelte';
 	import Minimap from './canvas/Minimap.svelte';
 	import BranchCompare from './compare/BranchCompare.svelte';
 	import DesktopTour from './onboarding/DesktopTour.svelte';
+	import ThemePicker from './theme/ThemePicker.svelte';
 
 	type InputActionsContext = {
 		engine: TraekEngine;
@@ -271,6 +274,7 @@
 	let userInput = $state('');
 	let sendFlash = $state(false);
 	let editingNodeId = $state<string | null>(null);
+	let lastEditedNodeId = $state<string | null>(null);
 
 	// Branch celebration tracking
 	let celebratedBranches = $state(new Set<string>());
@@ -441,11 +445,53 @@
 	function handleEditSave(nodeId: string, content: string) {
 		engine?.updateNode(nodeId, { content });
 		editingNodeId = null;
+		lastEditedNodeId = nodeId;
+
+		// Mark descendant assistant nodes as outdated
+		if (engine) {
+			const descendants: Node[] = [];
+			const queue = [nodeId];
+			// eslint-disable-next-line svelte/prefer-svelte-reactivity
+			const visited = new Set<string>();
+
+			while (queue.length > 0) {
+				const currentId = queue.shift()!;
+				if (visited.has(currentId)) continue;
+				visited.add(currentId);
+
+				const children = engine.getChildren(currentId);
+				for (const child of children) {
+					descendants.push(child);
+					queue.push(child.id);
+				}
+			}
+
+			descendants.forEach((desc: Node) => {
+				if (desc.role === 'assistant' && desc.metadata) {
+					desc.metadata.outdated = true;
+				}
+			});
+		}
+
 		onNodesChanged?.();
 	}
 
 	function handleEditCancel() {
 		editingNodeId = null;
+	}
+
+	function handleRegenerate(nodeId: string) {
+		const node = engine?.nodes.find((n) => n.id === nodeId);
+		if (!node || node.type !== 'text' || !('content' in node)) return;
+
+		const messageNode = node as MessageNode;
+		const content = messageNode.content || '';
+
+		// Clear the re-generate button by resetting lastEditedNodeId
+		lastEditedNodeId = null;
+
+		// Send message with the edited content
+		onSendMessage?.(content, messageNode);
 	}
 
 	function handleCompare(nodeId: string) {
@@ -594,6 +640,40 @@
 						/>
 					{/if}
 				{/if}
+
+				{#if lastEditedNodeId}
+					{@const editedNode = engine.nodes.find((n) => n.id === lastEditedNodeId)}
+					{#if editedNode}
+						{@const step = config.gridStep}
+						<div
+							class="regenerate-button-wrapper"
+							style:left="{(editedNode.metadata?.x ?? 0) * step}px"
+							style:top="{(editedNode.metadata?.y ?? 0) * step +
+								(editedNode.metadata?.height ?? 100) +
+								10}px"
+						>
+							<button
+								type="button"
+								class="regenerate-button"
+								onclick={() => handleRegenerate(lastEditedNodeId!)}
+							>
+								<svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+									<path
+										d="M2 7a5 5 0 0 1 9-3M12 7a5 5 0 0 1-9 3M11 4v3h-3M3 10V7h3"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									/>
+								</svg>
+								Re-generate response
+							</button>
+						</div>
+					{/if}
+				{/if}
+
+				<!-- Ghost Preview -->
+				<GhostPreview {engine} {config} {userInput} />
 			</div>
 
 			{#if engine.activeNodeId}
@@ -656,6 +736,7 @@
 
 			<ZoomControls {viewport} nodes={engine.nodes} {config} />
 			<Minimap {viewport} nodes={engine.nodes} {config} />
+			<ThemePicker compact={true} />
 
 			{#if showSearchBar}
 				<SearchBar
@@ -674,6 +755,15 @@
 			{#if keyboardNavigator?.showHelp}
 				<KeyboardHelpOverlay
 					onClose={() => keyboardNavigator && (keyboardNavigator.showHelp = false)}
+				/>
+			{/if}
+
+			<!-- Fuzzy Search Overlay -->
+			{#if keyboardNavigator?.showFuzzySearch}
+				<FuzzySearchOverlay
+					{engine}
+					onClose={() => keyboardNavigator?.closeFuzzySearch()}
+					onSelect={(nodeId) => keyboardNavigator?.navigateToNodeById(nodeId)}
 				/>
 			{/if}
 
@@ -812,6 +902,52 @@
 			width: 100%;
 			max-width: calc(min(600px, 100vw) - 3rem);
 			z-index: 100;
+		}
+
+		.regenerate-button-wrapper {
+			position: absolute;
+			z-index: 10;
+			animation: fade-in 200ms ease-out;
+		}
+
+		.regenerate-button {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			padding: 8px 16px;
+			background: var(--traek-input-button-bg, #00d8ff);
+			color: var(--traek-input-button-text, #000000);
+			border: none;
+			border-radius: 8px;
+			font-family: inherit;
+			font-size: 12px;
+			font-weight: 500;
+			cursor: pointer;
+			transition:
+				opacity 0.15s,
+				transform 0.15s;
+			box-shadow: 0 4px 12px rgba(0, 216, 255, 0.3);
+		}
+
+		.regenerate-button:hover {
+			opacity: 0.9;
+			transform: translateY(-1px);
+		}
+
+		.regenerate-button:focus-visible {
+			outline: 2px solid var(--traek-input-button-bg, #00d8ff);
+			outline-offset: 2px;
+		}
+
+		@keyframes fade-in {
+			from {
+				opacity: 0;
+				transform: translateY(-4px);
+			}
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
 		}
 	}
 </style>

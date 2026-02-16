@@ -390,3 +390,64 @@ export type ThemeName = keyof typeof themes;
  * Default theme name
  */
 export const DEFAULT_THEME: ThemeName = 'dark';
+
+/**
+ * Generate color variations for the accent color
+ */
+function generateAccentVariations(accentHex: string): {
+	base: string;
+	light: string;
+	dark: string;
+	alpha15: string;
+	alpha20: string;
+	alpha30: string;
+} {
+	// Parse hex color
+	const hex = accentHex.replace('#', '');
+	const r = parseInt(hex.slice(0, 2), 16);
+	const g = parseInt(hex.slice(2, 4), 16);
+	const b = parseInt(hex.slice(4, 6), 16);
+
+	// Generate lighter version (+20% brightness)
+	const lighter = (v: number) => Math.min(255, Math.floor(v * 1.2));
+	const light = `#${lighter(r).toString(16).padStart(2, '0')}${lighter(g).toString(16).padStart(2, '0')}${lighter(b).toString(16).padStart(2, '0')}`;
+
+	// Generate darker version (-20% brightness)
+	const darker = (v: number) => Math.floor(v * 0.8);
+	const dark = `#${darker(r).toString(16).padStart(2, '0')}${darker(g).toString(16).padStart(2, '0')}${darker(b).toString(16).padStart(2, '0')}`;
+
+	return {
+		base: accentHex,
+		light,
+		dark,
+		alpha15: `rgba(${r}, ${g}, ${b}, 0.15)`,
+		alpha20: `rgba(${r}, ${g}, ${b}, 0.2)`,
+		alpha30: `rgba(${r}, ${g}, ${b}, 0.3)`
+	};
+}
+
+/**
+ * Create a custom theme by replacing the accent color in a base theme
+ */
+export function createCustomTheme(baseTheme: TraekTheme, accentColor: string): TraekTheme {
+	const variations = generateAccentVariations(accentColor);
+
+	// Deep clone the base theme
+	const customTheme: TraekTheme = JSON.parse(JSON.stringify(baseTheme));
+
+	// Replace all accent colors in the theme
+	customTheme.colors.nodeActiveBorder = variations.base;
+	customTheme.colors.nodeActiveGlow = variations.alpha15;
+	customTheme.colors.nodeUserBorderTop = variations.base;
+	customTheme.colors.connectionHighlight = variations.base;
+	customTheme.colors.inputButtonBg = variations.base;
+	customTheme.colors.inputDot = variations.base;
+	customTheme.colors.thoughtPanelBorderActive = variations.base;
+	customTheme.colors.thoughtPanelGlow = variations.alpha15;
+	customTheme.colors.thoughtTagCyan = variations.base;
+	customTheme.colors.thoughtBadgeCyan = variations.light;
+	customTheme.colors.overlayPillBg = variations.base;
+	customTheme.colors.overlayPillShadow = variations.alpha20;
+
+	return customTheme;
+}
