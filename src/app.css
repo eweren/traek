@@ -1,374 +1,374 @@
 @font-face {
-  font-family: 'Space Grotesk';
-  src: url('/SpaceGrotesk-VariableFont_wght.ttf') format('truetype');
-  font-weight: 100 700;
-  font-display: swap;
+	font-family: 'Space Grotesk';
+	src: url('/SpaceGrotesk-VariableFont_wght.ttf') format('truetype');
+	font-weight: 100 700;
+	font-display: swap;
 }
 
 @font-face {
-  font-family: 'Space Mono';
-  src: url('/SpaceMono-Regular.ttf') format('truetype');
-  font-weight: 400;
-  font-display: swap;
+	font-family: 'Space Mono';
+	src: url('/SpaceMono-Regular.ttf') format('truetype');
+	font-weight: 400;
+	font-display: swap;
 }
 
 :root {
-  /* ========== Package (traek) – used by TraekCanvas, TextNode, TraekNodeWrapper, DefaultLoadingOverlay ========== */
+	/* ========== Package (traek) – used by TraekCanvas, TextNode, TraekNodeWrapper, DefaultLoadingOverlay ========== */
 
-  /* Canvas + nodes */
-  --traek-canvas-bg: #0b0b0b;
-  --traek-canvas-dot: #333333;
-  --traek-node-bg: #161616;
-  --traek-node-border: #2a2a2a;
-  --traek-node-text: #dddddd;
-  --traek-node-active-border: #00d8ff;
-  --traek-node-active-glow: rgba(0, 216, 255, 0.15);
-  --traek-node-user-border-top: #00d8ff;
-  --traek-node-assistant-border-top: #ff3e00;
+	/* Canvas + nodes */
+	--traek-canvas-bg: #0b0b0b;
+	--traek-canvas-dot: #333333;
+	--traek-node-bg: #161616;
+	--traek-node-border: #2a2a2a;
+	--traek-node-text: #dddddd;
+	--traek-node-active-border: #00d8ff;
+	--traek-node-active-glow: rgba(0, 216, 255, 0.15);
+	--traek-node-user-border-top: #00d8ff;
+	--traek-node-assistant-border-top: #ff3e00;
 
-  --traek-connection-stroke: #333333;
-  --traek-connection-highlight: #00d8ff;
+	--traek-connection-stroke: #333333;
+	--traek-connection-highlight: #00d8ff;
 
-  --traek-input-bg: rgba(30, 30, 30, 0.8);
-  --traek-input-border: #444444;
-  --traek-input-shadow: rgba(0, 0, 0, 0.4);
-  --traek-input-button-bg: #00d8ff;
-  --traek-input-button-text: #000000;
-  --traek-input-text: rgb(255,255,255);
-  --traek-input-context-bg: rgba(0, 0, 0, 0.4);
-  --traek-input-context-text: #888888;
-  --traek-input-dot: #00d8ff;
-  --traek-input-dot-muted: #555555;
-  --traek-stats-text: #555555;
+	--traek-input-bg: rgba(30, 30, 30, 0.8);
+	--traek-input-border: #444444;
+	--traek-input-shadow: rgba(0, 0, 0, 0.4);
+	--traek-input-button-bg: #00d8ff;
+	--traek-input-button-text: #000000;
+	--traek-input-text: rgb(255, 255, 255);
+	--traek-input-context-bg: rgba(0, 0, 0, 0.4);
+	--traek-input-context-text: #888888;
+	--traek-input-dot: #00d8ff;
+	--traek-input-dot-muted: #555555;
+	--traek-stats-text: #555555;
 
-  /* Text node / markdown */
-  --traek-textnode-text: #dddddd;
-  --traek-textnode-bg: #222222;
-  --traek-markdown-quote-border: #444444;
-  --traek-markdown-quote-text: #999999;
-  --traek-markdown-hr: #333333;
-  --traek-scroll-hint-bg: linear-gradient(transparent, rgba(0, 0, 0, 0.5));
-  --traek-scroll-hint-text: #444444;
-  --traek-scrollbar-thumb: #333333;
-  --traek-scrollbar-thumb-hover: #444444;
-  --traek-typing-cursor: #ff3e00;
+	/* Text node / markdown */
+	--traek-textnode-text: #dddddd;
+	--traek-textnode-bg: #222222;
+	--traek-markdown-quote-border: #444444;
+	--traek-markdown-quote-text: #999999;
+	--traek-markdown-hr: #333333;
+	--traek-scroll-hint-bg: linear-gradient(transparent, rgba(0, 0, 0, 0.5));
+	--traek-scroll-hint-text: #444444;
+	--traek-scrollbar-thumb: #333333;
+	--traek-scrollbar-thumb-hover: #444444;
+	--traek-typing-cursor: #ff3e00;
 
-  /* Thought / message wrapper */
-  --traek-thought-panel-bg: rgba(22, 22, 22, 0.9);
-  --traek-thought-panel-border: #333333;
-  --traek-thought-panel-border-active: #00d8ff;
-  --traek-thought-panel-glow: rgba(0, 216, 255, 0.15);
-  --traek-thought-header-bg: rgba(255, 255, 255, 0.03);
-  --traek-thought-header-border: #222222;
-  --traek-thought-header-muted: #666666;
-  --traek-thought-header-accent: #888888;
-  --traek-thought-tag-cyan: #00d8ff;
-  --traek-thought-tag-orange: #ff3e00;
-  --traek-thought-tag-gray: #444444;
-  --traek-thought-divider: rgba(255, 255, 255, 0.06);
-  --traek-thought-row-bg: rgba(255, 255, 255, 0.03);
-  --traek-thought-row-muted-1: #888888;
-  --traek-thought-row-muted-2: #aaaaaa;
-  --traek-thought-row-muted-3: #999999;
-  --traek-thought-row-muted-4: #666666;
-  --traek-thought-badge-cyan: #00dddd;
-  --traek-thought-footer-muted: #bbbbbb;
-  --traek-thought-footer-bg: rgba(0, 0, 0, 0.2);
-  --traek-thought-footer-border: rgba(255, 255, 255, 0.05);
-  --traek-thought-toggle-bg: #444444;
-  --traek-thought-toggle-border: #555555;
+	/* Thought / message wrapper */
+	--traek-thought-panel-bg: rgba(22, 22, 22, 0.9);
+	--traek-thought-panel-border: #333333;
+	--traek-thought-panel-border-active: #00d8ff;
+	--traek-thought-panel-glow: rgba(0, 216, 255, 0.15);
+	--traek-thought-header-bg: rgba(255, 255, 255, 0.03);
+	--traek-thought-header-border: #222222;
+	--traek-thought-header-muted: #666666;
+	--traek-thought-header-accent: #888888;
+	--traek-thought-tag-cyan: #00d8ff;
+	--traek-thought-tag-orange: #ff3e00;
+	--traek-thought-tag-gray: #444444;
+	--traek-thought-divider: rgba(255, 255, 255, 0.06);
+	--traek-thought-row-bg: rgba(255, 255, 255, 0.03);
+	--traek-thought-row-muted-1: #888888;
+	--traek-thought-row-muted-2: #aaaaaa;
+	--traek-thought-row-muted-3: #999999;
+	--traek-thought-row-muted-4: #666666;
+	--traek-thought-badge-cyan: #00dddd;
+	--traek-thought-footer-muted: #bbbbbb;
+	--traek-thought-footer-bg: rgba(0, 0, 0, 0.2);
+	--traek-thought-footer-border: rgba(255, 255, 255, 0.05);
+	--traek-thought-toggle-bg: #444444;
+	--traek-thought-toggle-border: #555555;
 
-  /* Overlays */
-  --traek-overlay-gradient-1: rgba(0, 0, 0, 0.7);
-  --traek-overlay-gradient-2: rgba(0, 0, 0, 0.9);
-  --traek-overlay-gradient-3: rgba(0, 0, 0, 1);
-  --traek-overlay-card-bg: rgba(15, 15, 15, 0.9);
-  --traek-overlay-card-border: rgba(255, 255, 255, 0.08);
-  --traek-overlay-card-shadow: rgba(0, 0, 0, 0.8);
-  --traek-overlay-text: #e5e5e5;
-  --traek-overlay-pill-bg: #00d8ff;
-  --traek-overlay-pill-shadow: rgba(0, 216, 255, 0.7);
+	/* Overlays */
+	--traek-overlay-gradient-1: rgba(0, 0, 0, 0.7);
+	--traek-overlay-gradient-2: rgba(0, 0, 0, 0.9);
+	--traek-overlay-gradient-3: rgba(0, 0, 0, 1);
+	--traek-overlay-card-bg: rgba(15, 15, 15, 0.9);
+	--traek-overlay-card-border: rgba(255, 255, 255, 0.08);
+	--traek-overlay-card-shadow: rgba(0, 0, 0, 0.8);
+	--traek-overlay-text: #e5e5e5;
+	--traek-overlay-pill-bg: #00d8ff;
+	--traek-overlay-pill-shadow: rgba(0, 216, 255, 0.7);
 
-  /* ========== Demo app only – landing, demo list, conversation shell, theme toggle, gravity background ========== */
+	/* ========== Demo app only – landing, demo list, conversation shell, theme toggle, gravity background ========== */
 
-  /* App shell (body, code blocks) */
-  --traek-bg-body: #0b0b0b;
-  --traek-text-body: #dddddd;
-  --traek-code-bg: rgba(0, 0, 0, 0.2);
+	/* App shell (body, code blocks) */
+	--traek-bg-body: #0b0b0b;
+	--traek-text-body: #dddddd;
+	--traek-code-bg: rgba(0, 0, 0, 0.2);
 
-  /* Landing page */
-  --traek-landing-bg-top: #151515;
-  --traek-landing-bg-mid: #050505;
-  --traek-landing-bg-bottom: #000000;
-  --traek-landing-text-main: #f5f5f5;
-  --traek-landing-text-muted-1: #8b8b8b;
-  --traek-landing-text-muted-2: #a5a5a5;
-  --traek-landing-text-muted-3: #c3c3c3;
-  --traek-landing-text-muted-4: #d4d4d4;
-  --traek-landing-text-muted-5: #dcdcdc;
-  --traek-landing-text-muted-6: #e0e0e0;
-  --traek-landing-text-muted-7: #e4e4e4;
-  --traek-landing-text-muted-8: #e5e5e5;
-  --traek-landing-text-muted-9: #f0f0f0;
-  --traek-landing-text-strong: #f6f6f6;
+	/* Landing page */
+	--traek-landing-bg-top: #151515;
+	--traek-landing-bg-mid: #050505;
+	--traek-landing-bg-bottom: #000000;
+	--traek-landing-text-main: #f5f5f5;
+	--traek-landing-text-muted-1: #8b8b8b;
+	--traek-landing-text-muted-2: #a5a5a5;
+	--traek-landing-text-muted-3: #c3c3c3;
+	--traek-landing-text-muted-4: #d4d4d4;
+	--traek-landing-text-muted-5: #dcdcdc;
+	--traek-landing-text-muted-6: #e0e0e0;
+	--traek-landing-text-muted-7: #e4e4e4;
+	--traek-landing-text-muted-8: #e5e5e5;
+	--traek-landing-text-muted-9: #f0f0f0;
+	--traek-landing-text-strong: #f6f6f6;
 
-  --traek-accent-cyan: #00d8ff;
-  --traek-accent-lime: #00ffa3;
-  --traek-accent-cyan-soft: rgba(0, 216, 255, 0.08);
+	--traek-accent-cyan: #00d8ff;
+	--traek-accent-lime: #00ffa3;
+	--traek-accent-cyan-soft: rgba(0, 216, 255, 0.08);
 
-  --traek-pill-bg: rgba(255, 255, 255, 0.03);
-  --traek-pill-border: rgba(255, 255, 255, 0.06);
+	--traek-pill-bg: rgba(255, 255, 255, 0.03);
+	--traek-pill-border: rgba(255, 255, 255, 0.06);
 
-  --traek-demo-frame-bg-outer: #191919;
-  --traek-demo-frame-bg-inner: #050505;
-  --traek-demo-frame-bg-bottom: #000000;
+	--traek-demo-frame-bg-outer: #191919;
+	--traek-demo-frame-bg-inner: #050505;
+	--traek-demo-frame-bg-bottom: #000000;
 
-  --traek-section-alt-glow: rgba(0, 216, 255, 0.08);
-  --traek-metric-accent: rgba(0, 216, 255, 0.12);
-  --traek-metric-accent-border: rgba(0, 216, 255, 0.3);
-  --traek-metric-bg-end: #060606;
-  --traek-metric-glow: rgba(0, 216, 255, 0.18);
-  --traek-stack-accent: rgba(0, 216, 255, 0.08);
-  --traek-stack-accent-border: rgba(0, 216, 255, 0.28);
-  --traek-stack-bg-end: #050505;
-  --traek-code-label: #9f9f9f;
-  --traek-final-muted: #cfcfcf;
-  --traek-card-bg-dark-1: #1f1f1f;
-  --traek-card-bg-dark-2: #101010;
-  --traek-card-bg-dark-3: #262626;
-  --traek-card-bg-dark-4: #111111;
+	--traek-section-alt-glow: rgba(0, 216, 255, 0.08);
+	--traek-metric-accent: rgba(0, 216, 255, 0.12);
+	--traek-metric-accent-border: rgba(0, 216, 255, 0.3);
+	--traek-metric-bg-end: #060606;
+	--traek-metric-glow: rgba(0, 216, 255, 0.18);
+	--traek-stack-accent: rgba(0, 216, 255, 0.08);
+	--traek-stack-accent-border: rgba(0, 216, 255, 0.28);
+	--traek-stack-bg-end: #050505;
+	--traek-code-label: #9f9f9f;
+	--traek-final-muted: #cfcfcf;
+	--traek-card-bg-dark-1: #1f1f1f;
+	--traek-card-bg-dark-2: #101010;
+	--traek-card-bg-dark-3: #262626;
+	--traek-card-bg-dark-4: #111111;
 
-  /* Demo list page */
-  --traek-demo-text-main: #e4e4e7;
-  --traek-demo-text-strong: #fafafa;
-  --traek-demo-text-muted-1: #a1a1aa;
-  --traek-demo-text-muted-2: #d4d4d8;
-  --traek-demo-text-muted-3: #f4f4f5;
-  --traek-demo-text-muted-4: #71717a;
-  --traek-demo-panel-bg-1: rgba(24, 24, 27, 0.85);
-  --traek-demo-panel-bg-2: rgba(24, 24, 27, 0.8);
-  --traek-demo-panel-bg-empty: rgba(24, 24, 27, 0.5);
-  --traek-demo-border-soft: rgba(255, 255, 255, 0.1);
-  --traek-demo-border-strong: rgba(255, 255, 255, 0.15);
-  --traek-demo-border-dashed: rgba(255, 255, 255, 0.08);
-  --traek-demo-border-hover: rgba(255, 255, 255, 0.16);
-  --traek-demo-button-bg: rgba(255, 255, 255, 0.1);
-  --traek-demo-button-bg-hover: rgba(255, 255, 255, 0.16);
-  --traek-demo-list-bg-hover: rgba(39, 39, 42, 0.9);
+	/* Demo list page */
+	--traek-demo-text-main: #e4e4e7;
+	--traek-demo-text-strong: #fafafa;
+	--traek-demo-text-muted-1: #a1a1aa;
+	--traek-demo-text-muted-2: #d4d4d8;
+	--traek-demo-text-muted-3: #f4f4f5;
+	--traek-demo-text-muted-4: #71717a;
+	--traek-demo-panel-bg-1: rgba(24, 24, 27, 0.85);
+	--traek-demo-panel-bg-2: rgba(24, 24, 27, 0.8);
+	--traek-demo-panel-bg-empty: rgba(24, 24, 27, 0.5);
+	--traek-demo-border-soft: rgba(255, 255, 255, 0.1);
+	--traek-demo-border-strong: rgba(255, 255, 255, 0.15);
+	--traek-demo-border-dashed: rgba(255, 255, 255, 0.08);
+	--traek-demo-border-hover: rgba(255, 255, 255, 0.16);
+	--traek-demo-button-bg: rgba(255, 255, 255, 0.1);
+	--traek-demo-button-bg-hover: rgba(255, 255, 255, 0.16);
+	--traek-demo-list-bg-hover: rgba(39, 39, 42, 0.9);
 
-  /* Conversation page (shell: back button, loading, error) */
-  --traek-conv-bg: #fafafa;
-  --traek-conv-back-bg: #0b0b0b;
-  --traek-conv-back-text: #dddddd;
-  --traek-error-text: #cc0000;
-  --traek-loading-bg: #0b0b0b;
-  --traek-spinner-border: rgba(255, 255, 255, 0.12);
-  --traek-spinner-top: #888888;
+	/* Conversation page (shell: back button, loading, error) */
+	--traek-conv-bg: #fafafa;
+	--traek-conv-back-bg: #0b0b0b;
+	--traek-conv-back-text: #dddddd;
+	--traek-error-text: #cc0000;
+	--traek-loading-bg: #0b0b0b;
+	--traek-spinner-border: rgba(255, 255, 255, 0.12);
+	--traek-spinner-top: #888888;
 
-  /* Gravity dots background */
-  --traek-gravity-dot: #262626;
-  --traek-gravity-tendril: rgba(148, 163, 184, 0.35);
-  --traek-gravity-tendril-branch: rgba(148, 163, 184, 0.22);
+	/* Gravity dots background */
+	--traek-gravity-dot: #262626;
+	--traek-gravity-tendril: rgba(148, 163, 184, 0.35);
+	--traek-gravity-tendril-branch: rgba(148, 163, 184, 0.22);
 
-  /* Demo shadows */
-  --traek-shadow-dot-glow: 0 0 14px rgba(0, 216, 255, 0.6);
-  --traek-shadow-btn-primary: 0 12px 32px rgba(0, 216, 255, 0.28);
-  --traek-shadow-btn-primary-hover: 0 16px 40px rgba(0, 216, 255, 0.38);
-  --traek-shadow-demo-frame: 0 22px 60px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(0, 0, 0, 0.6);
-  --traek-shadow-card: 0 18px 45px rgba(0, 0, 0, 0.75);
-  --traek-shadow-metric: 0 18px 45px rgba(0, 0, 0, 0.9);
-  --traek-shadow-code-card: 0 18px 45px rgba(0, 0, 0, 0.8);
-  --traek-shadow-stack-item: 0 18px 45px rgba(0, 0, 0, 0.2);
-  --traek-shadow-demo-info: 0 4px 24px rgba(0, 0, 0, 0.25);
-  --traek-shadow-demo-list-item: 0 2px 12px rgba(0, 0, 0, 0.2);
-  --traek-shadow-demo-list-item-hover: 0 4px 20px rgba(0, 0, 0, 0.3);
-  --traek-shadow-tool-panel: 0 12px 40px rgba(0, 0, 0, 0.5);
+	/* Demo shadows */
+	--traek-shadow-dot-glow: 0 0 14px rgba(0, 216, 255, 0.6);
+	--traek-shadow-btn-primary: 0 12px 32px rgba(0, 216, 255, 0.28);
+	--traek-shadow-btn-primary-hover: 0 16px 40px rgba(0, 216, 255, 0.38);
+	--traek-shadow-demo-frame: 0 22px 60px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(0, 0, 0, 0.6);
+	--traek-shadow-card: 0 18px 45px rgba(0, 0, 0, 0.75);
+	--traek-shadow-metric: 0 18px 45px rgba(0, 0, 0, 0.9);
+	--traek-shadow-code-card: 0 18px 45px rgba(0, 0, 0, 0.8);
+	--traek-shadow-stack-item: 0 18px 45px rgba(0, 0, 0, 0.2);
+	--traek-shadow-demo-info: 0 4px 24px rgba(0, 0, 0, 0.25);
+	--traek-shadow-demo-list-item: 0 2px 12px rgba(0, 0, 0, 0.2);
+	--traek-shadow-demo-list-item-hover: 0 4px 20px rgba(0, 0, 0, 0.3);
+	--traek-shadow-tool-panel: 0 12px 40px rgba(0, 0, 0, 0.5);
 }
 
 /* Light theme */
 [data-theme='light'] {
-  /* ========== Package (traek) ========== */
+	/* ========== Package (traek) ========== */
 
-  --traek-canvas-bg: #f0f0f0;
-  --traek-canvas-dot: #cccccc;
-  --traek-node-bg: #ffffff;
-  --traek-node-border: #d4d4d4;
-  --traek-node-text: #1a1a1a;
-  --traek-node-active-border: #0099cc;
-  --traek-node-active-glow: rgba(0, 153, 204, 0.2);
-  --traek-node-user-border-top: #0099cc;
-  --traek-node-assistant-border-top: #e03a00;
-  --traek-input-text: #1a1a1a;
+	--traek-canvas-bg: #f0f0f0;
+	--traek-canvas-dot: #cccccc;
+	--traek-node-bg: #ffffff;
+	--traek-node-border: #d4d4d4;
+	--traek-node-text: #1a1a1a;
+	--traek-node-active-border: #0099cc;
+	--traek-node-active-glow: rgba(0, 153, 204, 0.2);
+	--traek-node-user-border-top: #0099cc;
+	--traek-node-assistant-border-top: #e03a00;
+	--traek-input-text: #1a1a1a;
 
-  --traek-connection-stroke: #a3a3a3;
-  --traek-connection-highlight: #0099cc;
+	--traek-connection-stroke: #a3a3a3;
+	--traek-connection-highlight: #0099cc;
 
-  --traek-input-bg: rgba(255, 255, 255, 0.95);
-  --traek-input-border: #a3a3a3;
-  --traek-input-shadow: rgba(0, 0, 0, 0.1);
-  --traek-input-button-bg: #0099cc;
-  --traek-input-button-text: #ffffff;
-  --traek-input-context-bg: rgba(0, 0, 0, 0.05);
-  --traek-input-context-text: #525252;
-  --traek-input-dot: #0099cc;
-  --traek-input-dot-muted: #a3a3a3;
-  --traek-stats-text: #737373;
+	--traek-input-bg: rgba(255, 255, 255, 0.95);
+	--traek-input-border: #a3a3a3;
+	--traek-input-shadow: rgba(0, 0, 0, 0.1);
+	--traek-input-button-bg: #0099cc;
+	--traek-input-button-text: #ffffff;
+	--traek-input-context-bg: rgba(0, 0, 0, 0.05);
+	--traek-input-context-text: #525252;
+	--traek-input-dot: #0099cc;
+	--traek-input-dot-muted: #a3a3a3;
+	--traek-stats-text: #737373;
 
-  --traek-textnode-text: #1a1a1a;
-  --traek-textnode-bg: #ffffff;
-  --traek-markdown-quote-border: #a3a3a3;
-  --traek-markdown-quote-text: #525252;
-  --traek-markdown-hr: #d4d4d4;
-  --traek-scroll-hint-bg: linear-gradient(transparent, rgba(255, 255, 255, 0.8));
-  --traek-scroll-hint-text: #737373;
-  --traek-scrollbar-thumb: #d4d4d4;
-  --traek-scrollbar-thumb-hover: #a3a3a3;
-  --traek-typing-cursor: #e03a00;
+	--traek-textnode-text: #1a1a1a;
+	--traek-textnode-bg: #ffffff;
+	--traek-markdown-quote-border: #a3a3a3;
+	--traek-markdown-quote-text: #525252;
+	--traek-markdown-hr: #d4d4d4;
+	--traek-scroll-hint-bg: linear-gradient(transparent, rgba(255, 255, 255, 0.8));
+	--traek-scroll-hint-text: #737373;
+	--traek-scrollbar-thumb: #d4d4d4;
+	--traek-scrollbar-thumb-hover: #a3a3a3;
+	--traek-typing-cursor: #e03a00;
 
-  --traek-thought-panel-bg: rgba(255, 255, 255, 0.95);
-  --traek-thought-panel-border: #d4d4d4;
-  --traek-thought-panel-border-active: #0099cc;
-  --traek-thought-panel-glow: rgba(0, 153, 204, 0.2);
-  --traek-thought-header-bg: rgba(0, 0, 0, 0.03);
-  --traek-thought-header-border: #e5e5e5;
-  --traek-thought-header-muted: #737373;
-  --traek-thought-header-accent: #525252;
-  --traek-thought-tag-cyan: #0099cc;
-  --traek-thought-tag-orange: #e03a00;
-  --traek-thought-tag-gray: #a3a3a3;
-  --traek-thought-divider: rgba(0, 0, 0, 0.06);
-  --traek-thought-row-bg: rgba(0, 0, 0, 0.02);
-  --traek-thought-row-muted-1: #737373;
-  --traek-thought-row-muted-2: #525252;
-  --traek-thought-row-muted-3: #525252;
-  --traek-thought-row-muted-4: #737373;
-  --traek-thought-badge-cyan: #008b8b;
-  --traek-thought-footer-muted: #404040;
-  --traek-thought-footer-bg: rgba(0, 0, 0, 0.04);
-  --traek-thought-footer-border: rgba(0, 0, 0, 0.06);
-  --traek-thought-toggle-bg: #d4d4d4;
-  --traek-thought-toggle-border: #a3a3a3;
+	--traek-thought-panel-bg: rgba(255, 255, 255, 0.95);
+	--traek-thought-panel-border: #d4d4d4;
+	--traek-thought-panel-border-active: #0099cc;
+	--traek-thought-panel-glow: rgba(0, 153, 204, 0.2);
+	--traek-thought-header-bg: rgba(0, 0, 0, 0.03);
+	--traek-thought-header-border: #e5e5e5;
+	--traek-thought-header-muted: #737373;
+	--traek-thought-header-accent: #525252;
+	--traek-thought-tag-cyan: #0099cc;
+	--traek-thought-tag-orange: #e03a00;
+	--traek-thought-tag-gray: #a3a3a3;
+	--traek-thought-divider: rgba(0, 0, 0, 0.06);
+	--traek-thought-row-bg: rgba(0, 0, 0, 0.02);
+	--traek-thought-row-muted-1: #737373;
+	--traek-thought-row-muted-2: #525252;
+	--traek-thought-row-muted-3: #525252;
+	--traek-thought-row-muted-4: #737373;
+	--traek-thought-badge-cyan: #008b8b;
+	--traek-thought-footer-muted: #404040;
+	--traek-thought-footer-bg: rgba(0, 0, 0, 0.04);
+	--traek-thought-footer-border: rgba(0, 0, 0, 0.06);
+	--traek-thought-toggle-bg: #d4d4d4;
+	--traek-thought-toggle-border: #a3a3a3;
 
-  --traek-overlay-gradient-1: rgba(0, 0, 0, 0.4);
-  --traek-overlay-gradient-2: rgba(0, 0, 0, 0.6);
-  --traek-overlay-gradient-3: rgba(0, 0, 0, 0.85);
-  --traek-overlay-card-bg: rgba(255, 255, 255, 0.95);
-  --traek-overlay-card-border: rgba(0, 0, 0, 0.1);
-  --traek-overlay-card-shadow: rgba(0, 0, 0, 0.2);
-  --traek-overlay-text: #1a1a1a;
-  --traek-overlay-pill-bg: #0099cc;
-  --traek-overlay-pill-shadow: rgba(0, 153, 204, 0.4);
-  --traek-node-active-glow: rgba(0, 153, 204, 0.12);
-  --traek-thought-panel-glow: rgba(0, 153, 204, 0.12);
+	--traek-overlay-gradient-1: rgba(0, 0, 0, 0.4);
+	--traek-overlay-gradient-2: rgba(0, 0, 0, 0.6);
+	--traek-overlay-gradient-3: rgba(0, 0, 0, 0.85);
+	--traek-overlay-card-bg: rgba(255, 255, 255, 0.95);
+	--traek-overlay-card-border: rgba(0, 0, 0, 0.1);
+	--traek-overlay-card-shadow: rgba(0, 0, 0, 0.2);
+	--traek-overlay-text: #1a1a1a;
+	--traek-overlay-pill-bg: #0099cc;
+	--traek-overlay-pill-shadow: rgba(0, 153, 204, 0.4);
+	--traek-node-active-glow: rgba(0, 153, 204, 0.12);
+	--traek-thought-panel-glow: rgba(0, 153, 204, 0.12);
 
-  /* ========== Demo app only ========== */
+	/* ========== Demo app only ========== */
 
-  --traek-bg-body: #f5f5f5;
-  --traek-text-body: #1a1a1a;
-  --traek-code-bg: rgba(0, 0, 0, 0.06);
+	--traek-bg-body: #f5f5f5;
+	--traek-text-body: #1a1a1a;
+	--traek-code-bg: rgba(0, 0, 0, 0.06);
 
-  --traek-landing-bg-top: #fafafa;
-  --traek-landing-bg-mid: #f0f0f0;
-  --traek-landing-bg-bottom: #e8e8e8;
-  --traek-landing-text-main: #0f0f0f;
-  --traek-landing-text-muted-1: #525252;
-  --traek-landing-text-muted-2: #404040;
-  --traek-landing-text-muted-3: #363636;
-  --traek-landing-text-muted-4: #2e2e2e;
-  --traek-landing-text-muted-5: #262626;
-  --traek-landing-text-muted-6: #1f1f1f;
-  --traek-landing-text-muted-7: #1a1a1a;
-  --traek-landing-text-muted-8: #171717;
-  --traek-landing-text-muted-9: #141414;
-  --traek-landing-text-strong: #0a0a0a;
+	--traek-landing-bg-top: #fafafa;
+	--traek-landing-bg-mid: #f0f0f0;
+	--traek-landing-bg-bottom: #e8e8e8;
+	--traek-landing-text-main: #0f0f0f;
+	--traek-landing-text-muted-1: #525252;
+	--traek-landing-text-muted-2: #404040;
+	--traek-landing-text-muted-3: #363636;
+	--traek-landing-text-muted-4: #2e2e2e;
+	--traek-landing-text-muted-5: #262626;
+	--traek-landing-text-muted-6: #1f1f1f;
+	--traek-landing-text-muted-7: #1a1a1a;
+	--traek-landing-text-muted-8: #171717;
+	--traek-landing-text-muted-9: #141414;
+	--traek-landing-text-strong: #0a0a0a;
 
-  --traek-accent-cyan: #0099cc;
-  --traek-accent-lime: #00c97a;
-  --traek-accent-cyan-soft: rgba(0, 153, 204, 0.12);
+	--traek-accent-cyan: #0099cc;
+	--traek-accent-lime: #00c97a;
+	--traek-accent-cyan-soft: rgba(0, 153, 204, 0.12);
 
-  --traek-pill-bg: rgba(0, 0, 0, 0.04);
-  --traek-pill-border: rgba(0, 0, 0, 0.08);
+	--traek-pill-bg: rgba(0, 0, 0, 0.04);
+	--traek-pill-border: rgba(0, 0, 0, 0.08);
 
-  --traek-demo-frame-bg-outer: #e8e8e8;
-  --traek-demo-frame-bg-inner: #f0f0f0;
-  --traek-demo-frame-bg-bottom: #e0e0e0;
+	--traek-demo-frame-bg-outer: #e8e8e8;
+	--traek-demo-frame-bg-inner: #f0f0f0;
+	--traek-demo-frame-bg-bottom: #e0e0e0;
 
-  --traek-section-alt-glow: rgba(0, 153, 204, 0.12);
-  --traek-metric-accent: rgba(0, 153, 204, 0.15);
-  --traek-metric-accent-border: rgba(0, 153, 204, 0.4);
-  --traek-metric-bg-end: #f5f5f5;
-  --traek-metric-glow: rgba(0, 153, 204, 0.25);
-  --traek-stack-accent: rgba(0, 153, 204, 0.1);
-  --traek-stack-accent-border: rgba(0, 153, 204, 0.35);
-  --traek-stack-bg-end: #f0f0f0;
-  --traek-code-label: #525252;
-  --traek-final-muted: #404040;
-  --traek-card-bg-dark-1: #ffffff;
-  --traek-card-bg-dark-2: #fafafa;
-  --traek-card-bg-dark-3: #f5f5f5;
-  --traek-card-bg-dark-4: #f8f8f8;
+	--traek-section-alt-glow: rgba(0, 153, 204, 0.12);
+	--traek-metric-accent: rgba(0, 153, 204, 0.15);
+	--traek-metric-accent-border: rgba(0, 153, 204, 0.4);
+	--traek-metric-bg-end: #f5f5f5;
+	--traek-metric-glow: rgba(0, 153, 204, 0.25);
+	--traek-stack-accent: rgba(0, 153, 204, 0.1);
+	--traek-stack-accent-border: rgba(0, 153, 204, 0.35);
+	--traek-stack-bg-end: #f0f0f0;
+	--traek-code-label: #525252;
+	--traek-final-muted: #404040;
+	--traek-card-bg-dark-1: #ffffff;
+	--traek-card-bg-dark-2: #fafafa;
+	--traek-card-bg-dark-3: #f5f5f5;
+	--traek-card-bg-dark-4: #f8f8f8;
 
-  --traek-demo-text-main: #18181b;
-  --traek-demo-text-strong: #09090b;
-  --traek-demo-text-muted-1: #3f3f46;
-  --traek-demo-text-muted-2: #27272a;
-  --traek-demo-text-muted-3: #18181b;
-  --traek-demo-text-muted-4: #71717a;
-  --traek-demo-panel-bg-1: rgba(255, 255, 255, 0.9);
-  --traek-demo-panel-bg-2: rgba(255, 255, 255, 0.85);
-  --traek-demo-panel-bg-empty: rgba(255, 255, 255, 0.6);
-  --traek-demo-border-soft: rgba(0, 0, 0, 0.1);
-  --traek-demo-border-strong: rgba(0, 0, 0, 0.15);
-  --traek-demo-border-dashed: rgba(0, 0, 0, 0.08);
-  --traek-demo-border-hover: rgba(0, 0, 0, 0.2);
-  --traek-demo-button-bg: rgba(0, 0, 0, 0.06);
-  --traek-demo-button-bg-hover: rgba(0, 0, 0, 0.1);
-  --traek-demo-list-bg-hover: rgba(0, 0, 0, 0.04);
+	--traek-demo-text-main: #18181b;
+	--traek-demo-text-strong: #09090b;
+	--traek-demo-text-muted-1: #3f3f46;
+	--traek-demo-text-muted-2: #27272a;
+	--traek-demo-text-muted-3: #18181b;
+	--traek-demo-text-muted-4: #71717a;
+	--traek-demo-panel-bg-1: rgba(255, 255, 255, 0.9);
+	--traek-demo-panel-bg-2: rgba(255, 255, 255, 0.85);
+	--traek-demo-panel-bg-empty: rgba(255, 255, 255, 0.6);
+	--traek-demo-border-soft: rgba(0, 0, 0, 0.1);
+	--traek-demo-border-strong: rgba(0, 0, 0, 0.15);
+	--traek-demo-border-dashed: rgba(0, 0, 0, 0.08);
+	--traek-demo-border-hover: rgba(0, 0, 0, 0.2);
+	--traek-demo-button-bg: rgba(0, 0, 0, 0.06);
+	--traek-demo-button-bg-hover: rgba(0, 0, 0, 0.1);
+	--traek-demo-list-bg-hover: rgba(0, 0, 0, 0.04);
 
-  --traek-conv-bg: #fafafa;
-  --traek-conv-back-bg: #1a1a1a;
-  --traek-conv-back-text: #e5e5e5;
-  --traek-error-text: #b30000;
-  --traek-loading-bg: #f5f5f5;
-  --traek-spinner-border: rgba(0, 0, 0, 0.1);
-  --traek-spinner-top: #525252;
+	--traek-conv-bg: #fafafa;
+	--traek-conv-back-bg: #1a1a1a;
+	--traek-conv-back-text: #e5e5e5;
+	--traek-error-text: #b30000;
+	--traek-loading-bg: #f5f5f5;
+	--traek-spinner-border: rgba(0, 0, 0, 0.1);
+	--traek-spinner-top: #525252;
 
-  --traek-gravity-dot: #a3a3a3;
-  --traek-gravity-tendril: rgba(82, 82, 82, 0.35);
-  --traek-gravity-tendril-branch: rgba(82, 82, 82, 0.2);
+	--traek-gravity-dot: #a3a3a3;
+	--traek-gravity-tendril: rgba(82, 82, 82, 0.35);
+	--traek-gravity-tendril-branch: rgba(82, 82, 82, 0.2);
 
-  /* Demo shadows – softer for light mode */
-  --traek-shadow-dot-glow: 0 0 12px rgba(0, 153, 204, 0.35);
-  --traek-shadow-btn-primary: 0 8px 24px rgba(0, 153, 204, 0.18);
-  --traek-shadow-btn-primary-hover: 0 10px 28px rgba(0, 153, 204, 0.25);
-  --traek-shadow-demo-frame: 0 16px 40px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.06);
-  --traek-shadow-card: 0 10px 30px rgba(0, 0, 0, 0.08);
-  --traek-shadow-metric: 0 10px 30px rgba(0, 0, 0, 0.1);
-  --traek-shadow-code-card: 0 10px 30px rgba(0, 0, 0, 0.08);
-  --traek-shadow-stack-item: 0 8px 24px rgba(0, 0, 0, 0.06);
-  --traek-shadow-demo-info: 0 2px 12px rgba(0, 0, 0, 0.06);
-  --traek-shadow-demo-list-item: 0 1px 6px rgba(0, 0, 0, 0.06);
-  --traek-shadow-demo-list-item-hover: 0 4px 16px rgba(0, 0, 0, 0.08);
-  --traek-shadow-tool-panel: 0 8px 24px rgba(0, 0, 0, 0.12);
+	/* Demo shadows – softer for light mode */
+	--traek-shadow-dot-glow: 0 0 12px rgba(0, 153, 204, 0.35);
+	--traek-shadow-btn-primary: 0 8px 24px rgba(0, 153, 204, 0.18);
+	--traek-shadow-btn-primary-hover: 0 10px 28px rgba(0, 153, 204, 0.25);
+	--traek-shadow-demo-frame: 0 16px 40px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.06);
+	--traek-shadow-card: 0 10px 30px rgba(0, 0, 0, 0.08);
+	--traek-shadow-metric: 0 10px 30px rgba(0, 0, 0, 0.1);
+	--traek-shadow-code-card: 0 10px 30px rgba(0, 0, 0, 0.08);
+	--traek-shadow-stack-item: 0 8px 24px rgba(0, 0, 0, 0.06);
+	--traek-shadow-demo-info: 0 2px 12px rgba(0, 0, 0, 0.06);
+	--traek-shadow-demo-list-item: 0 1px 6px rgba(0, 0, 0, 0.06);
+	--traek-shadow-demo-list-item-hover: 0 4px 16px rgba(0, 0, 0, 0.08);
+	--traek-shadow-tool-panel: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
 body {
-  background-color: var(--traek-bg-body, #0b0b0b);
-  color: var(--traek-text-body, #dddddd);
-  font-family: 'Space Grotesk', sans-serif;
-  line-height: 1.5;
-  font-size: 16px;
-  font-weight: 400;
-  font-style: normal;
-  font-optical-sizing: auto;
-  font-synthesis: none;
+	background-color: var(--traek-bg-body, #0b0b0b);
+	color: var(--traek-text-body, #dddddd);
+	font-family: 'Space Grotesk', sans-serif;
+	line-height: 1.5;
+	font-size: 16px;
+	font-weight: 400;
+	font-style: normal;
+	font-optical-sizing: auto;
+	font-synthesis: none;
 }
 
 code,
 pre {
-  font-family: 'Space Mono', monospace;
+	font-family: 'Space Mono', monospace;
 }
 .hljs {
-  background-color: var(--traek-code-bg, rgba(0,0,0, 0.2)) !important;
-  border-radius: 12px !important;
+	background-color: var(--traek-code-bg, rgba(0, 0, 0, 0.2)) !important;
+	border-radius: 12px !important;
 }

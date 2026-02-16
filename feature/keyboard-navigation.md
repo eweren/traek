@@ -16,37 +16,37 @@ Vim-artige und Arrow-Key-Navigation durch den Baum. Ermoeglicht schnelles Traver
 
 Navigation entlang der Baum-Struktur, unabhaengig von der visuellen Position:
 
-| Taste | Aktion |
-|-------|--------|
-| `j` / `ArrowDown` | Naechster Sibling (oder erstes Kind wenn kein naechster Sibling) |
-| `k` / `ArrowUp` | Vorheriger Sibling (oder Parent wenn kein vorheriger Sibling) |
-| `h` / `ArrowLeft` | Zum Parent-Node |
-| `l` / `ArrowRight` | Zum ersten Child-Node |
-| `J` (Shift+j) | Letzter Sibling |
-| `K` (Shift+k) | Erster Sibling |
-| `g g` | Zum Root-Node |
-| `G` | Zum letzten Leaf-Node im aktuellen Branch |
+| Taste              | Aktion                                                           |
+| ------------------ | ---------------------------------------------------------------- |
+| `j` / `ArrowDown`  | Naechster Sibling (oder erstes Kind wenn kein naechster Sibling) |
+| `k` / `ArrowUp`    | Vorheriger Sibling (oder Parent wenn kein vorheriger Sibling)    |
+| `h` / `ArrowLeft`  | Zum Parent-Node                                                  |
+| `l` / `ArrowRight` | Zum ersten Child-Node                                            |
+| `J` (Shift+j)      | Letzter Sibling                                                  |
+| `K` (Shift+k)      | Erster Sibling                                                   |
+| `g g`              | Zum Root-Node                                                    |
+| `G`                | Zum letzten Leaf-Node im aktuellen Branch                        |
 
 #### Canvas-Aktionen
 
-| Taste | Aktion |
-|-------|--------|
-| `Enter` | Node aktivieren / fokussieren (centerOnNode) |
-| `Escape` | Node deselektieren |
-| `i` | Input-Feld fokussieren (Insert-Modus) |
-| `b` | Branch von aktuellem Node erstellen |
-| `/` | Slash-Command Input oeffnen |
-| `Space` | Toggle Node expanded/collapsed (wenn implementiert) |
-| `z z` | Aktiven Node zentrieren |
-| `+` / `-` | Zoom in/out |
-| `0` | Zoom auf 100% zuruecksetzen |
+| Taste     | Aktion                                              |
+| --------- | --------------------------------------------------- |
+| `Enter`   | Node aktivieren / fokussieren (centerOnNode)        |
+| `Escape`  | Node deselektieren                                  |
+| `i`       | Input-Feld fokussieren (Insert-Modus)               |
+| `b`       | Branch von aktuellem Node erstellen                 |
+| `/`       | Slash-Command Input oeffnen                         |
+| `Space`   | Toggle Node expanded/collapsed (wenn implementiert) |
+| `z z`     | Aktiven Node zentrieren                             |
+| `+` / `-` | Zoom in/out                                         |
+| `0`       | Zoom auf 100% zuruecksetzen                         |
 
 #### Quick-Jump
 
-| Taste | Aktion |
-|-------|--------|
-| `1`-`9` | Zum n-ten Root-Thread springen |
-| `f` | "Find Node" — Fuzzy-Suche ueber Node-Content, Ergebnis-Liste mit `j`/`k` navigierbar |
+| Taste   | Aktion                                                                               |
+| ------- | ------------------------------------------------------------------------------------ |
+| `1`-`9` | Zum n-ten Root-Thread springen                                                       |
+| `f`     | "Find Node" — Fuzzy-Suche ueber Node-Content, Ergebnis-Liste mit `j`/`k` navigierbar |
 
 ### Visueller Fokus-Indikator
 
@@ -66,35 +66,35 @@ Navigation entlang der Baum-Struktur, unabhaengig von der visuellen Position:
 
 ```typescript
 class KeyboardNavigator {
-  /** Currently focused node ID (separate from engine.activeNodeId). */
-  focusedNodeId = $state<string | null>(null);
-  /** Whether keyboard navigation is active (false when input is focused). */
-  enabled = $state(true);
-  /** Pending chord key (e.g. first 'g' of 'gg'). */
-  private pendingChord: string | null = null;
+	/** Currently focused node ID (separate from engine.activeNodeId). */
+	focusedNodeId = $state<string | null>(null);
+	/** Whether keyboard navigation is active (false when input is focused). */
+	enabled = $state(true);
+	/** Pending chord key (e.g. first 'g' of 'gg'). */
+	private pendingChord: string | null = null;
 
-  constructor(engine: TraekEngine, centerOnNode: (node: Node) => void);
+	constructor(engine: TraekEngine, centerOnNode: (node: Node) => void);
 
-  /** Handle keydown events. Returns true if the event was consumed. */
-  handleKeydown(e: KeyboardEvent): boolean;
+	/** Handle keydown events. Returns true if the event was consumed. */
+	handleKeydown(e: KeyboardEvent): boolean;
 
-  /** Navigate to parent. */
-  goToParent(): void;
-  /** Navigate to first child. */
-  goToFirstChild(): void;
-  /** Navigate to next sibling. */
-  goToNextSibling(): void;
-  /** Navigate to previous sibling. */
-  goToPrevSibling(): void;
-  /** Navigate to root. */
-  goToRoot(): void;
-  /** Navigate to deepest leaf in current branch. */
-  goToLeaf(): void;
+	/** Navigate to parent. */
+	goToParent(): void;
+	/** Navigate to first child. */
+	goToFirstChild(): void;
+	/** Navigate to next sibling. */
+	goToNextSibling(): void;
+	/** Navigate to previous sibling. */
+	goToPrevSibling(): void;
+	/** Navigate to root. */
+	goToRoot(): void;
+	/** Navigate to deepest leaf in current branch. */
+	goToLeaf(): void;
 
-  /** Activate the focused node (set as reply target). */
-  activate(): void;
-  /** Clear focus. */
-  blur(): void;
+	/** Activate the focused node (set as reply target). */
+	activate(): void;
+	/** Clear focus. */
+	blur(): void;
 }
 ```
 
@@ -116,18 +116,18 @@ Fuer Multi-Key-Shortcuts (`gg`, `zz`):
 
 ## Aenderungen an bestehenden Dateien
 
-| Datei | Aenderung |
-|-------|-----------|
-| `TraekCanvas.svelte` | `keyboardNavigation` Prop, Navigator-Lifecycle, Keydown-Handler, Fokus-Indikator CSS |
+| Datei                   | Aenderung                                                                                        |
+| ----------------------- | ------------------------------------------------------------------------------------------------ |
+| `TraekCanvas.svelte`    | `keyboardNavigation` Prop, Navigator-Lifecycle, Keydown-Handler, Fokus-Indikator CSS             |
 | `TraekEngine.svelte.ts` | Helper-Methoden: `getSiblings(nodeId)`, `getChildren(nodeId)`, `getParent(nodeId)`, `getRoots()` |
-| `index.ts` | Neue Exports |
+| `index.ts`              | Neue Exports                                                                                     |
 
 ## Neue Dateien
 
-| Datei | Beschreibung |
-|-------|-------------|
-| `src/lib/keyboard/KeyboardNavigator.svelte.ts` | Navigator-Klasse |
-| `src/lib/keyboard/KeybindingsOverlay.svelte` | Help-Overlay (`?`) |
+| Datei                                          | Beschreibung       |
+| ---------------------------------------------- | ------------------ |
+| `src/lib/keyboard/KeyboardNavigator.svelte.ts` | Navigator-Klasse   |
+| `src/lib/keyboard/KeybindingsOverlay.svelte`   | Help-Overlay (`?`) |
 
 ## Offene Fragen
 

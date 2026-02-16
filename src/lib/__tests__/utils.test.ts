@@ -212,7 +212,8 @@ describe('markdownToHtml', () => {
 
 		it('should handle mixed markdown elements', () => {
 			expect.assertions(4);
-			const md = '# Title\n\nSome **bold** and *italic* text.\n\n- item\n\n```ts\nconst x = 1;\n```';
+			const md =
+				'# Title\n\nSome **bold** and *italic* text.\n\n- item\n\n```ts\nconst x = 1;\n```';
 			const result = markdownToHtml(md);
 			expect(result).toContain('<h1');
 			expect(result).toContain('<strong>bold</strong>');

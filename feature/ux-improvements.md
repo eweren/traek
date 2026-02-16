@@ -9,21 +9,21 @@ This document contains concrete, prioritized UX improvement proposals based on t
 
 ## Priority Matrix
 
-| ID | Feature | Impact | Effort | Priority |
-|----|---------|--------|--------|----------|
-| UX-01 | First-Time Onboarding Tour | High | Medium | 🔴 P0 |
-| UX-02 | Canvas Interaction Hints | High | Low | 🔴 P0 |
-| UX-03 | Keyboard Navigation (Foundation) | High | High | 🔴 P0 |
-| UX-04 | Touch Target Size Increase | High | Low | 🟠 P1 |
-| UX-05 | Multi-Line Input Field | Medium | Low | 🟠 P1 |
-| UX-06 | Subtree Collapse/Expand | High | Medium | 🟠 P1 |
-| UX-07 | Action Badges Always Visible | Medium | Low | 🟠 P1 |
-| UX-08 | Node Ghost Preview | Medium | Medium | 🟡 P2 |
-| UX-09 | Connection Fading | Medium | Low | 🟡 P2 |
-| UX-10 | Improved Error Visibility | Medium | Low | 🟡 P2 |
-| UX-11 | Context Path Breadcrumb | Medium | Medium | 🟡 P2 |
-| UX-12 | Empty State Design | Low | Low | 🟢 P3 |
-| UX-13 | Minimap/Overview | Low | High | 🟢 P3 |
+| ID    | Feature                          | Impact | Effort | Priority |
+| ----- | -------------------------------- | ------ | ------ | -------- |
+| UX-01 | First-Time Onboarding Tour       | High   | Medium | 🔴 P0    |
+| UX-02 | Canvas Interaction Hints         | High   | Low    | 🔴 P0    |
+| UX-03 | Keyboard Navigation (Foundation) | High   | High   | 🔴 P0    |
+| UX-04 | Touch Target Size Increase       | High   | Low    | 🟠 P1    |
+| UX-05 | Multi-Line Input Field           | Medium | Low    | 🟠 P1    |
+| UX-06 | Subtree Collapse/Expand          | High   | Medium | 🟠 P1    |
+| UX-07 | Action Badges Always Visible     | Medium | Low    | 🟠 P1    |
+| UX-08 | Node Ghost Preview               | Medium | Medium | 🟡 P2    |
+| UX-09 | Connection Fading                | Medium | Low    | 🟡 P2    |
+| UX-10 | Improved Error Visibility        | Medium | Low    | 🟡 P2    |
+| UX-11 | Context Path Breadcrumb          | Medium | Medium | 🟡 P2    |
+| UX-12 | Empty State Design               | Low    | Low    | 🟢 P3    |
+| UX-13 | Minimap/Overview                 | Low    | High   | 🟢 P3    |
 
 ---
 
@@ -32,6 +32,7 @@ This document contains concrete, prioritized UX improvement proposals based on t
 ### UX-01: First-Time Onboarding Tour
 
 **Problem:** Users land on a blank canvas with no guidance. They don't understand:
+
 - What the spatial metaphor means
 - How to pan/zoom
 - How to create branches
@@ -215,6 +216,7 @@ Top-Right:
 **Visual Design:**
 
 **Focused Node (Keyboard):**
+
 ```
 ┌─────────────────────────────────────────┐
 │  ╔═════════════════════════════════╗    │  ← Thick cyan outline (focus ring)
@@ -226,6 +228,7 @@ Top-Right:
 ```
 
 **Active Node (Reply Target):**
+
 ```
 ┌─────────────────────────────────────────┐
 │  ┌─────────────────────────────────┐    │  ← Glowing border (active)
@@ -237,6 +240,7 @@ Top-Right:
 ```
 
 **Both Focused AND Active:**
+
 ```
 ┌─────────────────────────────────────────┐
 │  ╔═════════════════════════════════╗    │  ← Outline + glow (combined)
@@ -275,6 +279,7 @@ Top-Right:
 **Problem:** Tap targets on mobile are too small (< 44px iOS minimum).
 
 **Current Sizes:**
+
 - Node header: ~34px tall (10px padding × 2 + 14px text)
 - Action badges: ~28px tall (4px padding × 2 + 20px)
 - Send button: 40px × 40px ✅
@@ -285,15 +290,15 @@ Top-Right:
 
 ```css
 @media (max-width: 768px) {
-  .node-header {
-    padding: 14px; /* was 10px */
-  }
-  .action-badge {
-    padding: 8px 12px; /* was 4px 10px */
-  }
-  .thought-pill {
-    padding: 10px 14px; /* was 6px 14px */
-  }
+	.node-header {
+		padding: 14px; /* was 10px */
+	}
+	.action-badge {
+		padding: 8px 12px; /* was 4px 10px */
+	}
+	.thought-pill {
+		padding: 10px 14px; /* was 6px 14px */
+	}
 }
 ```
 
@@ -316,6 +321,7 @@ Top-Right:
 **Design:**
 
 **Before:**
+
 ```
 ┌─────────────────────────────────────────┐
 │  [Type here...              ] [Send]    │  ← Single line
@@ -323,6 +329,7 @@ Top-Right:
 ```
 
 **After (Auto-Expanding):**
+
 ```
 ┌─────────────────────────────────────────┐
 │  ┌──────────────────────────────────┐   │
@@ -345,19 +352,19 @@ Top-Right:
 ```svelte
 <!-- Replace <input> with <textarea> -->
 <textarea
-  bind:value={userInput}
-  placeholder="Ask the expert..."
-  rows="1"
-  style="resize: none; overflow-y: auto; max-height: 8em;"
-  onkeydown={(e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
-    // Auto-resize
-    e.currentTarget.style.height = 'auto';
-    e.currentTarget.style.height = e.currentTarget.scrollHeight + 'px';
-  }}
+	bind:value={userInput}
+	placeholder="Ask the expert..."
+	rows="1"
+	style="resize: none; overflow-y: auto; max-height: 8em;"
+	onkeydown={(e) => {
+		if (e.key === 'Enter' && !e.shiftKey) {
+			e.preventDefault();
+			sendMessage();
+		}
+		// Auto-resize
+		e.currentTarget.style.height = 'auto';
+		e.currentTarget.style.height = e.currentTarget.scrollHeight + 'px';
+	}}
 />
 ```
 
@@ -382,6 +389,7 @@ Top-Right:
 **Design:**
 
 **Expanded Node (with children):**
+
 ```
 ┌─────────────────────────────────────────┐
 │  ● User                        [−]      │  ← Collapse button
@@ -394,6 +402,7 @@ Top-Right:
 ```
 
 **Collapsed Node:**
+
 ```
 ┌─────────────────────────────────────────┐
 │  ● User                        [+]      │  ← Expand button
@@ -443,6 +452,7 @@ Top-Right:
 **Design:**
 
 **Before (Current):**
+
 ```
 ┌─────────────────────────────────────────┐
 │  (no badges visible until you type)     │
@@ -453,6 +463,7 @@ Top-Right:
 ```
 
 **After (Always Visible):**
+
 ```
 ┌─────────────────────────────────────────┐
 │  [🖼️ Image] [🧪 Debug] [🔁 Repeat]      │  ← All actions, inactive
@@ -463,6 +474,7 @@ Top-Right:
 ```
 
 **After (With Suggestion):**
+
 ```
 ┌─────────────────────────────────────────┐
 │  [🖼️ Image] [🧪 Debug] [🔁 Repeat]      │  ← "Image" highlighted (suggested)
@@ -488,10 +500,10 @@ Update ActionBadges.svelte:
 const visibleActions = $derived(actions); // was: actions.filter(...)
 
 <button
-  class="action-badge"
-  class:suggested={suggestedIds.includes(action.id)}
-  class:selected={selectedIds.includes(action.id)}
-  ...
+	class="action-badge"
+	class:suggested={suggestedIds.includes(action.id)}
+	class:selected={selectedIds.includes(action.id)}
+	...
 />
 ```
 
@@ -499,15 +511,15 @@ Update CSS:
 
 ```css
 .action-badge {
-  opacity: 0.4; /* Inactive */
+	opacity: 0.4; /* Inactive */
 }
 .action-badge.suggested {
-  opacity: 1;
-  animation: pulse 2s ease-in-out infinite;
+	opacity: 1;
+	animation: pulse 2s ease-in-out infinite;
 }
 .action-badge.selected {
-  opacity: 1;
-  border-color: #00d8ff;
+	opacity: 1;
+	border-color: #00d8ff;
 }
 ```
 
@@ -534,6 +546,7 @@ Update CSS:
 **Design:**
 
 **Active Node Selected (Reply Mode):**
+
 ```
 ┌─────────────────────────────────────────┐
 │  ● User (ACTIVE)                         │
@@ -547,6 +560,7 @@ Update CSS:
 ```
 
 **No Active Node (New Thread):**
+
 ```
 ┌─────────────────────────────────────────┐
 │                                         │
@@ -585,6 +599,7 @@ Update CSS:
 **Design:**
 
 **Before (All Connections Same Opacity):**
+
 ```
          ┌─────┐
          │ Root│
@@ -596,6 +611,7 @@ Update CSS:
 ```
 
 **After (Active Node B → Highlight Path, Fade Others):**
+
 ```
          ┌─────┐
          │ Root│
@@ -626,11 +642,11 @@ CSS:
 
 ```css
 .connection {
-  opacity: 1;
-  transition: opacity 0.2s;
+	opacity: 1;
+	transition: opacity 0.2s;
 }
 .connection.faded {
-  opacity: 0.2; /* Fade non-active connections */
+	opacity: 0.2; /* Fade non-active connections */
 }
 ```
 
@@ -655,6 +671,7 @@ CSS:
 **Design:**
 
 **Current (Error in Header):**
+
 ```
 ┌─────────────────────────────────────────┐
 │  ◆ Assistant · Error: Request failed    │  ← Small, easy to miss
@@ -664,6 +681,7 @@ CSS:
 ```
 
 **New (Red Border + Icon):**
+
 ```
 ╔═════════════════════════════════════════╗  ← Red border (thick)
 ║  ◆ Assistant                        ⚠️  ║
@@ -681,11 +699,11 @@ Update TraekNodeWrapper.svelte:
 
 ```svelte
 {#if node.status === 'error'}
-  <div class="error-banner">
-    <span class="error-icon">⚠️</span>
-    <span class="error-message">{node.errorMessage ?? 'An error occurred'}</span>
-    <button onclick={() => retryNode(node.id)}>Retry</button>
-  </div>
+	<div class="error-banner">
+		<span class="error-icon">⚠️</span>
+		<span class="error-message">{node.errorMessage ?? 'An error occurred'}</span>
+		<button onclick={() => retryNode(node.id)}>Retry</button>
+	</div>
 {/if}
 ```
 
@@ -693,16 +711,16 @@ CSS:
 
 ```css
 .message-node-wrapper.error {
-  border: 2px solid #ff3e00;
-  box-shadow: 0 0 20px rgba(255, 62, 0, 0.3);
+	border: 2px solid #ff3e00;
+	box-shadow: 0 0 20px rgba(255, 62, 0, 0.3);
 }
 .error-banner {
-  background: rgba(255, 62, 0, 0.1);
-  padding: 12px;
-  border-radius: 8px;
-  display: flex;
-  gap: 8px;
-  align-items: center;
+	background: rgba(255, 62, 0, 0.1);
+	padding: 12px;
+	border-radius: 8px;
+	display: flex;
+	gap: 8px;
+	align-items: center;
 }
 ```
 
@@ -727,6 +745,7 @@ CSS:
 **Design:**
 
 **Top-Left Breadcrumb (Appears When Active Node Exists):**
+
 ```
 ┌─────────────────────────────────────────┐
 │  Root > Planning > Technical > Detail   │  ← Clickable breadcrumb
@@ -751,31 +770,28 @@ New component: `src/lib/ContextBreadcrumb.svelte`
 
 ```svelte
 <script lang="ts">
-  let { engine, onNodeClick } = $props();
-  const path = $derived(engine.contextPath());
+	let { engine, onNodeClick } = $props();
+	const path = $derived(engine.contextPath());
 </script>
 
 {#if path.length > 1}
-  <div class="context-breadcrumb">
-    {#each path as node, i}
-      <button onclick={() => onNodeClick(node.id)}>
-        {node.content?.slice(0, 20) ?? node.type}
-      </button>
-      {#if i < path.length - 1}
-        <span class="separator">></span>
-      {/if}
-    {/each}
-  </div>
+	<div class="context-breadcrumb">
+		{#each path as node, i}
+			<button onclick={() => onNodeClick(node.id)}>
+				{node.content?.slice(0, 20) ?? node.type}
+			</button>
+			{#if i < path.length - 1}
+				<span class="separator">></span>
+			{/if}
+		{/each}
+	</div>
 {/if}
 ```
 
 Add to TraekCanvas:
 
 ```svelte
-<ContextBreadcrumb
-  {engine}
-  onNodeClick={(id) => engine.focusOnNode(id)}
-/>
+<ContextBreadcrumb {engine} onNodeClick={(id) => engine.focusOnNode(id)} />
 ```
 
 **Acceptance Criteria:**
@@ -837,6 +853,7 @@ Add to TraekCanvas:
 **Design:**
 
 **Bottom-Right Minimap:**
+
 ```
 ┌─────────────────────────────────────────┐
 │                                    ┌───┐│

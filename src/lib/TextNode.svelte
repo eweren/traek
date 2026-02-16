@@ -5,6 +5,8 @@
 	import TraekNodeWrapper from './TraekNodeWrapper.svelte';
 	import { markdownToHtml } from './utils.ts';
 
+	import type { MessageNode } from './TraekEngine.svelte';
+
 	let {
 		node,
 		isActive,
@@ -18,7 +20,7 @@
 		onEditCancel,
 		onStartEdit
 	} = $props<{
-		node: any;
+		node: MessageNode;
 		isActive: boolean;
 		engine?: TraekEngine;
 		viewportRoot?: HTMLElement | null;
@@ -132,6 +134,7 @@
 		>
 			<div class="text-content markdown-body">
 				{#if node.content}
+					<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 					{@html renderedContent}
 				{:else if node.role === 'assistant'}
 					<span class="typing-cursor">|</span>

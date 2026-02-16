@@ -42,8 +42,11 @@
 			const style = getComputedStyle(document.documentElement);
 			return {
 				dot: style.getPropertyValue('--traek-gravity-dot').trim() || '#262626',
-				tendril: style.getPropertyValue('--traek-gravity-tendril').trim() || 'rgba(148, 163, 184, 0.35)',
-				tendrilBranch: style.getPropertyValue('--traek-gravity-tendril-branch').trim() || 'rgba(148, 163, 184, 0.22)'
+				tendril:
+					style.getPropertyValue('--traek-gravity-tendril').trim() || 'rgba(148, 163, 184, 0.35)',
+				tendrilBranch:
+					style.getPropertyValue('--traek-gravity-tendril-branch').trim() ||
+					'rgba(148, 163, 184, 0.22)'
 			};
 		}
 

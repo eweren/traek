@@ -18,6 +18,7 @@ export class ActionResolver {
 
 	private actions: ActionDefinition[];
 	private resolveCallback: ResolveActions | null;
+	// eslint-disable-next-line svelte/prefer-svelte-reactivity
 	private cache = new Map<string, string[]>();
 	private debounceTimer = 0;
 	private debounceMs: number;
@@ -144,6 +145,7 @@ export class ActionResolver {
 	}
 
 	private mergeSuggestions(keyword: string[], semantic: string[]): void {
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity
 		const merged = [...new Set([...keyword, ...semantic])];
 		this.suggestedIds = merged;
 	}

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { TraekEngine, DEFAULT_TRACK_ENGINE_CONFIG } from '../TraekEngine.svelte';
+import { TraekEngine } from '../TraekEngine.svelte';
 import type { MessageNode } from '../TraekEngine.svelte';
 
 beforeEach(() => {
@@ -274,7 +274,8 @@ describe('TraekEngine — additional coverage', () => {
 			const engine = new TraekEngine();
 			const parent = engine.addNode('Parent', 'user', { parentIds: [] });
 			const child = engine.addNode('Child', 'assistant', { parentIds: [parent.id] });
-			const grandchild = engine.addNode('Grandchild', 'user', { parentIds: [child.id] });
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
+			const _grandchild = engine.addNode('Grandchild', 'user', { parentIds: [child.id] });
 			const children = engine.getChildren(parent.id);
 			expect(children).toHaveLength(1);
 			expect(children[0].id).toBe(child.id);
@@ -291,16 +292,19 @@ describe('TraekEngine — additional coverage', () => {
 		it('should create a node with a component reference', () => {
 			expect.assertions(3);
 			const engine = new TraekEngine();
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			const MockComponent = {} as any;
 			const node = engine.addCustomNode(MockComponent);
 			expect(node).toBeDefined();
 			expect(node.id).toBeDefined();
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			expect((node as any).component).toBe(MockComponent);
 		});
 
 		it('should assign correct parentIds from activeNodeId', () => {
 			expect.assertions(1);
 			const engine = new TraekEngine();
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			const MockComponent = {} as any;
 			const parent = engine.addNode('Parent', 'user', { parentIds: [] });
 			const custom = engine.addCustomNode(MockComponent, undefined, 'assistant');
@@ -310,6 +314,7 @@ describe('TraekEngine — additional coverage', () => {
 		it('should respect explicit parentIds', () => {
 			expect.assertions(1);
 			const engine = new TraekEngine();
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			const MockComponent = {} as any;
 			const a = engine.addNode('A', 'user', { parentIds: [] });
 			const b = engine.addNode('B', 'user', { parentIds: [] });
@@ -322,6 +327,7 @@ describe('TraekEngine — additional coverage', () => {
 		it('should default type to text', () => {
 			expect.assertions(1);
 			const engine = new TraekEngine();
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			const MockComponent = {} as any;
 			const node = engine.addCustomNode(MockComponent);
 			expect(node.type).toBe('text');
@@ -330,6 +336,7 @@ describe('TraekEngine — additional coverage', () => {
 		it('should respect custom type', () => {
 			expect.assertions(1);
 			const engine = new TraekEngine();
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			const MockComponent = {} as any;
 			const node = engine.addCustomNode(MockComponent, undefined, 'user', {
 				type: 'debugNode'
@@ -340,6 +347,7 @@ describe('TraekEngine — additional coverage', () => {
 		it('should set activeNodeId to the new node', () => {
 			expect.assertions(1);
 			const engine = new TraekEngine();
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			const MockComponent = {} as any;
 			const node = engine.addCustomNode(MockComponent);
 			expect(engine.activeNodeId).toBe(node.id);
@@ -348,6 +356,7 @@ describe('TraekEngine — additional coverage', () => {
 		it('should not change activeNodeId for thought type', () => {
 			expect.assertions(1);
 			const engine = new TraekEngine();
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			const MockComponent = {} as any;
 			const parent = engine.addNode('Parent', 'user');
 			engine.addCustomNode(MockComponent, undefined, 'assistant', { type: 'thought' });
@@ -357,15 +366,18 @@ describe('TraekEngine — additional coverage', () => {
 		it('should pass props to the custom node', () => {
 			expect.assertions(1);
 			const engine = new TraekEngine();
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			const MockComponent = {} as any;
 			const props = { label: 'test', count: 42 };
 			const node = engine.addCustomNode(MockComponent, props);
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			expect((node as any).props).toEqual({ label: 'test', count: 42 });
 		});
 
 		it('should fire onNodeCreated callback', () => {
 			expect.assertions(2);
 			const engine = new TraekEngine();
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			const MockComponent = {} as any;
 			const callback = vi.fn();
 			engine.onNodeCreated = callback;
@@ -377,6 +389,7 @@ describe('TraekEngine — additional coverage', () => {
 		it('should add node to the nodes array', () => {
 			expect.assertions(1);
 			const engine = new TraekEngine();
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			const MockComponent = {} as any;
 			engine.addCustomNode(MockComponent);
 			expect(engine.nodes).toHaveLength(1);
@@ -385,6 +398,7 @@ describe('TraekEngine — additional coverage', () => {
 		it('should set explicit position and mark manualPosition', () => {
 			expect.assertions(3);
 			const engine = new TraekEngine();
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			const MockComponent = {} as any;
 			const node = engine.addCustomNode(MockComponent, undefined, 'user', {
 				x: 42,
@@ -398,6 +412,7 @@ describe('TraekEngine — additional coverage', () => {
 		it('should store data payload', () => {
 			expect.assertions(1);
 			const engine = new TraekEngine();
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			const MockComponent = {} as any;
 			const node = engine.addCustomNode(MockComponent, undefined, 'user', {
 				data: { extra: 'info' }
@@ -408,6 +423,7 @@ describe('TraekEngine — additional coverage', () => {
 		it('should default role to user', () => {
 			expect.assertions(1);
 			const engine = new TraekEngine();
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			const MockComponent = {} as any;
 			const node = engine.addCustomNode(MockComponent);
 			expect(node.role).toBe('user');
@@ -416,6 +432,7 @@ describe('TraekEngine — additional coverage', () => {
 		it('should have empty parentIds when no activeNodeId and no explicit parentIds', () => {
 			expect.assertions(1);
 			const engine = new TraekEngine();
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			const MockComponent = {} as any;
 			engine.activeNodeId = null;
 			const node = engine.addCustomNode(MockComponent, undefined, 'user', { parentIds: [] });

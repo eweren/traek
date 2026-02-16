@@ -8,7 +8,7 @@
 		error?: string;
 	};
 
-	let { node, engine, isActive } = $props<{
+	let { node, isActive } = $props<{
 		node: Node;
 		engine: TraekEngine;
 		isActive: boolean;
@@ -70,7 +70,12 @@
 			padding: 10px 12px 12px;
 			background: rgba(0, 0, 0, 0.3);
 			color: #e5e5e5;
-			font-family: system-ui, -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+			font-family:
+				system-ui,
+				-apple-system,
+				BlinkMacSystemFont,
+				'SF Pro Text',
+				sans-serif;
 			font-size: 12px;
 		}
 
@@ -186,4 +191,3 @@
 		}
 	}
 </style>
-

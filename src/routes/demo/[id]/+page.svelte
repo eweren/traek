@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
+	import { resolve } from '$app/paths';
 	import TraekCanvas from '$lib/TraekCanvas.svelte';
 	import {
 		DefaultLoadingOverlay,
@@ -402,7 +403,7 @@
 
 {#if engine}
 	<div class="chat-layout">
-		<a href="/demo" class="back" data-umami-event="demo-back-to-list">← Back to list</a>
+		<a href={resolve('/demo')} class="back" data-umami-event="demo-back-to-list">← Back to list</a>
 		<div class="canvas-wrap">
 			<TraekCanvas
 				{engine}

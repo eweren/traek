@@ -70,7 +70,8 @@
 	);
 
 	$effect(() => {
-		const _ = viewportResizeVersion;
+		// Track viewportResizeVersion to trigger effect on change
+		void viewportResizeVersion;
 		if (wrapper && intersectionObserverRef) {
 			intersectionObserverRef.unobserve(wrapper);
 			intersectionObserverRef.observe(wrapper);
@@ -217,7 +218,7 @@
 				<div class="thought-detail" transition:slide={{ duration: 180 }}>
 					{#if thoughtSteps.length > 0}
 						<ul class="thought-steps">
-							{#each thoughtSteps as step, i}
+							{#each thoughtSteps as step, i (i)}
 								{@const isLast = i === thoughtSteps.length - 1}
 								{@const inProgress = isLast && thoughtChild.content === 'Thinking...'}
 								{@const stepExpanded = expandedStepIndices[i]}

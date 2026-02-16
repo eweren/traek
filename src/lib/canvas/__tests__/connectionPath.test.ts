@@ -1,9 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import {
-	pathVerticalHorizontalVertical,
-	getConnectionPath,
-	CONNECTION_CORNER_RADIUS
-} from '../connectionPath';
+import { pathVerticalHorizontalVertical, getConnectionPath } from '../connectionPath';
 
 describe('pathVerticalHorizontalVertical', () => {
 	it('should produce a path for normal case', () => {

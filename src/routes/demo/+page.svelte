@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { afterNavigate } from '$app/navigation';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import GravityDotsBackground from '$lib/GravityDotsBackground.svelte';
 	import {
 		listConversations,
@@ -18,12 +19,12 @@
 	function newChat() {
 		track('demo-new-chat');
 		const conv = createConversation();
-		goto(`/demo/${conv.id}`);
+		goto(resolve(`/demo/${conv.id}`));
 	}
 
 	function open(id: string) {
 		track('demo-open-conversation', { conversationId: id });
-		goto(`/demo/${id}`);
+		goto(resolve(`/demo/${id}`));
 	}
 </script>
 
@@ -47,7 +48,7 @@
 			<button type="button" onclick={newChat}>New chat</button>
 		</header>
 		<ul>
-			{#each conversations as conv}
+			{#each conversations as conv (conv.id)}
 				<li>
 					<button type="button" onclick={() => open(conv.id)}>
 						<span class="title">{conv.title}</span>
@@ -64,7 +65,7 @@
 			{/each}
 		</ul>
 		<p class="home">
-			<a href="/" data-umami-event="demo-nav-home">← Home</a>
+			<a href={resolve('/')} data-umami-event="demo-nav-home">← Home</a>
 		</p>
 	</div>
 </div>
@@ -77,7 +78,7 @@
 	}
 
 	/* —— Content (above background) —— */
-		.demo-list {
+	.demo-list {
 		position: relative;
 		z-index: 1;
 		max-width: 32rem;

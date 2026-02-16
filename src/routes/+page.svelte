@@ -3,6 +3,7 @@
 	import { theme } from '$lib/theme';
 	import highlightDarkUrl from 'highlight.js/styles/github-dark.css?url';
 	import highlightLightUrl from 'highlight.js/styles/github.css?url';
+	import { resolve } from '$app/paths';
 
 	import { DEFAULT_TRACK_ENGINE_CONFIG, TraekCanvas, DefaultLoadingOverlay } from '$lib';
 	import { createHeroEngine } from '$lib/heroDemoEngine';
@@ -44,7 +45,9 @@ npm install traek
   }
 
   <TraekCanvas {engine} {onSendMessage} />
-<\/script>
+` +
+				// eslint-disable-next-line no-useless-escape
+				`<\/script>
 \`\`\``
 		)
 	);
@@ -77,7 +80,7 @@ npm install traek
 			</div>
 
 			<div class="hero-cta-row">
-				<a href="/demo" class="btn primary" data-umami-event="landing-cta-demo"
+				<a href={resolve('/demo')} class="btn primary" data-umami-event="landing-cta-demo"
 					>Open interactive demo</a
 				>
 				<a
@@ -169,6 +172,7 @@ npm install traek
 
 			<div class="code-card">
 				<div class="code-card-label">Quick start</div>
+				<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 				{@html renderedContent}
 			</div>
 		</div>
@@ -224,7 +228,7 @@ npm install traek
 				spatial AI conversations feel.
 			</p>
 			<div class="hero-cta-row">
-				<a href="/demo" class="btn primary" data-umami-event="landing-cta-demo-bottom"
+				<a href={resolve('/demo')} class="btn primary" data-umami-event="landing-cta-demo-bottom"
 					>Open interactive demo</a
 				>
 				<a

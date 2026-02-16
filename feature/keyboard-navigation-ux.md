@@ -34,11 +34,12 @@ These must be visually distinct.
 ```
 
 **Current CSS:**
+
 ```css
 .message-node-wrapper.active {
-  border-color: #00d8ff;
-  box-shadow: 0 0 30px rgba(0, 216, 255, 0.15);
-  transform: scale(1.02);
+	border-color: #00d8ff;
+	box-shadow: 0 0 30px rgba(0, 216, 255, 0.15);
+	transform: scale(1.02);
 }
 ```
 
@@ -60,15 +61,17 @@ These must be visually distinct.
 ```
 
 **New CSS:**
+
 ```css
 .message-node-wrapper:focus-visible {
-  outline: 3px solid var(--traek-focus-ring, #00d8ff);
-  outline-offset: 3px;
-  /* Do NOT change border, box-shadow, or transform */
+	outline: 3px solid var(--traek-focus-ring, #00d8ff);
+	outline-offset: 3px;
+	/* Do NOT change border, box-shadow, or transform */
 }
 ```
 
 **Rationale:**
+
 - **Outline** (outside border) is standard for keyboard focus (WCAG guideline)
 - **Outline-offset** creates visual separation from node edge
 - **No scale transform** — focus should not move content (causes layout shift)
@@ -91,20 +94,22 @@ These must be visually distinct.
 ```
 
 **Combined CSS:**
+
 ```css
 .message-node-wrapper.active:focus-visible {
-  /* Active styles (glow, scale) */
-  border-color: #00d8ff;
-  box-shadow: 0 0 30px rgba(0, 216, 255, 0.15);
-  transform: scale(1.02);
+	/* Active styles (glow, scale) */
+	border-color: #00d8ff;
+	box-shadow: 0 0 30px rgba(0, 216, 255, 0.15);
+	transform: scale(1.02);
 
-  /* Focus styles (outline ring) */
-  outline: 3px solid var(--traek-focus-ring, #00d8ff);
-  outline-offset: 3px;
+	/* Focus styles (outline ring) */
+	outline: 3px solid var(--traek-focus-ring, #00d8ff);
+	outline-offset: 3px;
 }
 ```
 
 **Visual Effect:**
+
 - Inner glow (active) + outer ring (focus) = clearly "this is the most important node"
 - Scale transform still applies (active state)
 
@@ -116,24 +121,24 @@ When navigating with keyboard, pulse the focus ring once to draw attention.
 
 ```css
 @keyframes focus-pulse {
-  0% {
-    outline-width: 3px;
-    outline-color: rgba(0, 216, 255, 1);
-  }
-  50% {
-    outline-width: 5px;
-    outline-color: rgba(0, 216, 255, 0.6);
-  }
-  100% {
-    outline-width: 3px;
-    outline-color: rgba(0, 216, 255, 1);
-  }
+	0% {
+		outline-width: 3px;
+		outline-color: rgba(0, 216, 255, 1);
+	}
+	50% {
+		outline-width: 5px;
+		outline-color: rgba(0, 216, 255, 0.6);
+	}
+	100% {
+		outline-width: 3px;
+		outline-color: rgba(0, 216, 255, 1);
+	}
 }
 
 .message-node-wrapper:focus-visible {
-  outline: 3px solid #00d8ff;
-  outline-offset: 3px;
-  animation: focus-pulse 0.4s ease-out;
+	outline: 3px solid #00d8ff;
+	outline-offset: 3px;
+	animation: focus-pulse 0.4s ease-out;
 }
 ```
 
@@ -144,20 +149,22 @@ When navigating with keyboard, pulse the focus ring once to draw attention.
 ### Dark vs. Light Theme
 
 **Dark Theme (Default):**
+
 - Focus ring: `#00d8ff` (cyan)
 - Contrast ratio: ~10:1 against `#0b0b0b` background ✅
 
 **Light Theme:**
+
 - Focus ring: `#0088cc` (darker cyan for better contrast)
 - Contrast ratio: ~4.5:1 against `#fafafa` background ✅
 
 ```css
 :root {
-  --traek-focus-ring: #00d8ff; /* Dark theme */
+	--traek-focus-ring: #00d8ff; /* Dark theme */
 }
 
 :root[data-theme='light'] {
-  --traek-focus-ring: #0088cc; /* Light theme */
+	--traek-focus-ring: #0088cc; /* Light theme */
 }
 ```
 
@@ -203,6 +210,7 @@ Users won't know keyboard shortcuts exist unless we tell them.
 ```
 
 **Behavior:**
+
 - Press `?` → Show overlay (fade in, 200ms)
 - Press `?` again → Hide overlay (fade out)
 - Press `Esc` → Hide overlay
@@ -215,27 +223,28 @@ New component: `src/lib/keyboard/KeyboardHelpOverlay.svelte`
 
 ```svelte
 <script lang="ts">
-  let { show, onClose } = $props();
+	let { show, onClose } = $props();
 </script>
 
 {#if show}
-  <div class="help-overlay-backdrop" onclick={onClose} transition:fade>
-    <div class="help-overlay-card" onclick={(e) => e.stopPropagation()}>
-      <header>
-        <h2>Keyboard Shortcuts</h2>
-        <button onclick={onClose}>×</button>
-      </header>
-      <div class="help-grid">
-        <!-- Navigation section -->
-        <!-- Actions section -->
-        <!-- etc. -->
-      </div>
-    </div>
-  </div>
+	<div class="help-overlay-backdrop" onclick={onClose} transition:fade>
+		<div class="help-overlay-card" onclick={(e) => e.stopPropagation()}>
+			<header>
+				<h2>Keyboard Shortcuts</h2>
+				<button onclick={onClose}>×</button>
+			</header>
+			<div class="help-grid">
+				<!-- Navigation section -->
+				<!-- Actions section -->
+				<!-- etc. -->
+			</div>
+		</div>
+	</div>
 {/if}
 ```
 
 **Acceptance Criteria:**
+
 - [ ] `?` key shows/hides overlay
 - [ ] Overlay is visually clear (two-column grid)
 - [ ] Click outside closes overlay
@@ -270,6 +279,7 @@ New component: `src/lib/keyboard/KeyboardHelpOverlay.svelte`
 4. "Press 'Enter' to activate this node"
 
 **Behavior:**
+
 - Show tooltip 1 second after first hover
 - Auto-dismiss after 4 seconds
 - Mark as shown in sessionStorage (`traek-tooltip-shown: true`)
@@ -280,13 +290,14 @@ Add to TraekNodeWrapper:
 
 ```svelte
 {#if showTooltip}
-  <div class="keyboard-tooltip" transition:fade>
-    💡 Tip: {tooltipText}
-  </div>
+	<div class="keyboard-tooltip" transition:fade>
+		💡 Tip: {tooltipText}
+	</div>
 {/if}
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Tooltip appears on first hover (once per session)
 - [ ] Tooltip auto-dismisses
 - [ ] Tooltip is unobtrusive
@@ -321,6 +332,7 @@ Add to TraekNodeWrapper:
 Vim-style `hjkl` keys conflict with typing in the input field.
 
 **Example:**
+
 - User is typing "hello" in input field
 - Pressing `h` should insert "h", not navigate to parent node
 
@@ -373,10 +385,12 @@ Vim-style `hjkl` keys conflict with typing in the input field.
 #### Visual Indicator
 
 **Navigation Mode:**
+
 - Input field has subtle blue outline: `outline: 1px dashed #00d8ff88`
 - Placeholder text: "Press 'i' to type..."
 
 **Input Mode:**
+
 - Input field has solid border: `border: 2px solid #00d8ff`
 - Placeholder text: "Type your message..."
 
@@ -385,13 +399,13 @@ Vim-style `hjkl` keys conflict with typing in the input field.
 ```css
 /* Navigation mode (input blurred) */
 .input-wrapper {
-  outline: 1px dashed rgba(0, 216, 255, 0.5);
+	outline: 1px dashed rgba(0, 216, 255, 0.5);
 }
 
 /* Input mode (input focused) */
 .input-wrapper:focus-within {
-  outline: none;
-  border: 2px solid #00d8ff;
+	outline: none;
+	border: 2px solid #00d8ff;
 }
 ```
 
@@ -403,31 +417,31 @@ Update KeyboardNavigator:
 
 ```typescript
 class KeyboardNavigator {
-  mode = $state<'navigation' | 'input'>('navigation');
+	mode = $state<'navigation' | 'input'>('navigation');
 
-  handleKeydown(e: KeyboardEvent): boolean {
-    // If in input mode, ignore all shortcuts except Esc
-    if (this.mode === 'input' && e.key !== 'Escape') {
-      return false; // Let input handle the key
-    }
+	handleKeydown(e: KeyboardEvent): boolean {
+		// If in input mode, ignore all shortcuts except Esc
+		if (this.mode === 'input' && e.key !== 'Escape') {
+			return false; // Let input handle the key
+		}
 
-    // Navigation mode: handle shortcuts
-    if (e.key === 'i') {
-      this.enterInputMode();
-      return true;
-    }
-    // ... other shortcuts
-  }
+		// Navigation mode: handle shortcuts
+		if (e.key === 'i') {
+			this.enterInputMode();
+			return true;
+		}
+		// ... other shortcuts
+	}
 
-  enterInputMode() {
-    this.mode = 'input';
-    document.querySelector('input')?.focus();
-  }
+	enterInputMode() {
+		this.mode = 'input';
+		document.querySelector('input')?.focus();
+	}
 
-  exitInputMode() {
-    this.mode = 'navigation';
-    document.querySelector('input')?.blur();
-  }
+	exitInputMode() {
+		this.mode = 'navigation';
+		document.querySelector('input')?.blur();
+	}
 }
 ```
 
@@ -435,16 +449,16 @@ Update TraekCanvas:
 
 ```svelte
 <input
-  bind:value={userInput}
-  placeholder={navigator?.mode === 'input' ? 'Type your message...' : "Press 'i' to type..."}
-  onfocus={() => navigator?.enterInputMode()}
-  onblur={() => navigator?.exitInputMode()}
-  onkeydown={(e) => {
-    if (e.key === 'Escape') {
-      navigator?.exitInputMode();
-      e.currentTarget.blur();
-    }
-  }}
+	bind:value={userInput}
+	placeholder={navigator?.mode === 'input' ? 'Type your message...' : "Press 'i' to type..."}
+	onfocus={() => navigator?.enterInputMode()}
+	onblur={() => navigator?.exitInputMode()}
+	onkeydown={(e) => {
+		if (e.key === 'Escape') {
+			navigator?.exitInputMode();
+			e.currentTarget.blur();
+		}
+	}}
 />
 ```
 
@@ -510,12 +524,15 @@ handleKeydown(e: KeyboardEvent) {
 **Scenario:** User is on a leaf node (no children) and presses `l` (go to first child).
 
 **Current Behavior (Spec):**
+
 - Do nothing (no child exists)
 
 **UX Problem:**
+
 - No feedback — user doesn't know if the key worked
 
 **Solution:**
+
 - **Visual feedback:** Flash the focus ring red for 200ms
 - **Audio feedback (optional):** Play subtle "error" sound (system beep)
 
@@ -546,14 +563,21 @@ showErrorFeedback(nodeId: string) {
 
 ```css
 .message-node-wrapper.navigation-error {
-  outline: 3px solid #ff3e00 !important;
-  animation: shake 0.2s;
+	outline: 3px solid #ff3e00 !important;
+	animation: shake 0.2s;
 }
 
 @keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-4px); }
-  75% { transform: translateX(4px); }
+	0%,
+	100% {
+		transform: translateX(0);
+	}
+	25% {
+		transform: translateX(-4px);
+	}
+	75% {
+		transform: translateX(4px);
+	}
 }
 ```
 
@@ -564,12 +588,15 @@ showErrorFeedback(nodeId: string) {
 **Scenario:** Canvas has no nodes, user presses navigation keys.
 
 **Current Behavior (Spec):**
+
 - No nodes to navigate → do nothing
 
 **UX Problem:**
+
 - User is confused — nothing happens
 
 **Solution:**
+
 - **Disable navigation mode** when canvas is empty
 - **Show hint:** "Press 'i' to start a conversation"
 
@@ -605,10 +632,12 @@ showEmptyCanvasHint() {
 **UX Issue:** Jumping to parent is unexpected — user expects to stay on current node.
 
 **Proposal (Alternative Behavior):**
+
 - Do nothing (stay on current node)
 - Flash focus ring (same as "end of branch")
 
 **OR (Keep Spec Behavior, Add Feedback):**
+
 - Go to parent as specified
 - Show brief tooltip: "→ Moved to parent (no prev sibling)"
 
@@ -635,6 +664,7 @@ showEmptyCanvasHint() {
 **UX Issue:** If there are only 2 roots and user presses `3`, what happens?
 
 **Solution:**
+
 - If `n > rootCount`, flash error feedback
 - Show tooltip: "Only 2 root threads exist"
 
@@ -645,10 +675,12 @@ showEmptyCanvasHint() {
 **Scenario:** User rapidly presses `jjjjj` (next sibling 5 times).
 
 **UX Issue:**
+
 - If navigation triggers focus animation (pan to center node), rapid presses cause janky animation
 - Focus animation duration is 280ms (config.focusDurationMs)
 
 **Solution:**
+
 - **Debounce focus animation:** Don't pan on every keystroke, only after user stops typing
 - **OR:** Make animation faster when navigating (e.g., 150ms instead of 280ms)
 
@@ -670,6 +702,7 @@ goToNextSibling() {
 **UX Issue:** Focused node no longer exists — focus is lost.
 
 **Solution:**
+
 - On node deletion, if `focusedNodeId === deletedNodeId`:
   - Move focus to parent (or next sibling if no parent)
   - Show tooltip: "Node deleted, moved to parent"
@@ -699,39 +732,30 @@ deleteNode(nodeId: string) {
 **Viewport (Tree Container):**
 
 ```html
-<div
-  role="tree"
-  aria-label="Conversation tree"
-  aria-multiselectable="false"
-  tabindex="0"
->
+<div role="tree" aria-label="Conversation tree" aria-multiselectable="false" tabindex="0"></div>
 ```
 
 **Nodes (Tree Items):**
 
 ```html
 <div
-  role="treeitem"
-  aria-level="{depth}"
-  aria-posinset="{siblingIndex + 1}"
-  aria-setsize="{siblingCount}"
-  aria-selected="{isActive}"
-  aria-expanded="{hasChildren ? !isCollapsed : undefined}"
-  tabindex="{isActive || isFocused ? 0 : -1}"
-  data-node-id="{node.id}"
->
+	role="treeitem"
+	aria-level="{depth}"
+	aria-posinset="{siblingIndex + 1}"
+	aria-setsize="{siblingCount}"
+	aria-selected="{isActive}"
+	aria-expanded="{hasChildren ? !isCollapsed : undefined}"
+	tabindex="{isActive || isFocused ? 0 : -1}"
+	data-node-id="{node.id}"
+></div>
 ```
 
 **Keyboard Help Overlay:**
 
 ```html
-<div
-  role="dialog"
-  aria-modal="true"
-  aria-labelledby="help-title"
->
-  <h2 id="help-title">Keyboard Shortcuts</h2>
-  <!-- ... -->
+<div role="dialog" aria-modal="true" aria-labelledby="help-title">
+	<h2 id="help-title">Keyboard Shortcuts</h2>
+	<!-- ... -->
 </div>
 ```
 
@@ -743,9 +767,7 @@ deleteNode(nodeId: string) {
 
 ```html
 <div aria-live="polite" aria-atomic="true" class="sr-only">
-  {#if focusedNode}
-    Focused on {focusedNode.role} message: {focusedNode.content.slice(0, 50)}
-  {/if}
+	{#if focusedNode} Focused on {focusedNode.role} message: {focusedNode.content.slice(0, 50)} {/if}
 </div>
 ```
 
@@ -753,9 +775,7 @@ deleteNode(nodeId: string) {
 
 ```html
 <div aria-live="assertive" aria-atomic="true" class="sr-only">
-  {#if errorMessage}
-    {errorMessage}
-  {/if}
+	{#if errorMessage} {errorMessage} {/if}
 </div>
 ```
 
@@ -794,78 +814,85 @@ Example: "No child node. Staying on current node."
 ```css
 /* Focus ring (keyboard navigation) */
 .message-node-wrapper:focus-visible {
-  outline: 3px solid var(--traek-focus-ring, #00d8ff);
-  outline-offset: 3px;
-  animation: focus-pulse 0.4s ease-out;
+	outline: 3px solid var(--traek-focus-ring, #00d8ff);
+	outline-offset: 3px;
+	animation: focus-pulse 0.4s ease-out;
 }
 
 /* Active node (reply target) */
 .message-node-wrapper.active {
-  border-color: var(--traek-node-active-border, #00d8ff);
-  box-shadow: 0 0 30px var(--traek-node-active-glow, rgba(0, 216, 255, 0.15));
-  transform: scale(1.02);
+	border-color: var(--traek-node-active-border, #00d8ff);
+	box-shadow: 0 0 30px var(--traek-node-active-glow, rgba(0, 216, 255, 0.15));
+	transform: scale(1.02);
 }
 
 /* Both active AND focused */
 .message-node-wrapper.active:focus-visible {
-  outline: 3px solid var(--traek-focus-ring, #00d8ff);
-  outline-offset: 3px;
-  border-color: var(--traek-node-active-border, #00d8ff);
-  box-shadow: 0 0 30px var(--traek-node-active-glow, rgba(0, 216, 255, 0.15));
-  transform: scale(1.02);
+	outline: 3px solid var(--traek-focus-ring, #00d8ff);
+	outline-offset: 3px;
+	border-color: var(--traek-node-active-border, #00d8ff);
+	box-shadow: 0 0 30px var(--traek-node-active-glow, rgba(0, 216, 255, 0.15));
+	transform: scale(1.02);
 }
 
 /* Navigation error (red flash) */
 .message-node-wrapper.navigation-error {
-  outline: 3px solid #ff3e00 !important;
-  animation: shake 0.2s;
+	outline: 3px solid #ff3e00 !important;
+	animation: shake 0.2s;
 }
 
 /* Focus pulse animation */
 @keyframes focus-pulse {
-  0% {
-    outline-width: 3px;
-    outline-color: rgba(0, 216, 255, 1);
-  }
-  50% {
-    outline-width: 5px;
-    outline-color: rgba(0, 216, 255, 0.6);
-  }
-  100% {
-    outline-width: 3px;
-    outline-color: rgba(0, 216, 255, 1);
-  }
+	0% {
+		outline-width: 3px;
+		outline-color: rgba(0, 216, 255, 1);
+	}
+	50% {
+		outline-width: 5px;
+		outline-color: rgba(0, 216, 255, 0.6);
+	}
+	100% {
+		outline-width: 3px;
+		outline-color: rgba(0, 216, 255, 1);
+	}
 }
 
 /* Shake animation (error feedback) */
 @keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-4px); }
-  75% { transform: translateX(4px); }
+	0%,
+	100% {
+		transform: translateX(0);
+	}
+	25% {
+		transform: translateX(-4px);
+	}
+	75% {
+		transform: translateX(4px);
+	}
 }
 
 /* Input mode indicator */
 .input-wrapper {
-  outline: 1px dashed rgba(0, 216, 255, 0.5);
-  transition: all 0.2s;
+	outline: 1px dashed rgba(0, 216, 255, 0.5);
+	transition: all 0.2s;
 }
 
 .input-wrapper:focus-within {
-  outline: none;
-  border: 2px solid #00d8ff;
+	outline: none;
+	border: 2px solid #00d8ff;
 }
 
 /* Screen reader only (for announcements) */
 .sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border-width: 0;
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border-width: 0;
 }
 ```
 

@@ -35,7 +35,9 @@ export function checkDailyLimit(
 	if (entry.count >= limit) {
 		// Seconds until next midnight UTC
 		const now = new Date();
-		const tomorrow = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1));
+		const tomorrow = new Date(
+			Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1)
+		);
 		const retryAfter = Math.ceil((tomorrow.getTime() - now.getTime()) / 1000);
 		return { allowed: false, retryAfter };
 	}

@@ -32,6 +32,7 @@ export function wouldCreateCycle(nodes: Node[], parentId: string, childId: strin
 	// If parentId === childId, it's a self-loop
 	if (parentId === childId) return true;
 	// DFS from parentId upward: if we reach childId, it would create a cycle
+	// eslint-disable-next-line svelte/prefer-svelte-reactivity
 	const visited = new Set<string>();
 	const stack = [parentId];
 	while (stack.length > 0) {
@@ -50,6 +51,7 @@ export function wouldCreateCycle(nodes: Node[], parentId: string, childId: strin
 }
 
 export type CustomTraekNode = Node & {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	component: Component<any>;
 	props?: Record<string, unknown>;
 };
@@ -238,6 +240,7 @@ export class TraekEngine {
 	public pendingFocusNodeId = $state<string | null>(null);
 
 	addCustomNode(
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		component: Component<any>,
 		props?: Record<string, unknown>,
 		role: 'user' | 'assistant' | 'system' = 'user',
@@ -596,6 +599,7 @@ export class TraekEngine {
 
 	/** Count visible descendants of a node via BFS (excludes thought nodes). */
 	getDescendantCount(nodeId: string): number {
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity
 		const descendants = new Set<string>();
 		const queue = [nodeId];
 		while (queue.length > 0) {
@@ -616,6 +620,7 @@ export class TraekEngine {
 	/** Delete a node and all its descendants. Navigate to the deleted node's first parent if needed. */
 	deleteNodeAndDescendants(nodeId: string) {
 		// Collect all descendants via BFS
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity
 		const toDelete = new Set<string>([nodeId]);
 		const queue = [nodeId];
 		while (queue.length > 0) {
@@ -893,6 +898,7 @@ export class TraekEngine {
 	 * The array includes the given node itself.
 	 */
 	getAncestorPath(nodeId: string): string[] {
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity
 		const visited = new Set<string>();
 		const stack = [nodeId];
 		while (stack.length > 0) {

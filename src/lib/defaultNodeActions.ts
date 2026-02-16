@@ -1,5 +1,5 @@
 import type { NodeTypeAction } from './node-types/types.js';
-import type { Node, TraekEngine, MessageNode } from './TraekEngine.svelte';
+import type { Node, TraekEngine } from './TraekEngine.svelte';
 
 export const duplicateAction: NodeTypeAction = {
 	id: 'duplicate',

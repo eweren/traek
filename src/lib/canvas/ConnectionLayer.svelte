@@ -25,12 +25,12 @@
 	let hoverPos = $state<{ x: number; y: number } | null>(null);
 </script>
 
-{#each nodes as node}
+{#each nodes as node (node.id)}
 	{#if node.parentIds.length > 0 && node.type !== 'thought'}
 		{@const nodeX = (node.metadata?.x ?? 0) * config.gridStep}
 		{@const nodeY = (node.metadata?.y ?? 0) * config.gridStep}
 		{@const nodeH = node.metadata?.height ?? config.nodeHeightDefault}
-		{#each node.parentIds as pid}
+		{#each node.parentIds as pid (pid)}
 			{@const parent = nodes.find((n) => n.id === pid)}
 			{#if parent}
 				{@const parentX = (parent.metadata?.x ?? 0) * config.gridStep}
@@ -51,8 +51,7 @@
 					activeAncestorIds.has(parent.id) &&
 					activeAncestorIds.has(node.id)}
 				{@const isHoverAdjacent =
-					hoveredNodeId !== null &&
-					(parent.id === hoveredNodeId || node.id === hoveredNodeId)}
+					hoveredNodeId !== null && (parent.id === hoveredNodeId || node.id === hoveredNodeId)}
 				{#if !isOnActivePath}
 					<path
 						class="connection"
@@ -66,12 +65,12 @@
 	{/if}
 {/each}
 
-{#each nodes as node}
+{#each nodes as node (node.id)}
 	{#if node.parentIds.length > 0 && node.type !== 'thought'}
 		{@const nodeX = (node.metadata?.x ?? 0) * config.gridStep}
 		{@const nodeY = (node.metadata?.y ?? 0) * config.gridStep}
 		{@const nodeH = node.metadata?.height ?? config.nodeHeightDefault}
-		{#each node.parentIds as pid}
+		{#each node.parentIds as pid (pid)}
 			{@const parent = nodes.find((n) => n.id === pid)}
 			{#if parent}
 				{@const parentX = (parent.metadata?.x ?? 0) * config.gridStep}
@@ -126,12 +125,12 @@
 {/if}
 
 <!-- Invisible hit areas for clicking/deleting connections -->
-{#each nodes as node}
+{#each nodes as node (node.id)}
 	{#if node.parentIds.length > 0 && node.type !== 'thought'}
 		{@const nodeX = (node.metadata?.x ?? 0) * config.gridStep}
 		{@const nodeY = (node.metadata?.y ?? 0) * config.gridStep}
 		{@const nodeH = node.metadata?.height ?? config.nodeHeightDefault}
-		{#each node.parentIds as pid}
+		{#each node.parentIds as pid (pid)}
 			{@const parent = nodes.find((n) => n.id === pid)}
 			{#if parent}
 				{@const parentX = (parent.metadata?.x ?? 0) * config.gridStep}
@@ -189,7 +188,9 @@
 	{@const cpOffset = Math.max(40, dy * 0.5)}
 	<path
 		class="connection-rubber-band"
-		d="M {sx} {sy} C {sx} {sy + (connectionDrag.sourcePortType === 'output' ? cpOffset : -cpOffset)}, {cx} {cy + (connectionDrag.sourcePortType === 'output' ? -cpOffset : cpOffset)}, {cx} {cy}"
+		d="M {sx} {sy} C {sx} {sy +
+			(connectionDrag.sourcePortType === 'output' ? cpOffset : -cpOffset)}, {cx} {cy +
+			(connectionDrag.sourcePortType === 'output' ? -cpOffset : cpOffset)}, {cx} {cy}"
 	/>
 {/if}
 

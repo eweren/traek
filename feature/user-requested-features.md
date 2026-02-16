@@ -47,6 +47,7 @@ Wenn ich zwei Sibling-Nodes habe (beide Kinder desselben Parents), erscheint ein
 **Das ist DAS Killer-Feature das ChatGPT nicht hat.**
 
 Branching alleine ist gut — aber wenn ich die Branches nicht sinnvoll vergleichen kann, ist der Vorteil limitiert. Mit einem guten Compare-Feature wird Traek zum perfekten Tool fuer:
+
 - Entscheidungsfindung (welche Option ist besser?)
 - A/B-Testing von Prompts
 - Vergleich verschiedener AI-Antworten
@@ -77,6 +78,7 @@ Bei ChatGPT kann ich Ctrl+F nutzen und durch den Text suchen. Aber das funktioni
 **Zusatz-Feature: Semantic Search**
 
 Nicht nur exakter Text-Match, sondern auch semantische Suche:
+
 - Ich suche "Login" → findet auch Nodes mit "Authentication", "Sign in", etc.
 - Nutzt embeddings um aehnliche Konzepte zu finden
 
@@ -122,6 +124,7 @@ Oder: Nach einer Antwort erscheint ein Button **"Explore alternatives"** → ers
 Ich frage: "How should I learn Python?"
 
 Die AI antwortet:
+
 - Branch 1: "Self-taught approach (books, tutorials)"
 - Branch 2: "Structured course (Udemy, Coursera)"
 - Branch 3: "Project-based learning (build while learning)"
@@ -145,6 +148,7 @@ Fuer neue Nutzer ist das ein Gamechanger: Sie sehen sofort was Branching bringt,
 ### Das Problem
 
 Meine Konversationen auf dem Canvas werden chaotisch. Ich habe:
+
 - Fragen die noch offen sind ("To-Do")
 - Wichtige Insights die ich merken will ("Important")
 - Experimentelle Branches die vielleicht Bloedsinn sind ("Draft")
@@ -181,6 +185,7 @@ Aber alles sieht gleich aus. Ich verliere den Ueberblick was was ist.
 **Bonus: Smart Tags**
 
 Die AI schlaegt automatisch Tags vor:
+
 - "This looks like a to-do. Add 'To-Do' tag?"
 - "This seems important. Add 'Important' tag?"
 
@@ -189,6 +194,7 @@ Die AI schlaegt automatisch Tags vor:
 **Organisation.**
 
 Bei groesseren Konversationen wird der Canvas schnell unuebersichtlich. Tags helfen mir:
+
 - Den Canvas aufzuraeumen
 - Wichtiges von Unwichtigem zu trennen
 - Meinen Workflow zu strukturieren ("Zeig mir alle To-Dos")
@@ -243,6 +249,7 @@ Ich kann dann sofort loslegen und die Branches fuellen.
 **Custom Templates:**
 
 Ich kann meine eigenen Templates speichern:
+
 - "My Research Template" → mein persoenlicher Workflow
 - "Weekly Review" → immer dieselbe Struktur fuer Reviews
 

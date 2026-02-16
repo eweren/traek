@@ -8,10 +8,7 @@ declare global {
 	}
 }
 
-export function track(
-	eventName: string,
-	data?: Record<string, string | number | boolean>
-): void {
+export function track(eventName: string, data?: Record<string, string | number | boolean>): void {
 	if (typeof window === 'undefined') return;
 	window.umami?.track(eventName, data);
 }
