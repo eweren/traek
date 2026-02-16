@@ -79,7 +79,8 @@
 			{#if siblingTotal <= 5}
 				<!-- Item 5: Normal dots wenn ≤5 -->
 				<div class="sibling-dots" role="list" aria-label="Geschwister-Position">
-					{#each Array(siblingTotal) as _, i}
+					<!-- eslint-disable-next-line @typescript-eslint/no-unused-vars -->
+					{#each Array(siblingTotal) as _, i (i)}
 						<span
 							class="dot"
 							class:active={i === siblingIndex}

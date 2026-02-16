@@ -190,7 +190,8 @@
 
 		<div class="onboarding-footer">
 			<div class="progress-dots" role="list" aria-label="Tutorial Fortschritt">
-				{#each steps as _, i}
+				<!-- eslint-disable-next-line @typescript-eslint/no-unused-vars -->
+				{#each steps as _, i (i)}
 					<span
 						class="dot"
 						class:active={i === step}

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { TraekEngine, type MessageNode } from '../TraekEngine.svelte';
+import { TraekEngine } from '../TraekEngine.svelte';
 
 beforeEach(() => {
 	globalThis.requestAnimationFrame = (cb: FrameRequestCallback) => {
@@ -207,7 +207,7 @@ describe('TraekEngine traversal methods', () => {
 
 		it('should handle tree with thought nodes interspersed', () => {
 			expect.assertions(1);
-			const { engine, root, childA, grandchildA } = buildBranchingTree();
+			const { engine, root, childA } = buildBranchingTree();
 			// Add thought nodes at various levels
 			engine.addNode('Thought at root', 'assistant', { type: 'thought', parentIds: [root] });
 			engine.addNode('Thought at child', 'assistant', { type: 'thought', parentIds: [childA] });

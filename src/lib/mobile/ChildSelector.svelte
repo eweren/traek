@@ -87,13 +87,9 @@
 		}
 	}
 
-	const sheetTransform = $derived(
-		dragY > 0 ? `translateY(${dragY}px)` : ''
-	);
+	const sheetTransform = $derived(dragY > 0 ? `translateY(${dragY}px)` : '');
 	const backdropOpacity = $derived(
-		dragY > 0 && sheetEl
-			? Math.max(0, 1 - dragY / (sheetEl.offsetHeight ?? 400))
-			: 1
+		dragY > 0 && sheetEl ? Math.max(0, 1 - dragY / (sheetEl.offsetHeight ?? 400)) : 1
 	);
 </script>
 
@@ -135,7 +131,7 @@
 		<p class="selector-hint">Es gibt {children.length} Antworten. Wähle eine:</p>
 
 		<div class="children-list" role="list">
-			{#each children as child, i}
+			{#each children as child, i (i)}
 				<button class="child-option" onclick={() => onSelect(child.id)}>
 					<span class="option-number">{i + 1}</span>
 					<div class="option-content">

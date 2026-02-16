@@ -152,6 +152,7 @@ export class SwipeNavigator {
 		}
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	handleTouchEnd(_e: TouchEvent): void {
 		if (!this.touch) {
 			this.reset();

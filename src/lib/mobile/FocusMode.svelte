@@ -31,8 +31,7 @@
 		componentMap = {},
 		registry,
 		focusConfig,
-		onSendMessage,
-		onRetry
+		onSendMessage
 	}: {
 		engine: TraekEngine;
 		componentMap?: NodeComponentMap;

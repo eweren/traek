@@ -37,7 +37,7 @@
 <div class="breadcrumbs" class:expanded={isExpanded}>
 	{#if breadcrumbPath().length > 0}
 		<div class="breadcrumb-container">
-			{#each breadcrumbPath() as node, i}
+			{#each breadcrumbPath() as node, i (i)}
 				{@const isLast = i === breadcrumbPath().length - 1}
 				{@const isHidden =
 					!isExpanded &&
