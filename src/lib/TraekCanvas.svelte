@@ -23,6 +23,7 @@
 	import FocusMode from './mobile/FocusMode.svelte';
 	import type { FocusModeConfig } from './mobile/focusModeTypes.js';
 	import { ViewportManager } from './canvas/ViewportManager.svelte';
+	import { ViewportTracker } from './canvas/ViewportTracker.svelte';
 	import { CanvasInteraction } from './canvas/CanvasInteraction.svelte';
 	import NodeRenderer from './canvas/NodeRenderer.svelte';
 	import InputForm from './canvas/InputForm.svelte';
@@ -33,6 +34,7 @@
 	import ZoomControls from './canvas/ZoomControls.svelte';
 	import Minimap from './canvas/Minimap.svelte';
 	import BranchCompare from './compare/BranchCompare.svelte';
+	import DesktopTour from './onboarding/DesktopTour.svelte';
 
 	type InputActionsContext = {
 		engine: TraekEngine;
@@ -126,6 +128,19 @@
 	$effect(() => {
 		if (!engine || !viewport) return;
 		interaction = new CanvasInteraction(viewport, engine, config, onNodesChanged);
+	});
+
+	// Viewport tracker and visible nodes calculation
+	const visibleNodeIds = $derived.by(() => {
+		if (!viewport || !engine) return new Set<string>();
+		const tracker = new ViewportTracker(config, 200);
+		return tracker.getVisibleNodeIds(
+			engine.nodes,
+			engine.collapsedNodes,
+			viewport.viewportEl,
+			viewport.scale,
+			viewport.offset
+		);
 	});
 
 	// Keyboard navigator for desktop
@@ -266,6 +281,16 @@
 
 	// Search state
 	let showSearchBar = $state(false);
+
+	// Desktop tour state
+	let showDesktopTour = $state(false);
+	$effect(() => {
+		if (typeof localStorage === 'undefined' || resolvedMode !== 'canvas') return;
+		const tourCompleted = localStorage.getItem('traek-desktop-tour-completed');
+		if (!tourCompleted) {
+			showDesktopTour = true;
+		}
+	});
 
 	// Action resolver
 	let resolver = $state<ActionResolver | null>(null);
@@ -529,6 +554,7 @@
 								bind:hoveredConnection={interaction.hoveredConnection}
 								connectionDrag={interaction.connectionDrag}
 								collapsedNodes={engine.collapsedNodes}
+								{visibleNodeIds}
 								onDeleteConnection={(parentId, childId) => {
 									engine.removeConnection(parentId, childId);
 								}}
@@ -544,6 +570,8 @@
 					{registry}
 					viewportEl={viewport.viewportEl}
 					viewportResizeVersion={viewport.viewportResizeVersion}
+					scale={viewport.scale}
+					{visibleNodeIds}
 					{editingNodeId}
 					onEditSave={handleEditSave}
 					onEditCancel={handleEditCancel}
@@ -655,6 +683,11 @@
 			<!-- Branch Comparison Overlay -->
 			{#if comparingNodeId}
 				<BranchCompare {engine} nodeId={comparingNodeId} onClose={() => (comparingNodeId = null)} />
+			{/if}
+
+			<!-- Desktop Tour -->
+			{#if showDesktopTour}
+				<DesktopTour onComplete={() => (showDesktopTour = false)} />
 			{/if}
 		</div>
 	{/if}

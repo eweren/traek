@@ -11,6 +11,7 @@
 		hoveredConnection = $bindable(null),
 		connectionDrag,
 		collapsedNodes = new Set(),
+		visibleNodeIds = new Set(),
 		onDeleteConnection
 	}: {
 		nodes: Node[];
@@ -20,6 +21,7 @@
 		hoveredConnection: { parentId: string; childId: string } | null;
 		connectionDrag: ConnectionDragState | null;
 		collapsedNodes?: Set<string>;
+		visibleNodeIds?: Set<string>;
 		onDeleteConnection: (parentId: string, childId: string) => void;
 	} = $props();
 
@@ -63,13 +65,15 @@
 {#each nodes as node (node.id)}
 	{#if node.parentIds.length > 0 && node.type !== 'thought'}
 		{@const isNodeHidden = collapsedCache.get(node.id) ?? false}
+		{@const isChildVisible = visibleNodeIds.has(node.id)}
 		{#if !isNodeHidden}
 			{@const nodeX = (node.metadata?.x ?? 0) * config.gridStep}
 			{@const nodeY = (node.metadata?.y ?? 0) * config.gridStep}
 			{@const nodeH = node.metadata?.height ?? config.nodeHeightDefault}
 			{#each node.parentIds as pid (pid)}
 				{@const parent = nodeMap.get(pid)}
-				{#if parent}
+				{@const isParentVisible = visibleNodeIds.has(pid)}
+				{#if parent && (isChildVisible || isParentVisible)}
 					{@const parentX = (parent.metadata?.x ?? 0) * config.gridStep}
 					{@const parentY = (parent.metadata?.y ?? 0) * config.gridStep}
 					{@const parentH = parent.metadata?.height ?? config.nodeHeightDefault}

@@ -82,6 +82,10 @@ export { default as ChildSelector } from './mobile/ChildSelector.svelte';
 export { focusModeConfigSchema, DEFAULT_FOCUS_MODE_CONFIG } from './mobile/focusModeTypes';
 export type { FocusModeConfig, SwipeDirection } from './mobile/focusModeTypes';
 
+// Desktop Onboarding
+export { default as DesktopTour } from './onboarding/DesktopTour.svelte';
+export { default as TourStep } from './onboarding/TourStep.svelte';
+
 // Schemas (Zod)
 export {
 	serializedNodeSchema,
@@ -93,3 +97,25 @@ export {
 export { traekEngineConfigSchema, addNodePayloadSchema } from './schemas';
 export { actionDefinitionSchema } from './actions/schemas';
 export { nodeTypeActionSchema, nodeTypeDefinitionSchema } from './node-types/schemas';
+
+// Theme System
+export { default as ThemeProvider, useTheme, applyThemeToRoot } from './theme/ThemeProvider.svelte';
+export { darkTheme, lightTheme, highContrastTheme, themes, DEFAULT_THEME } from './theme/themes';
+export type { ThemeName } from './theme/themes';
+export type { ThemeContext } from './theme/ThemeProvider.svelte';
+export {
+	TraekThemeSchema,
+	TraekThemeColorsSchema,
+	TraekThemeSpacingSchema,
+	TraekThemeRadiusSchema,
+	TraekThemeTypographySchema,
+	TraekThemeAnimationSchema
+} from './theme/tokens';
+export type {
+	TraekTheme,
+	TraekThemeColors,
+	TraekThemeSpacing,
+	TraekThemeRadius,
+	TraekThemeTypography,
+	TraekThemeAnimation
+} from './theme/tokens';

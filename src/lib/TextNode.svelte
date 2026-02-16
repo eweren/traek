@@ -4,6 +4,7 @@
 	import type { TraekEngine } from './TraekEngine.svelte';
 	import TraekNodeWrapper from './TraekNodeWrapper.svelte';
 	import { markdownToHtml } from './utils.ts';
+	import { getDetailLevel } from './canvas/AdaptiveRenderer.svelte';
 
 	import type { MessageNode } from './TraekEngine.svelte';
 
@@ -15,6 +16,7 @@
 		gridStep = 20,
 		nodeWidth = 350,
 		viewportResizeVersion = 0,
+		scale = 1,
 		editingNodeId = null,
 		onEditSave,
 		onEditCancel,
@@ -27,6 +29,7 @@
 		gridStep?: number;
 		nodeWidth?: number;
 		viewportResizeVersion?: number;
+		scale?: number;
 		editingNodeId?: string | null;
 		onEditSave?: (nodeId: string, content: string) => void;
 		onEditCancel?: () => void;
@@ -39,6 +42,7 @@
 	let editTextarea = $state<HTMLTextAreaElement | null>(null);
 
 	const isEditing = $derived(editingNodeId === node.id);
+	const detailLevel = $derived(getDetailLevel(scale));
 
 	// When entering edit mode, initialize content and auto-focus
 	$effect(() => {
@@ -68,8 +72,14 @@
 	 * When streaming, we split content at the last double-newline:
 	 * - Everything before = stable (cached)
 	 * - Everything after = streaming (re-parsed each update)
+	 * Skip markdown parsing entirely at compact/minimal/dot zoom levels for performance.
 	 */
 	const contentParts = $derived.by(() => {
+		// Skip parsing at low zoom levels
+		if (detailLevel === 'compact' || detailLevel === 'minimal' || detailLevel === 'dot') {
+			return { stable: '', streaming: '' };
+		}
+
 		const content = node.content ?? '';
 		// If done or very short, treat entire content as streaming (no split)
 		if (node.status === 'done' || content.length < 100) {
@@ -91,6 +101,11 @@
 	let lastStableContent = $state('');
 
 	$effect(() => {
+		// Skip caching at low zoom levels
+		if (detailLevel === 'compact' || detailLevel === 'minimal' || detailLevel === 'dot') {
+			return;
+		}
+
 		const { stable } = contentParts;
 		if (stable !== lastStableContent) {
 			cachedStableHtml = markdownToHtml(stable);
@@ -99,7 +114,9 @@
 	});
 
 	// Only re-parse the streaming part on each update
-	const streamingHtml = $derived(markdownToHtml(contentParts.streaming));
+	const streamingHtml = $derived(
+		detailLevel === 'full' ? markdownToHtml(contentParts.streaming) : ''
+	);
 	const renderedContent = $derived(cachedStableHtml + streamingHtml);
 
 	function checkScrolledToEnd(el: HTMLElement | null) {
@@ -136,6 +153,7 @@
 	{gridStep}
 	{nodeWidth}
 	{viewportResizeVersion}
+	{scale}
 >
 	{#if isEditing}
 		<div class="edit-overlay">
@@ -157,7 +175,8 @@
 				<button type="button" class="edit-btn edit-btn-cancel" onclick={cancelEdit}>Cancel</button>
 			</div>
 		</div>
-	{:else}
+	{:else if detailLevel === 'full'}
+		<!-- Full detail: render complete markdown -->
 		<!-- svelte-ignore a11y_no_static_element_interactions -->
 		<div
 			bind:this={scrollContainer}

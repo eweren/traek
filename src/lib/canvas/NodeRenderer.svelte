@@ -15,6 +15,8 @@
 		registry,
 		viewportEl,
 		viewportResizeVersion,
+		scale,
+		visibleNodeIds,
 		editingNodeId,
 		onEditSave,
 		onEditCancel,
@@ -28,6 +30,8 @@
 		registry?: NodeTypeRegistry;
 		viewportEl: HTMLElement | null;
 		viewportResizeVersion: number;
+		scale: number;
+		visibleNodeIds: Set<string>;
 		editingNodeId: string | null;
 		onEditSave: (nodeId: string, content: string) => void;
 		onEditCancel: () => void;
@@ -41,29 +45,50 @@
 	{@const isActive = engine.activeNodeId === node.id}
 	{@const isFocused = focusedNodeId === node.id}
 	{@const isNodeHidden = engine.isInCollapsedSubtree(node.id)}
+	{@const isVisible = visibleNodeIds.has(node.id)}
 	{#if !isNodeHidden}
-		{@const typeDef = registry?.get(node.type)}
-		{@const uiData = node as CustomTraekNode}
-		{@const ResolvedComponent = typeDef?.component ?? uiData?.component ?? componentMap[node.type]}
-		{#if ResolvedComponent}
-			{#if typeDef?.selfWrapping}
-				<!-- Self-wrapping registry component (e.g. TextNode) -->
-				<ResolvedComponent
-					{node}
-					{isActive}
-					{isFocused}
-					{engine}
-					viewportRoot={viewportEl}
-					gridStep={config.gridStep}
-					nodeWidth={config.nodeWidth}
-					{viewportResizeVersion}
-					{editingNodeId}
-					{onEditSave}
-					{onEditCancel}
-					onStartEdit={onEditNode}
-				/>
-			{:else}
-				<!-- Wrapped component (registry, node.component, or componentMap) -->
+		{#if isVisible || isActive || isFocused}
+			{@const typeDef = registry?.get(node.type)}
+			{@const uiData = node as CustomTraekNode}
+			{@const ResolvedComponent =
+				typeDef?.component ?? uiData?.component ?? componentMap[node.type]}
+			{#if ResolvedComponent}
+				{#if typeDef?.selfWrapping}
+					<!-- Self-wrapping registry component (e.g. TextNode) -->
+					<ResolvedComponent
+						{node}
+						{isActive}
+						{isFocused}
+						{engine}
+						viewportRoot={viewportEl}
+						gridStep={config.gridStep}
+						nodeWidth={config.nodeWidth}
+						{viewportResizeVersion}
+						{scale}
+						{editingNodeId}
+						{onEditSave}
+						{onEditCancel}
+						onStartEdit={onEditNode}
+					/>
+				{:else}
+					<!-- Wrapped component (registry, node.component, or componentMap) -->
+					<TraekNodeWrapper
+						{node}
+						{isActive}
+						{isFocused}
+						{engine}
+						viewportRoot={viewportEl}
+						gridStep={config.gridStep}
+						nodeWidth={config.nodeWidth}
+						{viewportResizeVersion}
+						{scale}
+						{onRetry}
+					>
+						<ResolvedComponent {node} {engine} {isActive} {...uiData?.props ?? {}} />
+					</TraekNodeWrapper>
+				{/if}
+			{:else if node.type !== 'thought'}
+				<!-- Fallback if no component found -->
 				<TraekNodeWrapper
 					{node}
 					{isActive}
@@ -73,29 +98,28 @@
 					gridStep={config.gridStep}
 					nodeWidth={config.nodeWidth}
 					{viewportResizeVersion}
+					{scale}
 					{onRetry}
 				>
-					<ResolvedComponent {node} {engine} {isActive} {...uiData?.props ?? {}} />
+					<div class="node-card error">
+						<div class="role-tag">{node.type}</div>
+						<div class="node-card-content">Missing component for {node.type} node.</div>
+					</div>
 				</TraekNodeWrapper>
 			{/if}
 		{:else if node.type !== 'thought'}
-			<!-- Fallback if no component found -->
-			<TraekNodeWrapper
-				{node}
-				{isActive}
-				{isFocused}
-				{engine}
-				viewportRoot={viewportEl}
-				gridStep={config.gridStep}
-				nodeWidth={config.nodeWidth}
-				{viewportResizeVersion}
-				{onRetry}
-			>
-				<div class="node-card error">
-					<div class="role-tag">{node.type}</div>
-					<div class="node-card-content">Missing component for {node.type} node.</div>
-				</div>
-			</TraekNodeWrapper>
+			<!-- Placeholder for off-screen nodes to preserve scroll position -->
+			<div
+				class="node-placeholder"
+				data-node-id={node.id}
+				style:position="absolute"
+				style:left="{(node.metadata?.x ?? 0) * config.gridStep}px"
+				style:top="{(node.metadata?.y ?? 0) * config.gridStep}px"
+				style:width="{config.nodeWidth}px"
+				style:height="{node.metadata?.height ?? config.nodeHeightDefault}px"
+				style:pointer-events="none"
+				style:visibility="hidden"
+			></div>
 		{/if}
 	{/if}
 {/each}
@@ -131,5 +155,10 @@
 		line-height: 1.45;
 		white-space: pre-wrap;
 		word-break: break-word;
+	}
+
+	.node-placeholder {
+		/* Invisible placeholder to preserve layout for off-screen nodes */
+		background: transparent;
 	}
 </style>

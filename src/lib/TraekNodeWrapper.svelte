@@ -3,6 +3,7 @@
 	import { slide } from 'svelte/transition';
 	import type { TraekEngine, MessageNode, Node } from './TraekEngine.svelte.ts';
 	import Ghost from './Ghost.svelte';
+	import { getDetailLevel } from './canvas/AdaptiveRenderer.svelte';
 
 	const DEFAULT_PLACEHOLDER_HEIGHT = 100;
 
@@ -15,6 +16,7 @@
 		gridStep = 20,
 		nodeWidth = 350,
 		viewportResizeVersion = 0,
+		scale = 1,
 		onRetry,
 		children
 	}: {
@@ -26,6 +28,7 @@
 		gridStep?: number;
 		nodeWidth?: number;
 		viewportResizeVersion?: number;
+		scale?: number;
 		onRetry?: (nodeId: string) => void;
 		children: import('svelte').Snippet;
 	} = $props();
@@ -35,6 +38,15 @@
 	let isThoughtExpanded = $state(false);
 	let previousStatus = $state<string | undefined>(undefined);
 	let showCompletePulse = $state(false);
+
+	const detailLevel = $derived(getDetailLevel(scale));
+	const firstLine = $derived.by(() => {
+		if (node.type !== 'text' || !('content' in node)) return '';
+		const content = (node as MessageNode).content;
+		if (!content) return '';
+		const lines = content.split('\n');
+		return lines[0] || '';
+	});
 
 	$effect(() => {
 		if (previousStatus === 'streaming' && node.status === 'done') {
@@ -136,7 +148,7 @@
 		? 'keyboard-focused'
 		: ''} {node.status === 'error' ? 'error' : ''} {!isInView
 		? 'message-node-wrapper--placeholder'
-		: ''} {showCompletePulse ? 'stream-complete' : ''}"
+		: ''} {showCompletePulse ? 'stream-complete' : ''} detail-{detailLevel}"
 	style:left="{(node.metadata?.x ?? 0) * gridStep}px"
 	style:top="{(node.metadata?.y ?? 0) * gridStep}px"
 	style:width="{nodeWidth}px"
@@ -304,9 +316,19 @@
 			{/if}
 		</div>
 	{/if}
-	<div class="message-node-content">
-		{@render children()}
-	</div>
+	{#if detailLevel === 'full' || detailLevel === 'compact'}
+		<div class="message-node-content">
+			{#if detailLevel === 'compact'}
+				<div class="compact-text">{firstLine}</div>
+			{:else}
+				{@render children()}
+			{/if}
+		</div>
+	{:else if detailLevel === 'minimal'}
+		<div class="minimal-content">
+			<span class="minimal-role-icon">{node.role === 'user' ? '●' : '◆'}</span>
+		</div>
+	{/if}
 
 	{#if hasBranches && !isCollapsed}
 		<div class="branch-badge">
@@ -342,7 +364,11 @@
 			transition:
 				transform 0.2s,
 				border-color 0.2s,
-				box-shadow 0.2s;
+				box-shadow 0.2s,
+				opacity 0.2s,
+				width 0.2s,
+				height 0.2s,
+				border-radius 0.2s;
 			backdrop-filter: blur(10px);
 		}
 
@@ -910,6 +936,100 @@
 			pointer-events: none;
 			z-index: 5;
 			animation: fade-in 200ms ease-out;
+		}
+
+		/* Adaptive detail levels */
+		.compact-text {
+			padding: 16px;
+			font-size: 14px;
+			line-height: 1.4;
+			color: var(--traek-textnode-text, #dddddd);
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+
+		.minimal-content {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 100%;
+			height: 60px;
+		}
+
+		.minimal-role-icon {
+			font-size: 24px;
+			opacity: 0.8;
+		}
+
+		.message-node-wrapper.user .minimal-role-icon {
+			color: var(--traek-thought-tag-cyan, #00d8ff);
+		}
+
+		.message-node-wrapper.assistant .minimal-role-icon {
+			color: var(--traek-thought-tag-orange, #ff3e00);
+		}
+
+		/* Dot level: small colored circle */
+		.detail-dot {
+			width: 12px !important;
+			height: 12px !important;
+			min-height: 12px;
+			max-height: 12px;
+			border-radius: 50%;
+			overflow: hidden;
+			backdrop-filter: none;
+		}
+
+		.detail-dot .node-header-container,
+		.detail-dot .thought-inline,
+		.detail-dot .error-banner,
+		.detail-dot .hidden-count-badge,
+		.detail-dot .branch-badge,
+		.detail-dot .connection-port,
+		.detail-dot .collapse-toggle {
+			display: none;
+		}
+
+		.detail-dot.user {
+			background: var(--traek-thought-tag-cyan, #00d8ff);
+			border-color: var(--traek-thought-tag-cyan, #00d8ff);
+		}
+
+		.detail-dot.assistant {
+			background: var(--traek-thought-tag-orange, #ff3e00);
+			border-color: var(--traek-thought-tag-orange, #ff3e00);
+		}
+
+		/* Minimal level: hide certain UI elements */
+		.detail-minimal .thought-inline,
+		.detail-minimal .error-banner,
+		.detail-minimal .branch-badge,
+		.detail-minimal .connection-port {
+			display: none;
+		}
+
+		.detail-minimal {
+			max-height: 80px;
+		}
+
+		/* Compact level: hide thought details and complex UI */
+		.detail-compact .thought-inline {
+			display: none;
+		}
+
+		.detail-compact {
+			max-height: 100px;
+		}
+
+		/* Respect prefers-reduced-motion */
+		@media (prefers-reduced-motion: reduce) {
+			.message-node-wrapper {
+				transition:
+					transform 0.2s,
+					border-color 0.2s,
+					box-shadow 0.2s;
+			}
 		}
 	}
 </style>
