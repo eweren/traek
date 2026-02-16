@@ -127,6 +127,8 @@ export const DEFAULT_TRACK_ENGINE_CONFIG: TraekEngineConfig = {
 export class TraekEngine {
 	nodes = $state<Node[]>([]);
 	activeNodeId = $state<string | null>(null);
+	/** Set of collapsed node IDs. When a node is collapsed, its descendants are hidden from view. */
+	collapsedNodes = $state(new Set<string>());
 	private config: TraekEngineConfig;
 	private pendingHeightLayoutRafId: number | null = null;
 	/** Maps node ID → index in nodes array for O(1) lookup. */
@@ -1004,6 +1006,62 @@ export class TraekEngine {
 
 	branchFrom(nodeId: string) {
 		this.activeNodeId = nodeId;
+	}
+
+	/** Toggle collapse state of a node. When collapsed, descendants are hidden. */
+	toggleCollapse(nodeId: string) {
+		if (this.collapsedNodes.has(nodeId)) {
+			this.collapsedNodes.delete(nodeId);
+		} else {
+			this.collapsedNodes.add(nodeId);
+		}
+		// Force reactivity update
+		this.collapsedNodes = new Set(this.collapsedNodes);
+	}
+
+	/** Check if a node is collapsed. */
+	isCollapsed(nodeId: string): boolean {
+		return this.collapsedNodes.has(nodeId);
+	}
+
+	/**
+	 * Count the number of visible descendants hidden by collapsing this node.
+	 * Excludes thought nodes.
+	 */
+	getHiddenDescendantCount(nodeId: string): number {
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity
+		const hidden = new Set<string>();
+		const queue = [nodeId];
+		while (queue.length > 0) {
+			const currentId = queue.shift()!;
+			const children = this.getChildren(currentId);
+			for (const child of children) {
+				if (!hidden.has(child.id) && child.type !== 'thought') {
+					hidden.add(child.id);
+					queue.push(child.id);
+				}
+			}
+		}
+		return hidden.size;
+	}
+
+	/**
+	 * Check if a node should be hidden because one of its ancestors is collapsed.
+	 * A node is hidden if any ancestor in its primary parent chain is collapsed.
+	 */
+	isInCollapsedSubtree(nodeId: string): boolean {
+		let current = this.getNode(nodeId);
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity
+		const visited = new Set<string>();
+		while (current) {
+			if (visited.has(current.id)) return false;
+			visited.add(current.id);
+			const primaryParentId = current.parentIds[0];
+			if (!primaryParentId) return false;
+			if (this.collapsedNodes.has(primaryParentId)) return true;
+			current = this.getNode(primaryParentId);
+		}
+		return false;
 	}
 
 	/**

@@ -10,6 +10,7 @@
 		hoveredNodeId = null,
 		hoveredConnection = $bindable(null),
 		connectionDrag,
+		collapsedNodes = new Set(),
 		onDeleteConnection
 	}: {
 		nodes: Node[];
@@ -18,90 +19,132 @@
 		hoveredNodeId?: string | null;
 		hoveredConnection: { parentId: string; childId: string } | null;
 		connectionDrag: ConnectionDragState | null;
+		collapsedNodes?: Set<string>;
 		onDeleteConnection: (parentId: string, childId: string) => void;
 	} = $props();
 
 	// Cursor position in canvas coordinates for the delete icon
 	let hoverPos = $state<{ x: number; y: number } | null>(null);
+
+	/**
+	 * Build a Map for O(1) node lookup and cache collapsed subtree checks.
+	 * This replaces the expensive nodes.find() and repeated isInCollapsedSubtree() calls.
+	 */
+	const nodeMap = $derived(new Map(nodes.map((n) => [n.id, n])));
+
+	const collapsedCache = $derived.by(() => {
+		const cache = new Map<string, boolean>();
+		for (const node of nodes) {
+			cache.set(node.id, isInCollapsedSubtree(node.id));
+		}
+		return cache;
+	});
+
+	/**
+	 * Check if a node should be hidden because one of its ancestors is collapsed.
+	 * A node is hidden if any ancestor in its primary parent chain is collapsed.
+	 */
+	function isInCollapsedSubtree(nodeId: string): boolean {
+		const visited = new Set<string>();
+		let current = nodeMap.get(nodeId);
+		while (current) {
+			if (visited.has(current.id)) return false;
+			visited.add(current.id);
+			const primaryParentId = current.parentIds[0];
+			if (!primaryParentId) return false;
+			if (collapsedNodes.has(primaryParentId)) return true;
+			current = nodeMap.get(primaryParentId);
+		}
+		return false;
+	}
 </script>
 
+<!-- Single-pass rendering: compute path once, render all variants -->
 {#each nodes as node (node.id)}
 	{#if node.parentIds.length > 0 && node.type !== 'thought'}
-		{@const nodeX = (node.metadata?.x ?? 0) * config.gridStep}
-		{@const nodeY = (node.metadata?.y ?? 0) * config.gridStep}
-		{@const nodeH = node.metadata?.height ?? config.nodeHeightDefault}
-		{#each node.parentIds as pid (pid)}
-			{@const parent = nodes.find((n) => n.id === pid)}
-			{#if parent}
-				{@const parentX = (parent.metadata?.x ?? 0) * config.gridStep}
-				{@const parentY = (parent.metadata?.y ?? 0) * config.gridStep}
-				{@const parentH = parent.metadata?.height ?? config.nodeHeightDefault}
-				{@const pathD = getConnectionPath(
-					parentX,
-					parentY,
-					config.nodeWidth,
-					parentH,
-					nodeX,
-					nodeY,
-					config.nodeWidth,
-					nodeH
-				)}
-				{@const isOnActivePath =
-					activeAncestorIds !== null &&
-					activeAncestorIds.has(parent.id) &&
-					activeAncestorIds.has(node.id)}
-				{@const isHoverAdjacent =
-					hoveredNodeId !== null && (parent.id === hoveredNodeId || node.id === hoveredNodeId)}
-				{#if !isOnActivePath}
+		{@const isNodeHidden = collapsedCache.get(node.id) ?? false}
+		{#if !isNodeHidden}
+			{@const nodeX = (node.metadata?.x ?? 0) * config.gridStep}
+			{@const nodeY = (node.metadata?.y ?? 0) * config.gridStep}
+			{@const nodeH = node.metadata?.height ?? config.nodeHeightDefault}
+			{#each node.parentIds as pid (pid)}
+				{@const parent = nodeMap.get(pid)}
+				{#if parent}
+					{@const parentX = (parent.metadata?.x ?? 0) * config.gridStep}
+					{@const parentY = (parent.metadata?.y ?? 0) * config.gridStep}
+					{@const parentH = parent.metadata?.height ?? config.nodeHeightDefault}
+					{@const pathD = getConnectionPath(
+						parentX,
+						parentY,
+						config.nodeWidth,
+						parentH,
+						nodeX,
+						nodeY,
+						config.nodeWidth,
+						nodeH
+					)}
+					{@const isOnActivePath =
+						activeAncestorIds !== null &&
+						activeAncestorIds.has(parent.id) &&
+						activeAncestorIds.has(node.id)}
+					{@const isHoverAdjacent =
+						hoveredNodeId !== null && (parent.id === hoveredNodeId || node.id === hoveredNodeId)}
+
+					<!-- Normal connection (not on active path) -->
+					{#if !isOnActivePath}
+						<path
+							class="connection"
+							class:faded={activeAncestorIds !== null && !isHoverAdjacent}
+							class:hover-adjacent={isHoverAdjacent}
+							d={pathD}
+						/>
+					{/if}
+
+					<!-- Highlighted connection (on active path) -->
+					{#if isOnActivePath}
+						<path class="connection connection--highlight" d={pathD} />
+					{/if}
+
+					<!-- Hit area for interaction (always rendered) -->
+					<!-- svelte-ignore a11y_click_events_have_key_events -->
+					<!-- svelte-ignore a11y_no_static_element_interactions -->
 					<path
-						class="connection"
-						class:faded={activeAncestorIds !== null && !isHoverAdjacent}
-						class:hover-adjacent={isHoverAdjacent}
+						class="connection-hit-area"
 						d={pathD}
+						onmouseenter={() => (hoveredConnection = { parentId: pid, childId: node.id })}
+						onmousemove={(e) => {
+							const svg = (e.target as SVGElement).ownerSVGElement;
+							if (!svg) return;
+							const pt = svg.createSVGPoint();
+							pt.x = e.clientX;
+							pt.y = e.clientY;
+							const ctm = svg.getScreenCTM();
+							if (!ctm) return;
+							const svgPt = pt.matrixTransform(ctm.inverse());
+							hoverPos = { x: svgPt.x - 25000, y: svgPt.y - 25000 };
+						}}
+						onmouseleave={() => {
+							hoveredConnection = null;
+							hoverPos = null;
+						}}
+						onclick={(e) => {
+							e.stopPropagation();
+							onDeleteConnection(pid, node.id);
+							hoveredConnection = null;
+							hoverPos = null;
+						}}
 					/>
 				{/if}
-			{/if}
-		{/each}
+			{/each}
+		{/if}
 	{/if}
 {/each}
 
-{#each nodes as node (node.id)}
-	{#if node.parentIds.length > 0 && node.type !== 'thought'}
-		{@const nodeX = (node.metadata?.x ?? 0) * config.gridStep}
-		{@const nodeY = (node.metadata?.y ?? 0) * config.gridStep}
-		{@const nodeH = node.metadata?.height ?? config.nodeHeightDefault}
-		{#each node.parentIds as pid (pid)}
-			{@const parent = nodes.find((n) => n.id === pid)}
-			{#if parent}
-				{@const parentX = (parent.metadata?.x ?? 0) * config.gridStep}
-				{@const parentY = (parent.metadata?.y ?? 0) * config.gridStep}
-				{@const parentH = parent.metadata?.height ?? config.nodeHeightDefault}
-				{@const pathD = getConnectionPath(
-					parentX,
-					parentY,
-					config.nodeWidth,
-					parentH,
-					nodeX,
-					nodeY,
-					config.nodeWidth,
-					nodeH
-				)}
-				{@const isOnActivePath =
-					activeAncestorIds !== null &&
-					activeAncestorIds.has(parent.id) &&
-					activeAncestorIds.has(node.id)}
-				{#if isOnActivePath}
-					<path class="connection connection--highlight" d={pathD} />
-				{/if}
-			{/if}
-		{/each}
-	{/if}
-{/each}
 <!-- Delete highlight for hovered connection -->
 {#if hoveredConnection}
 	{@const hc = hoveredConnection}
-	{@const hChild = nodes.find((n) => n.id === hc.childId)}
-	{@const hParent = nodes.find((n) => n.id === hc.parentId)}
+	{@const hChild = nodeMap.get(hc.childId)}
+	{@const hParent = nodeMap.get(hc.parentId)}
 	{#if hChild && hParent}
 		{@const hPathD = getConnectionPath(
 			(hParent.metadata?.x ?? 0) * config.gridStep,
@@ -124,61 +167,7 @@
 	{/if}
 {/if}
 
-<!-- Invisible hit areas for clicking/deleting connections -->
-{#each nodes as node (node.id)}
-	{#if node.parentIds.length > 0 && node.type !== 'thought'}
-		{@const nodeX = (node.metadata?.x ?? 0) * config.gridStep}
-		{@const nodeY = (node.metadata?.y ?? 0) * config.gridStep}
-		{@const nodeH = node.metadata?.height ?? config.nodeHeightDefault}
-		{#each node.parentIds as pid (pid)}
-			{@const parent = nodes.find((n) => n.id === pid)}
-			{#if parent}
-				{@const parentX = (parent.metadata?.x ?? 0) * config.gridStep}
-				{@const parentY = (parent.metadata?.y ?? 0) * config.gridStep}
-				{@const parentH = parent.metadata?.height ?? config.nodeHeightDefault}
-				{@const pathD = getConnectionPath(
-					parentX,
-					parentY,
-					config.nodeWidth,
-					parentH,
-					nodeX,
-					nodeY,
-					config.nodeWidth,
-					nodeH
-				)}
-				<!-- svelte-ignore a11y_click_events_have_key_events -->
-				<!-- svelte-ignore a11y_no_static_element_interactions -->
-				<path
-					class="connection-hit-area"
-					d={pathD}
-					onmouseenter={() => (hoveredConnection = { parentId: pid, childId: node.id })}
-					onmousemove={(e) => {
-						const svg = (e.target as SVGElement).ownerSVGElement;
-						if (!svg) return;
-						const pt = svg.createSVGPoint();
-						pt.x = e.clientX;
-						pt.y = e.clientY;
-						const ctm = svg.getScreenCTM();
-						if (!ctm) return;
-						const svgPt = pt.matrixTransform(ctm.inverse());
-						hoverPos = { x: svgPt.x - 25000, y: svgPt.y - 25000 };
-					}}
-					onmouseleave={() => {
-						hoveredConnection = null;
-						hoverPos = null;
-					}}
-					onclick={(e) => {
-						e.stopPropagation();
-						onDeleteConnection(pid, node.id);
-						hoveredConnection = null;
-						hoverPos = null;
-					}}
-				/>
-			{/if}
-		{/each}
-	{/if}
-{/each}
-
+<!-- Connection drag rubber band -->
 {#if connectionDrag}
 	{@const sx = connectionDrag.sourceX}
 	{@const sy = connectionDrag.sourceY}

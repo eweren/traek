@@ -63,7 +63,44 @@
 		onEditCancel?.();
 	}
 
-	const renderedContent = $derived(markdownToHtml(node.content ?? ''));
+	/**
+	 * Markdown streaming optimization: cache stable paragraphs, only re-parse the last block.
+	 * When streaming, we split content at the last double-newline:
+	 * - Everything before = stable (cached)
+	 * - Everything after = streaming (re-parsed each update)
+	 */
+	const contentParts = $derived.by(() => {
+		const content = node.content ?? '';
+		// If done or very short, treat entire content as streaming (no split)
+		if (node.status === 'done' || content.length < 100) {
+			return { stable: '', streaming: content };
+		}
+		// Find last paragraph break (double newline)
+		const lastParagraphBreak = content.lastIndexOf('\n\n');
+		if (lastParagraphBreak === -1) {
+			return { stable: '', streaming: content };
+		}
+		return {
+			stable: content.slice(0, lastParagraphBreak + 2),
+			streaming: content.slice(lastParagraphBreak + 2)
+		};
+	});
+
+	// Cache stable HTML - only re-parse when stable content changes
+	let cachedStableHtml = $state('');
+	let lastStableContent = $state('');
+
+	$effect(() => {
+		const { stable } = contentParts;
+		if (stable !== lastStableContent) {
+			cachedStableHtml = markdownToHtml(stable);
+			lastStableContent = stable;
+		}
+	});
+
+	// Only re-parse the streaming part on each update
+	const streamingHtml = $derived(markdownToHtml(contentParts.streaming));
+	const renderedContent = $derived(cachedStableHtml + streamingHtml);
 
 	function checkScrolledToEnd(el: HTMLElement | null) {
 		if (!el) return;

@@ -1,5 +1,6 @@
 import type { NodeTypeAction } from './node-types/types.js';
-import type { Node, TraekEngine } from './TraekEngine.svelte';
+import type { Node, TraekEngine, MessageNode } from './TraekEngine.svelte';
+import { toast } from './toast/toastStore.svelte.js';
 
 export const duplicateAction: NodeTypeAction = {
 	id: 'duplicate',
@@ -55,13 +56,48 @@ export function createEditAction(onEditNode: (nodeId: string) => void): NodeType
 	};
 }
 
+export const copyBranchAction: NodeTypeAction = {
+	id: 'copy-branch',
+	label: 'Copy Branch',
+	icon: 'solar:clipboard-list-linear',
+	handler: async (node: Node, engine: TraekEngine) => {
+		// Build linear path from root to this node (following primary parent chain)
+		const path: Node[] = [];
+		let current: Node | null | undefined = node;
+
+		while (current) {
+			path.unshift(current);
+			const primaryParentId: string | undefined = current.parentIds[0];
+			current = primaryParentId ? engine.getNode(primaryParentId) : undefined;
+		}
+
+		// Format as Markdown
+		const markdown = path
+			.map((n) => {
+				const roleHeader = n.role === 'user' ? '## User' : n.role === 'assistant' ? '## Assistant' : '## System';
+				const content = (n as MessageNode).content ?? '';
+				return `${roleHeader}\n${content}`;
+			})
+			.join('\n\n');
+
+		// Copy to clipboard
+		try {
+			await navigator.clipboard.writeText(markdown);
+			toast('Branch copied to clipboard', 'success');
+		} catch (err) {
+			console.error('Failed to copy to clipboard:', err);
+			toast('Failed to copy to clipboard', 'error');
+		}
+	}
+};
+
 export interface DefaultNodeActionCallbacks {
 	onRetry?: (nodeId: string) => void;
 	onEditNode?: (nodeId: string) => void;
 }
 
 export function createDefaultNodeActions(callbacks: DefaultNodeActionCallbacks): NodeTypeAction[] {
-	const actions: NodeTypeAction[] = [duplicateAction, deleteAction];
+	const actions: NodeTypeAction[] = [duplicateAction, copyBranchAction, deleteAction];
 	if (callbacks.onRetry) {
 		actions.push(createRetryAction(callbacks.onRetry));
 	}

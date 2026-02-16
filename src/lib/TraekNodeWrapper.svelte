@@ -69,6 +69,17 @@
 				: (thoughtChild?.content ?? 'Thought process')
 	);
 
+	// Collapse & branch info
+	const nodeChildren = $derived(
+		engine?.getChildren(node.id).filter((c) => c.type !== 'thought') ?? []
+	);
+	const hasChildren = $derived(nodeChildren.length > 0);
+	const hasBranches = $derived(nodeChildren.length > 1);
+	const isCollapsed = $derived(engine?.isCollapsed(node.id) ?? false);
+	const hiddenCount = $derived(
+		isCollapsed && engine ? engine.getHiddenDescendantCount(node.id) : 0
+	);
+
 	$effect(() => {
 		// Track viewportResizeVersion to trigger effect on change
 		void viewportResizeVersion;
@@ -127,34 +138,62 @@
 	style:width="{nodeWidth}px"
 	style:height={!isInView ? `${placeholderHeight}px` : undefined}
 >
-	<button
-		type="button"
-		class="node-header"
-		onclick={(e) => {
-			e.stopPropagation();
-			if (engine) engine.activeNodeId = node.id;
-		}}
-		onkeydown={(e) => {
-			if (e.key === 'Enter' || e.key === ' ') {
-				e.preventDefault();
+	<div class="node-header-container">
+		<button
+			type="button"
+			class="node-header"
+			onclick={(e) => {
+				e.stopPropagation();
 				if (engine) engine.activeNodeId = node.id;
-			}
-		}}
-	>
-		<span class="role-indicator">
-			{node.role === 'user' ? '● User' : '◆ Assistant'}
-			{#if node.status === 'streaming'}
-				<span class="header-status header-status--streaming" role="status">
-					<span class="header-status-spinner"></span>
-					Processing…
-				</span>
-			{:else if node.status === 'error'}
-				<span class="header-status header-status--error" role="alert">
-					· Error{#if node.errorMessage}: {node.errorMessage}{/if}
-				</span>
-			{/if}
-		</span>
-	</button>
+			}}
+			onkeydown={(e) => {
+				if (e.key === 'Enter' || e.key === ' ') {
+					e.preventDefault();
+					if (engine) engine.activeNodeId = node.id;
+				}
+			}}
+		>
+			<span class="role-indicator">
+				{node.role === 'user' ? '● User' : '◆ Assistant'}
+				{#if node.status === 'streaming'}
+					<span class="header-status header-status--streaming" role="status">
+						<span class="header-status-spinner"></span>
+						Processing…
+					</span>
+				{:else if node.status === 'error'}
+					<span class="header-status header-status--error" role="alert">
+						· Error{#if node.errorMessage}: {node.errorMessage}{/if}
+					</span>
+				{/if}
+			</span>
+		</button>
+		{#if hasChildren && engine}
+			<button
+				type="button"
+				class="collapse-toggle"
+				onclick={(e) => {
+					e.stopPropagation();
+					engine.toggleCollapse(node.id);
+				}}
+				onkeydown={(e) => {
+					if (e.key === 'Enter' || e.key === ' ') {
+						e.preventDefault();
+						e.stopPropagation();
+						engine.toggleCollapse(node.id);
+					}
+				}}
+				aria-label={isCollapsed ? 'Expand subtree' : 'Collapse subtree'}
+				aria-expanded={!isCollapsed}
+			>
+				{isCollapsed ? '+' : '−'}
+			</button>
+		{/if}
+	</div>
+	{#if isCollapsed && hiddenCount > 0}
+		<div class="hidden-count-badge">
+			{hiddenCount} hidden
+		</div>
+	{/if}
 	{#if node.status === 'error'}
 		<div class="error-banner" role="alert">
 			<svg
@@ -265,6 +304,12 @@
 		{@render children()}
 	</div>
 
+	{#if hasBranches && !isCollapsed}
+		<div class="branch-badge">
+			{nodeChildren.length} branches
+		</div>
+	{/if}
+
 	<!-- Connection ports -->
 	<div
 		class="connection-port connection-port--input"
@@ -347,15 +392,23 @@
 			visibility: hidden;
 		}
 
+		.node-header-container {
+			position: relative;
+			display: flex;
+			align-items: center;
+			background: var(--traek-thought-header-bg, rgba(255, 255, 255, 0.03));
+			border-bottom: 1px solid var(--traek-thought-header-border, #222222);
+			border-radius: 14px 14px 0 0;
+			flex-shrink: 0;
+		}
+
 		.node-header {
 			display: flex;
 			justify-content: space-between;
 			align-items: center;
 			padding: 10px 14px;
-			background: var(--traek-thought-header-bg, rgba(255, 255, 255, 0.03));
+			background: transparent;
 			border: none;
-			border-bottom: 1px solid var(--traek-thought-header-border, #222222);
-			border-radius: 14px 14px 0 0;
 			font-family: 'Inter', sans-serif;
 			font-size: 10px;
 			text-transform: uppercase;
@@ -363,7 +416,7 @@
 			color: var(--traek-thought-header-muted, #666666);
 			flex-shrink: 0;
 			cursor: pointer;
-			width: 100%;
+			flex: 1;
 			text-align: left;
 		}
 
@@ -755,6 +808,89 @@
 				padding: 10px 14px;
 				min-height: 44px;
 			}
+		}
+
+		/* Collapse toggle button */
+		.collapse-toggle {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 20px;
+			height: 20px;
+			padding: 0;
+			margin: 0 10px 0 0;
+			background: var(--traek-thought-toggle-bg, #444444);
+			border: 1px solid var(--traek-thought-toggle-border, #555555);
+			border-radius: 4px;
+			font-size: 14px;
+			font-weight: 600;
+			line-height: 1;
+			color: var(--traek-thought-header-accent, #888888);
+			cursor: pointer;
+			transition:
+				background 0.15s,
+				color 0.15s,
+				transform 0.15s;
+			flex-shrink: 0;
+		}
+
+		.collapse-toggle:hover {
+			background: var(--traek-thought-toggle-border, #555555);
+			color: var(--traek-thought-row-muted-2, #aaaaaa);
+			transform: scale(1.1);
+		}
+
+		.collapse-toggle:focus-visible {
+			outline: 2px solid var(--traek-input-button-bg, #00d8ff);
+			outline-offset: 2px;
+		}
+
+		/* Hidden count badge */
+		.hidden-count-badge {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			padding: 4px 10px;
+			background: var(--traek-thought-footer-bg, rgba(0, 0, 0, 0.2));
+			border-top: 1px solid var(--traek-thought-divider, rgba(255, 255, 255, 0.06));
+			font-size: 10px;
+			font-weight: 500;
+			letter-spacing: 0.3px;
+			color: var(--traek-thought-row-muted-3, #999999);
+			text-transform: uppercase;
+			user-select: none;
+			animation: fade-in 200ms ease-out;
+		}
+
+		@keyframes fade-in {
+			from {
+				opacity: 0;
+			}
+			to {
+				opacity: 1;
+			}
+		}
+
+		/* Branch badge */
+		.branch-badge {
+			position: absolute;
+			bottom: -10px;
+			left: 50%;
+			transform: translateX(-50%);
+			padding: 3px 8px;
+			background: var(--traek-thought-toggle-bg, #444444);
+			border: 1px solid var(--traek-thought-toggle-border, #555555);
+			border-radius: 10px;
+			font-size: 9px;
+			font-weight: 600;
+			letter-spacing: 0.4px;
+			color: var(--traek-thought-badge-cyan, #00dddd);
+			text-transform: uppercase;
+			white-space: nowrap;
+			user-select: none;
+			pointer-events: none;
+			z-index: 5;
+			animation: fade-in 200ms ease-out;
 		}
 	}
 </style>

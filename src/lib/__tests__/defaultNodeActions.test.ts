@@ -154,26 +154,27 @@ describe('createEditAction', () => {
 });
 
 describe('createDefaultNodeActions', () => {
-	it('should always include duplicate and delete actions', () => {
-		expect.assertions(3);
+	it('should always include duplicate, copy-branch, and delete actions', () => {
+		expect.assertions(4);
 		const actions = createDefaultNodeActions({});
-		expect(actions).toHaveLength(2);
+		expect(actions).toHaveLength(3);
 		expect(actions[0].id).toBe('duplicate');
-		expect(actions[1].id).toBe('delete');
+		expect(actions[1].id).toBe('copy-branch');
+		expect(actions[2].id).toBe('delete');
 	});
 
 	it('should include retry action when onRetry is provided', () => {
 		expect.assertions(2);
 		const actions = createDefaultNodeActions({ onRetry: vi.fn() });
-		expect(actions).toHaveLength(3);
-		expect(actions[2].id).toBe('retry');
+		expect(actions).toHaveLength(4);
+		expect(actions[3].id).toBe('retry');
 	});
 
 	it('should include edit action when onEditNode is provided', () => {
 		expect.assertions(2);
 		const actions = createDefaultNodeActions({ onEditNode: vi.fn() });
-		expect(actions).toHaveLength(3);
-		expect(actions[2].id).toBe('edit');
+		expect(actions).toHaveLength(4);
+		expect(actions[3].id).toBe('edit');
 	});
 
 	it('should include both retry and edit when both callbacks are provided', () => {
@@ -182,21 +183,22 @@ describe('createDefaultNodeActions', () => {
 			onRetry: vi.fn(),
 			onEditNode: vi.fn()
 		});
-		expect(actions).toHaveLength(4);
-		expect(actions[2].id).toBe('retry');
-		expect(actions[3].id).toBe('edit');
+		expect(actions).toHaveLength(5);
+		expect(actions[3].id).toBe('retry');
+		expect(actions[4].id).toBe('edit');
 	});
 
-	it('should maintain correct ordering: duplicate, delete, retry, edit', () => {
-		expect.assertions(4);
+	it('should maintain correct ordering: duplicate, copy-branch, delete, retry, edit', () => {
+		expect.assertions(5);
 		const actions = createDefaultNodeActions({
 			onRetry: vi.fn(),
 			onEditNode: vi.fn()
 		});
 		expect(actions[0].id).toBe('duplicate');
-		expect(actions[1].id).toBe('delete');
-		expect(actions[2].id).toBe('retry');
-		expect(actions[3].id).toBe('edit');
+		expect(actions[1].id).toBe('copy-branch');
+		expect(actions[2].id).toBe('delete');
+		expect(actions[3].id).toBe('retry');
+		expect(actions[4].id).toBe('edit');
 	});
 
 	it('should wire up retry callback correctly through createDefaultNodeActions', () => {

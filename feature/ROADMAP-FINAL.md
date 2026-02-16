@@ -4,6 +4,7 @@
 **Zuletzt aktualisiert:** 2026-02-16
 **Input von:** UX Designer + Endnutzer, Dev / Tech Lead, UI Designer
 **Status:** VERBINDLICH — Dies ist die Roadmap die das Entwicklerteam umsetzt.
+**Fortschritt:** Phase 1 ✅ | Phase 2: 3/7 abgeschlossen | Phase 3–4: ausstehend
 
 **Synthese-Prinzip**: Wir parallelisieren Quick-Wins aus allen Disziplinen in Phase 1, damit das Produkt sofort besser wird — aber investieren gleichzeitig in die technische Foundation, damit spätere Phasen sicher und schnell gebaut werden können.
 
@@ -17,6 +18,8 @@
 - Phase 1: Vertrauen + Foundation ✅ (alle 6 Items)
 - Mobile Focus Mode ✅ (vorgezogen aus Phase 4.4, UX-Score 9.2/10)
 - Mobile Onboarding ✅ (teilweise vorgezogen aus Phase 4.1)
+- 2.6 Conversation Persistence UI ✅ (IndexedDB, Auto-Save, Chat-Liste, Export)
+- Light/Dark Mode Toggle ✅ (Theme-Toggle, CSS-Variablen, System-Preference-Erkennung)
 
 ---
 
@@ -102,9 +105,11 @@
 
 **Voraussetzung**: Phase 1 abgeschlossen (insbes. 1.1 Tests und 1.2 Node-ID-Map)
 
+**Fortschritt**: 3/7 Items abgeschlossen (2.6 Persistence ✅, 2.3 Mobile Breadcrumb ✅, Light/Dark Mode ✅). Nächster Fokus: 2.1 Canvas-Dekomposition (Critical Path Blocker für 2.2 + 2.5). Parallel dazu: 2.4 Subtree Collapse.
+
 ---
 
-### 2.1 Canvas-Dekomposition
+### 2.1 Canvas-Dekomposition ← NAECHSTES FEATURE (Critical Path)
 
 - **Was**: TraekCanvas.svelte aufbrechen in:
   - `CanvasInteraction.svelte.ts` — Pan/Zoom/Drag State-Machine (~300 Zeilen)
@@ -166,15 +171,17 @@
 
 ---
 
-### 2.6 Conversation Persistence UI ← NAECHSTES FEATURE
+### 2.6 Conversation Persistence UI
 
 - **Was**: ConversationStore mit IndexedDB, Auto-Save, Chat-Liste, Speicher-Indikator, Export.
 - **Warum**: Nutzer verlieren alles bei Page Reload. Speichern ist die #1 Vertrauens-Grundlage.
 - **Aufwand**: M (4-5 Tage)
 - **Abhängigkeiten**: Keine harten (serialize/fromSnapshot existieren)
-- **Dateien**: Neue Dateien `src/lib/persistence/ConversationStore.svelte.ts`, `src/lib/persistence/ChatList.svelte`, `src/lib/persistence/SaveIndicator.svelte`, `src/lib/persistence/indexedDBAdapter.ts`, `src/lib/persistence/exportUtils.ts`
+- **Dateien**: `src/lib/persistence/ConversationStore.svelte.ts`, `src/lib/persistence/ChatList.svelte`, `src/lib/persistence/SaveIndicator.svelte`, `src/lib/persistence/indexedDBAdapter.ts`, `src/lib/persistence/exportUtils.ts`
 - **PRD**: `feature/conversation-persistence-ui.md`
-- **Status**: In Arbeit
+- **Commit**: `8ea3de4`
+- **Status**: ✅
+- **Lieferumfang**: IndexedDB mit localStorage-Fallback, Auto-Save (1s Debounce), Chat-Liste mit Datums-Gruppierung (Heute/Gestern/Letzte Woche/Älter), JSON- und Markdown-Export, Legacy-Migration, Save-Indikator (saving/saved/error)
 
 ---
 
@@ -240,6 +247,7 @@
 ### 4.2 Design-Token-System
 
 - **Aufwand**: M (3-4 Tage)
+- **Hinweis**: Light/Dark-Mode mit ThemeToggle und CSS-Variablen ist bereits implementiert (Commit `f073f10`). Hier geht es um strukturierte Theme-Objekte, High-Contrast-Preset, und Runtime Theme-Switching API.
 
 ### 4.3 Adaptives Zoom-Level-Rendering
 
@@ -268,30 +276,40 @@
 
 ## Gesamtplan-Übersicht
 
-| Phase | Item                                    | Aufwand  | Abhängig von   | Status     |
-| ----- | --------------------------------------- | -------- | -------------- | ---------- |
-| **1** | 1.1 Engine Unit-Tests                   | M (3-5d) | -              | ✅         |
-| **1** | 1.2 Node-ID-Map + Children-Map          | M (3-4d) | -              | ✅         |
-| **1** | 1.3 Undo + Toast-System                 | M (3-4d) | -              | ✅         |
-| **1** | 1.4 Inline-Edit (statt window.prompt)   | S (2-3d) | -              | ✅         |
-| **1** | 1.5 Header-Cleanup + Micro-Interactions | S (2-3d) | -              | ✅         |
-| **1** | 1.6 Contextual Branching Hint           | S (1-2d) | -              | ✅         |
-| **2** | 2.1 Canvas-Dekomposition                | L (5-7d) | 1.1            |            |
-| **2** | 2.2 Zoom-to-Fit + Minimap + Controls    | M (4-5d) | 2.1            |            |
-| **2** | 2.3 Context-Path Breadcrumb (Desktop)   | S (1-2d) | -              | Mobile ✅  |
-| **2** | 2.4 Subtree Collapse + Branch-Badge     | M (3-4d) | 1.2            |            |
-| **2** | 2.5 Keyboard Navigation + ARIA          | L (5-7d) | 2.1            |            |
-| **2** | **2.6 Persistence UI + Auto-Save**      | M (4-5d) | -              | **In Arbeit** |
-| **2** | 2.7 Smart Search (Ctrl+F)               | M (3-4d) | 2.4            |            |
-| **3** | 3.1 ConnectionLayer + Markdown Optim.   | M (3-4d) | 1.2            |            |
-| **3** | 3.2 DOM-Virtualisierung                 | L (5-7d) | 1.2, 3.1, 2.4 |            |
-| **3** | 3.3 Branch-Vergleich Side-by-Side       | M (4-5d) | 2.4            |            |
-| **3** | 3.4 Copy Branch to Clipboard            | S (1-2d) | 1.3            |            |
-| **3** | 3.5 Performance-Benchmarks CI           | S (2d)   | 3.2            |            |
-| **4** | 4.1 Onboarding Tour (Desktop)           | M (3-4d) | Phase 2        |            |
-| **4** | 4.2 Design-Token-System                 | M (3-4d) | -              |            |
-| **4** | 4.3 Adaptives Zoom-Rendering            | M (3-4d) | 3.2            |            |
-| **4** | ~~4.4 Mobile Focus Mode~~               | L (5-7d) | -              | ✅         |
+| Phase | Item                                    | Aufwand  | Abhängig von   | Status        |
+| ----- | --------------------------------------- | -------- | -------------- | ------------- |
+| **1** | 1.1 Engine Unit-Tests                   | M (3-5d) | -              | ✅            |
+| **1** | 1.2 Node-ID-Map + Children-Map          | M (3-4d) | -              | ✅            |
+| **1** | 1.3 Undo + Toast-System                 | M (3-4d) | -              | ✅            |
+| **1** | 1.4 Inline-Edit (statt window.prompt)   | S (2-3d) | -              | ✅            |
+| **1** | 1.5 Header-Cleanup + Micro-Interactions | S (2-3d) | -              | ✅            |
+| **1** | 1.6 Contextual Branching Hint           | S (1-2d) | -              | ✅            |
+| **2** | **2.1 Canvas-Dekomposition**            | L (5-7d) | 1.1            | **Nächstes**  |
+| **2** | 2.2 Zoom-to-Fit + Minimap + Controls    | M (4-5d) | 2.1            |               |
+| **2** | 2.3 Context-Path Breadcrumb (Desktop)   | S (1-2d) | -              | Mobile ✅     |
+| **2** | 2.4 Subtree Collapse + Branch-Badge     | M (3-4d) | 1.2            | Bereit        |
+| **2** | 2.5 Keyboard Navigation + ARIA          | L (5-7d) | 2.1            |               |
+| **2** | 2.6 Persistence UI + Auto-Save          | M (4-5d) | -              | ✅            |
+| **2** | 2.7 Smart Search (Ctrl+F)               | M (3-4d) | 2.4            |               |
+| **3** | 3.1 ConnectionLayer + Markdown Optim.   | M (3-4d) | 1.2            |               |
+| **3** | 3.2 DOM-Virtualisierung                 | L (5-7d) | 1.2, 3.1, 2.4 |               |
+| **3** | 3.3 Branch-Vergleich Side-by-Side       | M (4-5d) | 2.4            |               |
+| **3** | 3.4 Copy Branch to Clipboard            | S (1-2d) | 1.3            |               |
+| **3** | 3.5 Performance-Benchmarks CI           | S (2d)   | 3.2            |               |
+| **4** | 4.1 Onboarding Tour (Desktop)           | M (3-4d) | Phase 2        |               |
+| **4** | 4.2 Design-Token-System                 | M (3-4d) | -              | Teilw. ✅     |
+| **4** | 4.3 Adaptives Zoom-Rendering            | M (3-4d) | 3.2            |               |
+| **4** | ~~4.4 Mobile Focus Mode~~               | L (5-7d) | -              | ✅            |
+
+### Sofort parallelisierbar (alle Dependencies erfüllt)
+
+| Item                                | Aufwand  | Blockiert        |
+| ----------------------------------- | -------- | ---------------- |
+| **2.1 Canvas-Dekomposition**        | L (5-7d) | 2.2, 2.5         |
+| 2.3 Context-Path Breadcrumb Desktop | S (1-2d) | -                |
+| 2.4 Subtree Collapse + Branch-Badge | M (3-4d) | 2.7, 3.2, 3.3   |
+| 3.1 ConnectionLayer Optimierung     | M (3-4d) | 3.2              |
+| 3.4 Copy Branch to Clipboard        | S (1-2d) | -                |
 
 ---
 
