@@ -1,5 +1,7 @@
 # Accessibility Foundation
 
+**Status:** Teilweise implementiert (Stand: 2026-02-16)
+
 ARIA-Semantik, Screen-Reader-Support und barrierefreie Interaktion fuer den Traek Canvas.
 
 ## Motivation / User Story
@@ -56,11 +58,28 @@ Streaming-Strategie (nicht jedes Token ankuendigen):
 - Fokus-Indikatoren: mindestens 3:1 Kontrast, nicht nur Farbe sondern auch Form
 - High-Contrast-Theme Preset
 
-### Was ist nicht drin
+### Implementierungsstatus (2026-02-16)
+
+| Feature | Status | Details |
+|---------|--------|---------|
+| ARIA Tree Semantics | ✅ Implementiert | `role="tree"`, `role="treeitem"`, `aria-level`, `aria-expanded`, `aria-selected` |
+| Live Regions | ✅ Implementiert | `LiveRegion.svelte` mit Streaming-Ankuendigungen |
+| Focus Management | ✅ Implementiert | Logische Tab-Reihenfolge, `tabindex`, Fokus-Wiederherstellung |
+| Keyboard Navigation | ✅ Implementiert | Arrow Keys, Modes, Help Overlay, Chords, Quick-Jump |
+| Reduced Motion | ✅ Implementiert | `@media (prefers-reduced-motion)` global |
+| Color & Contrast | ✅ Implementiert | WCAG AA, High-Contrast Theme Preset |
+| Focus-visible States | ✅ Implementiert | Auf allen interaktiven Elementen |
+| Touch Targets (44px) | ⚠️ Teilweise | Send-Button OK, Node Header + Action Badges unter 44px auf Mobile |
+| Screen Reader Tests | ❌ Offen | Kein VoiceOver/NVDA/JAWS Test durchgefuehrt |
+| Automatisierte a11y-Tests | ❌ Offen | Kein axe-core oder Playwright a11y in CI |
+| Reduced Motion verfeinern | ❌ Offen | Aktuell zu aggressiv (alle Animationen 0.01ms) |
+
+### Was ist nicht drin (noch offen)
 
 - Vollstaendige Screen-Reader-Tests mit JAWS/NVDA/VoiceOver
-- Automatisierte WCAG-Compliance-Tests in CI
-- Touch-Accessibility (wird in Mobile/Touch behandelt)
+- Automatisierte WCAG-Compliance-Tests in CI (axe-core)
+- Touch Targets auf 44px fuer alle Mobile-Elemente
+- Selektive Reduced Motion (dekorative vs. funktionale Animationen)
 - Cognitive Accessibility
 
 ## Akzeptanzkriterien

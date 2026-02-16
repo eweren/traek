@@ -1,6 +1,24 @@
 # Performance & Virtualization for Large Trees
 
+**Status:** Groesstenteils implementiert (Stand: 2026-02-16)
+
 Node-Virtualisierung, inkrementelle Layout-Berechnung und Rendering-Optimierungen fuer 100+ Nodes.
+
+## Implementierungsstatus
+
+| Feature | Status | Details |
+|---------|--------|---------|
+| Node Virtualization | ✅ Done | ViewportTracker mit 200px Buffer, nur sichtbare Nodes im DOM |
+| Node-ID-Map (O(1) Lookups) | ✅ Done | Interne Map statt Array.find() |
+| Children-Map-Cache | ✅ Done | Inkrementell aktualisiert bei Mutations |
+| ConnectionLayer Single-Pass | ✅ Done | Optimiertes Rendering |
+| Markdown-Streaming-Optimierung | ✅ Done | Nur letzter Absatz neu geparst |
+| Subtree Collapse | ✅ Done | collapsedNodes Set, Descendants uebersprungen |
+| Performance Benchmarks | ✅ Done | CI-Guard bei >20% Regression |
+| Incremental Layout (Web Worker) | ❌ Offen | Layout nur fuer betroffene Subtrees |
+| Scale-Tests (500/1000 Nodes) | ❌ Offen | Keine systematischen Benchmarks |
+| Lazy Content Loading | ❌ Offen | Markdown-Caching fehlt |
+| Canvas2D Renderer (extreme scale) | ❌ Offen | Fuer >1000 Nodes optional |
 
 ## Motivation / User Story
 
@@ -83,7 +101,7 @@ Node-Virtualisierung, inkrementelle Layout-Berechnung und Rendering-Optimierunge
 
 ## Offene Fragen
 
-- Virtualisierung per Default oder opt-in?
-- Placeholder-Hoehe: feste Default oder gecacht?
-- Web Worker: lohnt sich der Serialisierungs-Overhead?
-- Connection Lines virtualisieren oder immer rendern?
+- ~~Virtualisierung per Default oder opt-in?~~ → Resolved: Per Default aktiv
+- ~~Placeholder-Hoehe: feste Default oder gecacht?~~ → Resolved: Gecacht via ResizeObserver
+- Web Worker: lohnt sich der Serialisierungs-Overhead? → Noch offen
+- ~~Connection Lines virtualisieren oder immer rendern?~~ → Resolved: Nur sichtbare rendern

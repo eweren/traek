@@ -1,29 +1,40 @@
 # UX Improvements: Traek
 
-**Version:** 1.0
-**Date:** 2026-02-15
+**Version:** 1.1
+**Date:** 2026-02-16
+**Status:** Groesstenteils implementiert — verbleibende Items dokumentiert
 
-This document contains concrete, prioritized UX improvement proposals based on the UX audit (see `docs/UX-AUDIT.md`).
+This document contains concrete, prioritized UX improvement proposals based on the UX audit.
 
 ---
 
-## Priority Matrix
+## Implementierungsstatus (2026-02-16)
 
-| ID    | Feature                          | Impact | Effort | Priority |
-| ----- | -------------------------------- | ------ | ------ | -------- |
-| UX-01 | First-Time Onboarding Tour       | High   | Medium | 🔴 P0    |
-| UX-02 | Canvas Interaction Hints         | High   | Low    | 🔴 P0    |
-| UX-03 | Keyboard Navigation (Foundation) | High   | High   | 🔴 P0    |
-| UX-04 | Touch Target Size Increase       | High   | Low    | 🟠 P1    |
-| UX-05 | Multi-Line Input Field           | Medium | Low    | 🟠 P1    |
-| UX-06 | Subtree Collapse/Expand          | High   | Medium | 🟠 P1    |
-| UX-07 | Action Badges Always Visible     | Medium | Low    | 🟠 P1    |
-| UX-08 | Node Ghost Preview               | Medium | Medium | 🟡 P2    |
-| UX-09 | Connection Fading                | Medium | Low    | 🟡 P2    |
-| UX-10 | Improved Error Visibility        | Medium | Low    | 🟡 P2    |
-| UX-11 | Context Path Breadcrumb          | Medium | Medium | 🟡 P2    |
-| UX-12 | Empty State Design               | Low    | Low    | 🟢 P3    |
-| UX-13 | Minimap/Overview                 | Low    | High   | 🟢 P3    |
+| ID    | Feature                          | Impact | Effort | Priority | Status |
+| ----- | -------------------------------- | ------ | ------ | -------- | ------ |
+| UX-01 | First-Time Onboarding Tour       | High   | Medium | 🔴 P0    | ✅ Done (DesktopTour + OnboardingOverlay) |
+| UX-02 | Canvas Interaction Hints         | High   | Low    | 🔴 P0    | ✅ Done (Empty State, Branching Hint) |
+| UX-03 | Keyboard Navigation (Foundation) | High   | High   | 🔴 P0    | ✅ Done (KeyboardNavigator + ARIA + Phase 2) |
+| UX-04 | Touch Target Size Increase       | High   | Low    | 🟠 P1    | ⚠️ Teilweise (Send OK, Node Header/Badges offen) |
+| UX-05 | Multi-Line Input Field           | Medium | Low    | 🟠 P1    | ❌ Offen |
+| UX-06 | Subtree Collapse/Expand          | High   | Medium | 🟠 P1    | ✅ Done (collapsedNodes, Branch-Badge) |
+| UX-07 | Action Badges Always Visible     | Medium | Low    | 🟠 P1    | ✅ Done |
+| UX-08 | Node Ghost Preview               | Medium | Medium | 🟡 P2    | ✅ Done (GhostPreview) |
+| UX-09 | Connection Fading                | Medium | Low    | 🟡 P2    | ✅ Done (Active Path Highlighting) |
+| UX-10 | Improved Error Visibility        | Medium | Low    | 🟡 P2    | ⚠️ Teilweise (Error Status sichtbar, aber kein Retry Button) |
+| UX-11 | Context Path Breadcrumb          | Medium | Medium | 🟡 P2    | ✅ Done (Desktop + Mobile Breadcrumbs) |
+| UX-12 | Empty State Design               | Low    | Low    | 🟢 P3    | ✅ Done (Empty State mit Arrow) |
+| UX-13 | Minimap/Overview                 | Low    | High   | 🟢 P3    | ✅ Done (Minimap + ZoomControls)  |
+
+### Verbleibende UX-Arbeit
+
+- **UX-04** Touch Targets: Mobile Node Headers und Action Badges unter 44px
+- **UX-05** Multi-Line Input: Textarea mit Auto-Expand fehlt komplett
+- **UX-10** Error States: Retry-Button in Error-Nodes noch nicht implementiert
+- **Onboarding**: Tour koennte von 7 auf 5 Schritte vereinfacht werden
+- **Progressive Disclosure**: Feature Spotlights nach Nutzungsmilestones fehlen
+- **Mobile Search**: Search in FocusMode fehlt komplett
+- **Mobile Branch Compare**: Vereinfachte Version fuer FocusMode fehlt
 
 ---
 

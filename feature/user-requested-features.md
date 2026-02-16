@@ -1,6 +1,22 @@
 # User-Requested Features
 
+**Status:** Groesstenteils implementiert (Stand: 2026-02-16)
+
 Feature-Ideen aus Endnutzer-Perspektive. Diese Features wuerden Traek fuer normale Nutzer (keine Entwickler) deutlich attraktiver machen.
+
+## Implementierungsstatus
+
+| Feature | Status | Details |
+|---------|--------|---------|
+| 1. Branch-Vergleich (Side-by-Side) | ✅ Done | BranchCompare mit Word-Level-Diff |
+| 2. Smart Search & Highlight | ✅ Done | SearchBar mit Ctrl+F, Live-Highlighting, Treffer-Navigation |
+| 3. Auto-Branch-Suggestions | ❌ Offen | Geplant fuer Phase 6.3 (AI-Native) |
+| 4. Tag-System & Filter | ✅ Done | TagBadges, TagDropdown, TagFilter, PREDEFINED_TAGS |
+| 5. Canvas-Templates | ❌ Offen | Geplant fuer Phase 5.4 (Community Templates) |
+| Bonus: Export als Bild/PDF | ❌ Offen | JSON/Markdown Export vorhanden, PNG/SVG/PDF fehlt |
+| Bonus: Collapse/Expand Branches | ✅ Done | collapsedNodes mit Hidden-Count-Badge |
+| Bonus: Node-Farben anpassen | ❌ Offen | Theme-System vorhanden, aber keine per-Node Farben |
+| Bonus: Jump to Parent/Children | ✅ Done | Breadcrumbs + Keyboard Navigation (Arrow Keys) |
 
 ---
 
