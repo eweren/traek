@@ -1,6 +1,6 @@
 /**
  * Integration guides for Træk.
- * Written for developers integrating @traek/sdk into their SvelteKit apps.
+ * Written for developers integrating traek into their SvelteKit apps.
  */
 
 export interface Guide {
@@ -20,9 +20,9 @@ export const guides: Record<string, Guide> = {
 ## Install
 
 \`\`\`bash
-npm install @traek/sdk
+npm install traek
 # or
-pnpm add @traek/sdk
+pnpm add traek
 \`\`\`
 
 ## Peer dependencies
@@ -36,7 +36,7 @@ Create a SvelteKit route:
 \`\`\`svelte
 <!-- src/routes/+page.svelte -->
 <script lang="ts">
-  import { TraekCanvas, TraekEngine, type MessageNode } from '@traek/sdk'
+  import { TraekCanvas, TraekEngine, type MessageNode } from 'traek'
 
   const engine = new TraekEngine()
 
@@ -135,7 +135,7 @@ The key insight: use \`engine.contextPath()\` to send the full branch path as co
 
 \`\`\`svelte
 <script lang="ts">
-  import { TraekEngine, TraekCanvas, type MessageNode } from '@traek/sdk'
+  import { TraekEngine, TraekCanvas, type MessageNode } from 'traek'
 
   const engine = new TraekEngine()
 
@@ -231,7 +231,7 @@ Every custom node component receives \`TraekNodeComponentProps\`:
 \`\`\`svelte
 <!-- src/lib/ImageNode.svelte -->
 <script lang="ts">
-  import type { TraekNodeComponentProps } from '@traek/sdk'
+  import type { TraekNodeComponentProps } from 'traek'
 
   // REQUIRED: exactly these three props
   let { node, engine, isActive }: TraekNodeComponentProps = $props()
@@ -264,7 +264,7 @@ Every custom node component receives \`TraekNodeComponentProps\`:
 
 \`\`\`svelte
 <script lang="ts">
-  import { TraekCanvas, TraekEngine } from '@traek/sdk'
+  import { TraekCanvas, TraekEngine } from 'traek'
   import ImageNode from '$lib/ImageNode.svelte'
 
   const engine = new TraekEngine()
@@ -289,7 +289,7 @@ engine.addCustomNode(ImageNode, { url: 'https://...', alt: 'Result' }, 'assistan
 For toolbar actions and lifecycle hooks, use the registry:
 
 \`\`\`typescript
-import { createDefaultRegistry } from '@traek/sdk'
+import { createDefaultRegistry } from 'traek'
 import ImageNode from '$lib/ImageNode.svelte'
 
 const registry = createDefaultRegistry()
@@ -352,7 +352,7 @@ Træk provides two persistence options:
     TraekEngine, TraekCanvas,
     ConversationStore, ChatList, SaveIndicator,
     type MessageNode
-  } from '@traek/sdk'
+  } from 'traek'
 
   const engine = new TraekEngine()
   const store = new ConversationStore(engine)
@@ -392,7 +392,7 @@ const engine = TraekEngine.fromSnapshot(snapshot)  // Zod-validated
 ## Export to Markdown
 
 \`\`\`typescript
-import { snapshotToMarkdown, downloadFile } from '@traek/sdk'
+import { snapshotToMarkdown, downloadFile } from 'traek'
 
 const snapshot = engine.serialize()
 const markdown = snapshotToMarkdown(snapshot)
@@ -440,7 +440,7 @@ Use ThemeProvider in your root layout:
 \`\`\`svelte
 <!-- src/routes/+layout.svelte -->
 <script>
-  import { ThemeProvider } from '@traek/sdk'
+  import { ThemeProvider } from 'traek'
 <\/script>
 
 <ThemeProvider theme="dark">   <!-- or "light" or "highContrast" -->
@@ -451,7 +451,7 @@ Use ThemeProvider in your root layout:
 ## Custom theme object
 
 \`\`\`typescript
-import { createCustomTheme, darkTheme } from '@traek/sdk'
+import { createCustomTheme, darkTheme } from 'traek'
 
 const myTheme = createCustomTheme({
   ...darkTheme,
@@ -510,7 +510,7 @@ Choose: Svelte 5, TypeScript, no additional plugins needed.
 ## 2. Install Træk
 
 \`\`\`bash
-npm install @traek/sdk
+npm install traek
 \`\`\`
 
 ## 3. Configure SvelteKit
@@ -532,7 +532,7 @@ export default {
 \`\`\`svelte
 <!-- src/routes/+layout.svelte -->
 <script lang="ts">
-  import { ThemeProvider } from '@traek/sdk'
+  import { ThemeProvider } from 'traek'
   let { children } = $props()
 <\/script>
 
@@ -550,7 +550,7 @@ export default {
 \`\`\`svelte
 <!-- src/routes/+page.svelte -->
 <script lang="ts">
-  import { TraekEngine, TraekCanvas, type MessageNode } from '@traek/sdk'
+  import { TraekEngine, TraekCanvas, type MessageNode } from 'traek'
 
   const engine = new TraekEngine()
 

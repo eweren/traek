@@ -1,6 +1,6 @@
-import type { NodeTypeAction } from './node-types/types.js';
+import type { NodeTypeAction } from './node-types/types';
 import type { Node, TraekEngine, MessageNode } from './TraekEngine.svelte';
-import { toast } from './toast/toastStore.svelte.js';
+import { toast } from './toast/toastStore.svelte';
 
 export const duplicateAction: NodeTypeAction = {
 	id: 'duplicate',

@@ -1,12 +1,24 @@
 {
-	"extends": "../../tsconfig.base.json",
+	"extends": [
+		"../../tsconfig.base.json"
+	],
+	"include": [
+		"src/**/*",
+		"*.ts"
+	],
+	"exclude": [
+		"node_modules",
+		"dist",
+		"**/*.stories.svelte"
+	],
 	"compilerOptions": {
-		"outDir": "dist",
-		"rootDir": "src",
-		"target": "ES2022",
-		"module": "ESNext",
-		"moduleResolution": "Bundler"
-	},
-	"include": ["src/**/*"],
-	"exclude": ["node_modules", "dist"]
+		"rewriteRelativeImportExtensions": true,
+		"allowJs": true,
+		"checkJs": true,
+		"forceConsistentCasingInFileNames": true,
+		"resolveJsonModule": true,
+		"skipLibCheck": true,
+		"sourceMap": true,
+		"strict": true
+	}
 }

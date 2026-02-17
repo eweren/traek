@@ -14,11 +14,11 @@ description: How to install and set up Træk in your project.
 ## Install
 
 ```bash
-npm install @traek/sdk
+npm install traek
 # or
-pnpm add @traek/sdk
+pnpm add traek
 # or
-yarn add @traek/sdk
+yarn add traek
 ```
 
 ## Peer Dependencies

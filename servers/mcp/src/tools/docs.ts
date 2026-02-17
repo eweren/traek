@@ -52,7 +52,7 @@ export const docTools = [
 	{
 		name: 'get_component_api',
 		description:
-			'Get the full API reference for a specific @traek/sdk export. Returns props, state, methods, notes, and a usage example. Use this before integrating any Træk component.',
+			'Get the full API reference for a specific traek export. Returns props, state, methods, notes, and a usage example. Use this before integrating any Træk component.',
 		inputSchema: {
 			component: z
 				.string()
@@ -83,10 +83,10 @@ export const docTools = [
 	{
 		name: 'list_exports',
 		description:
-			'List all exported symbols from @traek/sdk grouped by category. Use this to discover what is available before deciding what to import.',
+			'List all exported symbols from traek grouped by category. Use this to discover what is available before deciding what to import.',
 		inputSchema: {},
 		handler: async () => {
-			const text = `# @traek/sdk Exports
+			const text = `# traek Exports
 
 ## Core Components
 - \`TraekCanvas\` — Main interactive canvas component
@@ -161,7 +161,7 @@ export const docTools = [
 - \`actionDefinitionSchema\`, \`nodeTypeActionSchema\`, \`nodeTypeDefinitionSchema\`
 
 ## Subpath Export
-- \`@traek/sdk/server\` — Server-only utilities (rate limiter, etc.)
+- \`traek/server\` — Server-only utilities (rate limiter, etc.)
 
 ## Key Types
 - \`Node\` — Base node interface (id, parentIds, role, type, status, metadata)

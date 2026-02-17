@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { getEnterTransform, getExitTransform, getTransitionDuration } from '../transitions.js';
-import type { SwipeDirection } from '../focusModeTypes.js';
+import { getEnterTransform, getExitTransform, getTransitionDuration } from '../transitions';
+import type { SwipeDirection } from '../focusModeTypes';
 
 afterEach(() => {
 	vi.restoreAllMocks();

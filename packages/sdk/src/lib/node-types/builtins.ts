@@ -1,4 +1,4 @@
-import type { NodeTypeDefinition } from './types.js';
+import type { NodeTypeDefinition } from './types';
 import TextNode from '../TextNode.svelte';
 
 export const textNodeDefinition: NodeTypeDefinition<string> = {

@@ -3,15 +3,15 @@
  * Provides CRUD operations, auto-save, and export functionality.
  */
 
-import type { TraekEngine } from '../TraekEngine.svelte.js';
+import type { TraekEngine } from '../TraekEngine.svelte';
 import type {
 	ConversationSnapshot,
 	StoredConversation,
 	ConversationListItem,
 	SaveState
-} from './types.js';
-import { conversationSnapshotSchema, storedConversationSchema } from './schemas.js';
-import * as idb from './indexedDBAdapter.js';
+} from './types';
+import { conversationSnapshotSchema, storedConversationSchema } from './schemas';
+import * as idb from './indexedDBAdapter';
 
 export interface ConversationStoreOptions {
 	dbName?: string;

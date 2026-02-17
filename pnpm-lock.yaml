@@ -42,7 +42,7 @@ importers:
       '@iconify/svelte':
         specifier: ^5.2.1
         version: 5.2.1(svelte@5.51.2)
-      '@traek/sdk':
+      'traek':
         specifier: workspace:*
         version: link:../../packages/sdk
       dompurify:

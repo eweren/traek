@@ -22,7 +22,7 @@ description: Create custom node renderers for Træk.
 
 ```svelte
 <script>
-  import { TraekCanvas, TraekEngine } from '@traek/sdk'
+  import { TraekCanvas, TraekEngine } from 'traek'
   import MyCustomNode from './MyCustomNode.svelte'
 
   const components = {

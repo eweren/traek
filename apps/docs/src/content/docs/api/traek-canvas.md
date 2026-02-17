@@ -20,7 +20,7 @@ The main component that renders the interactive conversation canvas.
 
 ```svelte
 <script>
-  import { TraekCanvas, TraekEngine } from '@traek/sdk'
+  import { TraekCanvas, TraekEngine } from 'traek'
 
   const engine = new TraekEngine()
 </script>

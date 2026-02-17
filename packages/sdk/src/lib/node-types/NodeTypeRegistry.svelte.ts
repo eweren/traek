@@ -1,4 +1,4 @@
-import type { NodeTypeDefinition } from './types.js';
+import type { NodeTypeDefinition } from './types';
 
 /**
  * Reactive node type registry backed by a `$state` Map.

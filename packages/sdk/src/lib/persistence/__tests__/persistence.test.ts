@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { TraekEngine, wouldCreateCycle } from '../../TraekEngine.svelte.js';
-import { ReplayController } from '../ReplayController.svelte.js';
-import type { ConversationSnapshot, SerializedNode } from '../types.js';
-import { serializedNodeSchema, conversationSnapshotSchema } from '../schemas.js';
+import { TraekEngine, wouldCreateCycle } from '../../TraekEngine.svelte';
+import { ReplayController } from '../ReplayController.svelte';
+import type { ConversationSnapshot, SerializedNode } from '../types';
+import { serializedNodeSchema, conversationSnapshotSchema } from '../schemas';
 
 function makeNode(overrides: Partial<SerializedNode> & { id: string }): SerializedNode {
 	return {

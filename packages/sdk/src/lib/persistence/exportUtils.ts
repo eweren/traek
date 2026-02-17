@@ -2,7 +2,7 @@
  * Utilities for exporting conversations as JSON and Markdown.
  */
 
-import type { ConversationSnapshot, SerializedNode } from './types.js';
+import type { ConversationSnapshot, SerializedNode } from './types';
 
 /**
  * Export a snapshot as pretty-printed JSON.

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { focusModeConfigSchema, DEFAULT_FOCUS_MODE_CONFIG } from '../focusModeTypes.js';
+import { focusModeConfigSchema, DEFAULT_FOCUS_MODE_CONFIG } from '../focusModeTypes';
 
 describe('focusModeTypes', () => {
 	describe('focusModeConfigSchema', () => {

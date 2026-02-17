@@ -2,12 +2,12 @@
 /**
  * Træk MCP Server — Developer Integration Assistant
  *
- * Helps developers integrate @traek/sdk into their SvelteKit projects.
+ * Helps developers integrate traek into their SvelteKit projects.
  * Designed for use with Claude Code and other MCP-compatible AI assistants.
  *
  * Tools:
  *   get_component_api   — Full prop/method API for TraekCanvas, TraekEngine, etc.
- *   list_exports        — All @traek/sdk exports grouped by category
+ *   list_exports        — All traek exports grouped by category
  *   list_guides         — Available integration guides
  *   get_guide           — Full text of an integration guide
  *   search_docs         — Full-text search across all docs
@@ -66,7 +66,7 @@ async function main() {
 				if (raw) {
 					try {
 						body = JSON.parse(raw);
-					} catch {}
+					} catch { }
 				}
 			}
 

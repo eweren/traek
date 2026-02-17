@@ -1,4 +1,4 @@
-import type { ActionDefinition, ResolveActions } from './types.js';
+import type { ActionDefinition, ResolveActions } from './types';
 
 /**
  * Two-stage action resolver with debounce and caching.

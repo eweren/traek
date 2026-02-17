@@ -1,7 +1,7 @@
-export type { SerializedNode, ConversationSnapshot } from './schemas.js';
-export { serializedNodeSchema, conversationSnapshotSchema } from './schemas.js';
+export type { SerializedNode, ConversationSnapshot } from './schemas';
+export { serializedNodeSchema, conversationSnapshotSchema } from './schemas';
 
-import type { ConversationSnapshot as ConversationSnapshotType } from './schemas.js';
+import type { ConversationSnapshot as ConversationSnapshotType } from './schemas';
 
 /**
  * A conversation stored in IndexedDB with metadata.

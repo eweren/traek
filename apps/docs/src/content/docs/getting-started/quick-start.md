@@ -9,7 +9,7 @@ description: Get Træk running in 5 minutes.
 
 ```svelte
 <script>
-  import { TraekCanvas, TraekEngine } from '@traek/sdk'
+  import { TraekCanvas, TraekEngine } from 'traek'
 
   const engine = new TraekEngine()
   engine.addNode({

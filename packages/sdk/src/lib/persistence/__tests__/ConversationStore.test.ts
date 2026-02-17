@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { ConversationStore } from '../ConversationStore.svelte.js';
-import type { ConversationSnapshot } from '../types.js';
+import { ConversationStore } from '../ConversationStore.svelte';
+import type { ConversationSnapshot } from '../types';
 
 // Mock localStorage for testing
 const localStorageMock = (() => {

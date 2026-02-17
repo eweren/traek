@@ -8,7 +8,7 @@ description: Integrate Træk into a SvelteKit application.
 ## Installation
 
 ```bash
-pnpm add @traek/sdk
+pnpm add traek
 ```
 
 ## Basic Route
@@ -17,7 +17,7 @@ Create a `+page.svelte` file:
 
 ```svelte
 <script>
-  import { TraekCanvas, TraekEngine } from '@traek/sdk'
+  import { TraekCanvas, TraekEngine } from 'traek'
 
   const engine = new TraekEngine()
 </script>

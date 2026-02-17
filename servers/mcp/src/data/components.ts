@@ -1,5 +1,5 @@
 /**
- * Accurate API reference for every exported component and class in @traek/sdk.
+ * Accurate API reference for every exported component and class in traek.
  * Derived from the actual source code in packages/sdk/src.
  */
 
@@ -31,7 +31,7 @@ export interface ComponentDoc {
 export const componentDocs: Record<string, ComponentDoc> = {
 	TraekCanvas: {
 		name: 'TraekCanvas',
-		importPath: '@traek/sdk',
+		importPath: 'traek',
 		description:
 			'Main exported component. Renders the interactive canvas with pan/zoom, message nodes, connection lines, and a streaming input bar. Can manage its own engine internally or accept an external one for full control.',
 		props: [
@@ -197,7 +197,7 @@ export const componentDocs: Record<string, ComponentDoc> = {
 			"For streaming: add an assistant node with status: 'streaming', then update its content incrementally, then set status: 'done'."
 		],
 		example: `<script lang="ts">
-  import { TraekEngine, TraekCanvas, type MessageNode } from '@traek/sdk'
+  import { TraekEngine, TraekCanvas, type MessageNode } from 'traek'
 
   const engine = new TraekEngine()
 
@@ -235,7 +235,7 @@ export const componentDocs: Record<string, ComponentDoc> = {
 
 	TraekEngine: {
 		name: 'TraekEngine',
-		importPath: '@traek/sdk',
+		importPath: 'traek',
 		description:
 			'Core state management class. Manages the DAG conversation tree: nodes, parent-child relationships (multi-parent DAG), spatial layout (x/y in grid units), search, collapse/expand, tagging, serialization, and undo. Uses Svelte 5 $state runes — all reactive properties are live and update the UI automatically.',
 		stateProps: [
@@ -450,7 +450,7 @@ export const componentDocs: Record<string, ComponentDoc> = {
 
 	TextNode: {
 		name: 'TextNode',
-		importPath: '@traek/sdk',
+		importPath: 'traek',
 		description:
 			'Default node renderer. Renders markdown (marked + DOMPurify), syntax-highlighted code blocks (highlight.js), and inline images. Used automatically for nodes of type "text". You can replace it via componentMap.',
 		props: [
@@ -481,7 +481,7 @@ export const componentDocs: Record<string, ComponentDoc> = {
 
 	ConversationStore: {
 		name: 'ConversationStore',
-		importPath: '@traek/sdk',
+		importPath: 'traek',
 		description:
 			'Persistence class. Auto-saves conversation snapshots to localStorage and manages a list of stored conversations. Wraps a TraekEngine and observes changes via onNodesChanged.',
 		stateProps: [
@@ -538,7 +538,7 @@ export const componentDocs: Record<string, ComponentDoc> = {
 			}
 		],
 		example: `<script lang="ts">
-  import { TraekEngine, ConversationStore, TraekCanvas } from '@traek/sdk'
+  import { TraekEngine, ConversationStore, TraekCanvas } from 'traek'
 
   const engine = new TraekEngine()
   const store = new ConversationStore(engine)
@@ -551,7 +551,7 @@ export const componentDocs: Record<string, ComponentDoc> = {
 
 	ReplayController: {
 		name: 'ReplayController',
-		importPath: '@traek/sdk',
+		importPath: 'traek',
 		description:
 			'Replay/scrub through conversation history. Replays a snapshot step-by-step, revealing nodes one at a time.',
 		methods: [
@@ -575,7 +575,7 @@ export const componentDocs: Record<string, ComponentDoc> = {
 
 	NodeTypeRegistry: {
 		name: 'NodeTypeRegistry',
-		importPath: '@traek/sdk',
+		importPath: 'traek',
 		description:
 			'Advanced node type system. Register custom node type definitions with toolbar actions, context menu items, and lifecycle hooks. Pass the registry instance to TraekCanvas.',
 		methods: [
@@ -591,7 +591,7 @@ export const componentDocs: Record<string, ComponentDoc> = {
 			}
 		],
 		example: `<script lang="ts">
-  import { createDefaultRegistry, TraekCanvas } from '@traek/sdk'
+  import { createDefaultRegistry, TraekCanvas } from 'traek'
   import MyCustomNode from './MyCustomNode.svelte'
 
   const registry = createDefaultRegistry()
@@ -609,7 +609,7 @@ export const componentDocs: Record<string, ComponentDoc> = {
 
 	ThemeProvider: {
 		name: 'ThemeProvider',
-		importPath: '@traek/sdk',
+		importPath: 'traek',
 		description:
 			'Wraps your app to provide theme context. Applies CSS custom properties (--traek-*) to :root. Required for theming.',
 		props: [
@@ -624,7 +624,7 @@ export const componentDocs: Record<string, ComponentDoc> = {
 		],
 		example: `<!-- +layout.svelte -->
 <script lang="ts">
-  import { ThemeProvider } from '@traek/sdk'
+  import { ThemeProvider } from 'traek'
 <\/script>
 
 <ThemeProvider theme="dark">

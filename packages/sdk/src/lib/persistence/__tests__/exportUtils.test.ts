@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { snapshotToJSON, snapshotToMarkdown } from '../exportUtils.js';
-import type { ConversationSnapshot } from '../types.js';
+import { snapshotToJSON, snapshotToMarkdown } from '../exportUtils';
+import type { ConversationSnapshot } from '../types';
 
 describe('exportUtils', () => {
 	describe('snapshotToJSON', () => {

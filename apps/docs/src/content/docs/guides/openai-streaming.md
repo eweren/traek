@@ -30,7 +30,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 ```svelte
 <script>
-  import { TraekCanvas, TraekEngine } from '@traek/sdk'
+  import { TraekCanvas, TraekEngine } from 'traek'
 
   const engine = new TraekEngine()
 
