@@ -274,7 +274,6 @@ describe('TraekEngine — additional coverage', () => {
 			const engine = new TraekEngine();
 			const parent = engine.addNode('Parent', 'user', { parentIds: [] });
 			const child = engine.addNode('Child', 'assistant', { parentIds: [parent.id] });
-			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			const _grandchild = engine.addNode('Grandchild', 'user', { parentIds: [child.id] });
 			const children = engine.getChildren(parent.id);
 			expect(children).toHaveLength(1);

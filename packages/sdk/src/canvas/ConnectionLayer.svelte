@@ -44,6 +44,7 @@
 	const nodeMap = $derived(new Map(nodes.map((n) => [n.id, n])));
 
 	const collapsedCache = $derived.by(() => {
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity
 		const cache = new Map<string, boolean>();
 		for (const node of nodes) {
 			cache.set(node.id, isInCollapsedSubtree(node.id));
@@ -56,6 +57,7 @@
 	 * A node is hidden if any ancestor in its primary parent chain is collapsed.
 	 */
 	function isInCollapsedSubtree(nodeId: string): boolean {
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity
 		const visited = new Set<string>();
 		let current = nodeMap.get(nodeId);
 		while (current) {
@@ -74,6 +76,7 @@
 	 * Does NOT include the node itself.
 	 */
 	function getAncestorIds(nodeId: string): Set<string> {
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity
 		const visited = new Set<string>();
 		const node = nodeMap.get(nodeId);
 		if (!node) return visited;
@@ -97,6 +100,7 @@
 	 * Get direct children IDs of a node.
 	 */
 	function getDirectChildrenIds(nodeId: string): Set<string> {
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity
 		const childIds = new Set<string>();
 		for (const node of nodes) {
 			if (node.parentIds.includes(nodeId) && node.type !== 'thought') {

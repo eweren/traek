@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { TraekEngine, DEFAULT_TRACK_ENGINE_CONFIG, type Node } from '../TraekEngine.svelte';
+import { TraekEngine, DEFAULT_TRACK_ENGINE_CONFIG } from '../TraekEngine.svelte';
 import { ViewportTracker } from '../canvas/ViewportTracker.svelte';
 
 /**
@@ -253,7 +253,7 @@ describe('TraekEngine Performance Benchmarks', () => {
 	describe('ViewportTracker performance', () => {
 		it('should calculate visible nodes for 1000 nodes within threshold', () => {
 			const engine = createEngine();
-			const nodeIds = populateEngineWithNodes(engine, 1000);
+			populateEngineWithNodes(engine, 1000);
 			engine.flushLayoutFromRoot();
 
 			const tracker = new ViewportTracker(DEFAULT_TRACK_ENGINE_CONFIG, 200);

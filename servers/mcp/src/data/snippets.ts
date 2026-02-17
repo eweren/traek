@@ -4,12 +4,12 @@
  */
 
 export interface Snippet {
-	id: string
-	title: string
-	description: string
-	language: string
-	code: string
-	relatedSnippets?: string[]
+	id: string;
+	title: string;
+	description: string;
+	language: string;
+	code: string;
+	relatedSnippets?: string[];
 }
 
 export const snippets: Record<string, Snippet> = {
@@ -32,7 +32,7 @@ export const snippets: Record<string, Snippet> = {
 <div style="height: 100dvh; width: 100%;">
   <TraekCanvas onSendMessage={handleSend} />
 </div>`,
-		relatedSnippets: ['controlled-engine', 'openai-streaming'],
+		relatedSnippets: ['controlled-engine', 'openai-streaming']
 	},
 
 	'controlled-engine': {
@@ -85,7 +85,7 @@ export const snippets: Record<string, Snippet> = {
 <div style="height: 100dvh; width: 100%;">
   <TraekCanvas {engine} onSendMessage={handleSend} />
 </div>`,
-		relatedSnippets: ['openai-streaming', 'persistence'],
+		relatedSnippets: ['openai-streaming', 'persistence']
 	},
 
 	'openai-streaming': {
@@ -123,7 +123,7 @@ export const POST: RequestHandler = async ({ request }) => {
     headers: { 'Content-Type': 'text/plain; charset=utf-8' }
   })
 }`,
-		relatedSnippets: ['openai-streaming-page', 'controlled-engine'],
+		relatedSnippets: ['openai-streaming-page', 'controlled-engine']
 	},
 
 	'openai-streaming-page': {
@@ -182,14 +182,14 @@ export const POST: RequestHandler = async ({ request }) => {
 <div style="height: 100dvh; width: 100%;">
   <TraekCanvas {engine} onSendMessage={handleSend} />
 </div>`,
-		relatedSnippets: ['openai-streaming', 'persistence'],
+		relatedSnippets: ['openai-streaming', 'persistence']
 	},
 
 	'custom-node': {
 		id: 'custom-node',
 		title: 'Custom Node Type',
 		description:
-			"Create a custom node type with its own Svelte component and register it on TraekCanvas via componentMap. The component must accept node, engine, and isActive props (TraekNodeComponentProps).",
+			'Create a custom node type with its own Svelte component and register it on TraekCanvas via componentMap. The component must accept node, engine, and isActive props (TraekNodeComponentProps).',
 		language: 'svelte',
 		code: `<!-- src/lib/ImageNode.svelte -->
 <script lang="ts">
@@ -212,13 +212,14 @@ export const POST: RequestHandler = async ({ request }) => {
   .image-node.active { border-color: var(--traek-color-accent); }
   img { width: 100%; display: block; }
 </style>`,
-		relatedSnippets: ['custom-node-usage', 'registry-setup'],
+		relatedSnippets: ['custom-node-usage', 'registry-setup']
 	},
 
 	'custom-node-usage': {
 		id: 'custom-node-usage',
 		title: 'Custom Node — Canvas Usage',
-		description: 'Register a custom node component on TraekCanvas and add custom nodes programmatically.',
+		description:
+			'Register a custom node component on TraekCanvas and add custom nodes programmatically.',
 		language: 'svelte',
 		code: `<!-- src/routes/+page.svelte -->
 <script lang="ts">
@@ -252,7 +253,7 @@ export const POST: RequestHandler = async ({ request }) => {
 <div style="height: 100dvh; width: 100%;">
   <TraekCanvas {engine} {componentMap} onSendMessage={handleSend} />
 </div>`,
-		relatedSnippets: ['custom-node', 'registry-setup'],
+		relatedSnippets: ['custom-node', 'registry-setup']
 	},
 
 	'registry-setup': {
@@ -300,7 +301,7 @@ export const POST: RequestHandler = async ({ request }) => {
 <div style="height: 100dvh; width: 100%;">
   <TraekCanvas {engine} {registry} onSendMessage={handleSend} />
 </div>`,
-		relatedSnippets: ['custom-node', 'custom-node-usage'],
+		relatedSnippets: ['custom-node', 'custom-node-usage']
 	},
 
 	persistence: {
@@ -352,7 +353,7 @@ export const POST: RequestHandler = async ({ request }) => {
   .sidebar { width: 240px; overflow-y: auto; border-right: 1px solid var(--traek-border); }
   main { flex: 1; position: relative; }
 </style>`,
-		relatedSnippets: ['controlled-engine', 'serialization'],
+		relatedSnippets: ['controlled-engine', 'serialization']
 	},
 
 	serialization: {
@@ -381,14 +382,13 @@ localStorage.setItem('conversation', json)
 const saved = JSON.parse(localStorage.getItem('conversation')!)
 const restored = TraekEngine.fromSnapshot(saved) // validates with Zod
 // restored.nodes is populated, layout is applied`,
-		relatedSnippets: ['persistence'],
+		relatedSnippets: ['persistence']
 	},
 
 	theming: {
 		id: 'theming',
 		title: 'Custom Theme',
-		description:
-			'Apply a built-in theme or create a custom theme with full token control.',
+		description: 'Apply a built-in theme or create a custom theme with full token control.',
 		language: 'svelte',
 		code: `<!-- src/routes/+layout.svelte -->
 <script lang="ts">
@@ -418,7 +418,7 @@ const restored = TraekEngine.fromSnapshot(saved) // validates with Zod
 <!-- Or use a built-in theme name: -->
 <!-- <ThemeProvider theme="light"> -->
 <!-- <ThemeProvider theme="highContrast"> -->`,
-		relatedSnippets: ['css-variables'],
+		relatedSnippets: ['css-variables']
 	},
 
 	'css-variables': {
@@ -461,14 +461,13 @@ const restored = TraekEngine.fromSnapshot(saved) // validates with Zod
   --traek-transition-fast: 100ms ease;
   --traek-transition-base: 200ms ease;
 }`,
-		relatedSnippets: ['theming'],
+		relatedSnippets: ['theming']
 	},
 
 	'slash-commands': {
 		id: 'slash-commands',
 		title: 'Slash Commands / Actions',
-		description:
-			'Add custom slash-command actions to the input bar that users can trigger with /.',
+		description: 'Add custom slash-command actions to the input bar that users can trigger with /.',
 		language: 'svelte',
 		code: `<script lang="ts">
   import { TraekCanvas, type ActionDefinition, type MessageNode } from '@traek/sdk'
@@ -513,14 +512,13 @@ const restored = TraekEngine.fromSnapshot(saved) // validates with Zod
 <div style="height: 100dvh;">
   <TraekCanvas {engine} {actions} onSendMessage={handleSend} />
 </div>`,
-		relatedSnippets: ['controlled-engine'],
+		relatedSnippets: ['controlled-engine']
 	},
 
 	'sveltekit-layout': {
 		id: 'sveltekit-layout',
 		title: 'SvelteKit Layout Setup',
-		description:
-			'Root layout file with ThemeProvider and global styles for a Træk app.',
+		description: 'Root layout file with ThemeProvider and global styles for a Træk app.',
 		language: 'svelte',
 		code: `<!-- src/routes/+layout.svelte -->
 <script lang="ts">
@@ -548,14 +546,14 @@ const restored = TraekEngine.fromSnapshot(saved) // validates with Zod
     overflow: hidden;
   }
 </style>`,
-		relatedSnippets: ['theming', 'basic-setup'],
-	},
-}
+		relatedSnippets: ['theming', 'basic-setup']
+	}
+};
 
 export function getSnippet(id: string): Snippet | null {
-	return snippets[id] ?? null
+	return snippets[id] ?? null;
 }
 
 export function listSnippets(): Array<{ id: string; title: string; description: string }> {
-	return Object.values(snippets).map(({ id, title, description }) => ({ id, title, description }))
+	return Object.values(snippets).map(({ id, title, description }) => ({ id, title, description }));
 }

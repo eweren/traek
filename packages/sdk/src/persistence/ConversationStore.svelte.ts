@@ -272,9 +272,7 @@ export class ConversationStore {
 		this.autoSaveUnsubscribe = $effect.root(() => {
 			$effect(() => {
 				// Access reactive nodes to track changes
-				// eslint-disable-next-line @typescript-eslint/no-unused-vars
 				const _nodes = engine.nodes;
-				// eslint-disable-next-line @typescript-eslint/no-unused-vars
 				const _activeNodeId = engine.activeNodeId;
 
 				// Debounce the save

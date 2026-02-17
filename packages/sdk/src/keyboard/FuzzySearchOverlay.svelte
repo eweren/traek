@@ -125,7 +125,6 @@
 				{@const messageNode = node as MessageNode}
 				{@const isSelected = index === selectedIndex}
 				<!-- svelte-ignore a11y_click_events_have_key_events -->
-				<!-- svelte-ignore a11y_no_static_element_interactions -->
 				<div
 					class="fuzzy-result"
 					class:selected={isSelected}

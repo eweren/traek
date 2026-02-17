@@ -534,7 +534,6 @@
 			{registry}
 			{focusConfig}
 			onSendMessage={(input, userNode) => onSendMessage?.(input, userNode)}
-			{onRetry}
 		/>
 	{:else}
 		<div

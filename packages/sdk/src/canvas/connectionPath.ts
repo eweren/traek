@@ -107,7 +107,6 @@ export function getConnectionPath(
 	childX: number,
 	childY: number,
 	childW: number,
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	_childH: number
 ): string {
 	const r = CONNECTION_CORNER_RADIUS;

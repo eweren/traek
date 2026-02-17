@@ -110,7 +110,7 @@
 			<rect class="minimap-bg" x="0" y="0" width={WIDTH} height={HEIGHT} rx="8" />
 
 			<g transform="translate({PADDING}, {PADDING})">
-				{#each nodes.filter((n) => n.type !== 'thought') as node}
+				{#each nodes.filter((n) => n.type !== 'thought') as node (node.id)}
 					{@const xPx = (node.metadata?.x ?? 0) * config.gridStep}
 					{@const yPx = (node.metadata?.y ?? 0) * config.gridStep}
 					{@const nodeH = node.metadata?.height ?? config.nodeHeightDefault}

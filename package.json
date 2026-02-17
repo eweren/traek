@@ -1,6 +1,8 @@
 {
 	"name": "traek-monorepo",
 	"private": true,
+	"type": "module",
+	"packageManager": "pnpm@10.29.3",
 	"scripts": {
 		"dev": "turbo dev",
 		"build": "turbo build",

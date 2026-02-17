@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { ViewportManager } from '../ViewportManager.svelte.ts';
+import { ViewportManager } from '../ViewportManager.svelte';
 import type { TraekEngineConfig, Node } from '../../TraekEngine.svelte';
 
 const DEFAULT_CONFIG: TraekEngineConfig = {

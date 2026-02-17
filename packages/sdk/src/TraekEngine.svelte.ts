@@ -1,5 +1,6 @@
 import { browser } from '$app/environment';
 import type { Component } from 'svelte';
+import { SvelteSet } from 'svelte/reactivity';
 import { conversationSnapshotSchema } from './persistence/schemas.js';
 import { searchNodes as searchNodesUtil } from './search/searchUtils.js';
 
@@ -129,7 +130,7 @@ export class TraekEngine {
 	nodes = $state<Node[]>([]);
 	activeNodeId = $state<string | null>(null);
 	/** Set of collapsed node IDs. When a node is collapsed, its descendants are hidden from view. */
-	collapsedNodes = $state(new Set<string>());
+	collapsedNodes = $state(new SvelteSet<string>());
 	/** Search state: current query */
 	searchQuery = $state<string>('');
 	/** Search state: array of matching node IDs */
@@ -630,11 +631,9 @@ export class TraekEngine {
 	 * Get all descendant nodes via BFS (excludes thought nodes). Returns reactive proxies.
 	 */
 	getDescendants(nodeId: string): Node[] {
-		// eslint-disable-next-line svelte/prefer-svelte-reactivity
 		const descendants: Node[] = [];
 		// eslint-disable-next-line svelte/prefer-svelte-reactivity
 		const visited = new Set<string>();
-		// eslint-disable-next-line svelte/prefer-svelte-reactivity
 		const queue = [nodeId];
 		while (queue.length > 0) {
 			const currentId = queue.shift()!;
@@ -1048,8 +1047,6 @@ export class TraekEngine {
 		} else {
 			this.collapsedNodes.add(nodeId);
 		}
-		// Force reactivity update
-		this.collapsedNodes = new Set(this.collapsedNodes);
 	}
 
 	/** Check if a node is collapsed. */
@@ -1224,9 +1221,6 @@ export class TraekEngine {
 
 			current = this.getNode(primaryParentId);
 		}
-
-		// Force reactivity update
-		this.collapsedNodes = new Set(this.collapsedNodes);
 	}
 
 	/**

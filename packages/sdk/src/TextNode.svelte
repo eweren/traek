@@ -3,7 +3,7 @@
 	import { fadedSlide } from './transitions.js';
 	import type { TraekEngine } from './TraekEngine.svelte';
 	import TraekNodeWrapper from './TraekNodeWrapper.svelte';
-	import { markdownToHtml } from './utils.ts';
+	import { markdownToHtml } from './utils';
 	import { getDetailLevel } from './canvas/AdaptiveRenderer.svelte';
 
 	import type { MessageNode } from './TraekEngine.svelte';

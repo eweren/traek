@@ -14,6 +14,7 @@
 
 <header class="header-bar {className}">
 	<div class="header-content">
+		<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
 		<a href={backHref} class="back-button">
 			<svg
 				class="chevron-icon"

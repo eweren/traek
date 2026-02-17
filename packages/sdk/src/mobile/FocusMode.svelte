@@ -38,7 +38,6 @@
 		registry?: NodeTypeRegistry;
 		focusConfig?: Partial<FocusModeConfig>;
 		onSendMessage?: (input: string, userNode: MessageNode) => void;
-		onRetry?: (nodeId: string) => void;
 	} = $props();
 
 	// svelte-ignore state_referenced_locally

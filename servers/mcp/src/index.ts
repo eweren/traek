@@ -20,39 +20,41 @@
  *   traek://guide/{name}      — Integration guide
  *   traek://snippet/{name}    — Code snippet
  */
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
-import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
-import { docTools } from './tools/docs'
-import { scaffoldTools } from './tools/scaffold'
-import { resourceHandlers } from './resources/docs'
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { docTools } from './tools/docs';
+import { scaffoldTools } from './tools/scaffold';
+import { resourceHandlers } from './resources/docs';
 
 const server = new McpServer({
 	name: 'traek-mcp',
-	version: '0.1.0',
-})
+	version: '0.1.0'
+});
 
 // Register documentation and search tools
 for (const tool of docTools) {
-	server.tool(tool.name, tool.description, tool.inputSchema, tool.handler)
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	server.tool(tool.name, tool.description, tool.inputSchema as any, tool.handler as any);
 }
 
 // Register scaffolding tools
 for (const tool of scaffoldTools) {
-	server.tool(tool.name, tool.description, tool.inputSchema, tool.handler)
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	server.tool(tool.name, tool.description, tool.inputSchema as any, tool.handler as any);
 }
 
 // Register URI-addressable resources
 for (const resource of resourceHandlers) {
-	server.resource(resource.name, resource.uri, resource.handler)
+	server.resource(resource.name, resource.uri, resource.handler);
 }
 
 async function main() {
-	const transport = new StdioServerTransport()
-	await server.connect(transport)
-	console.error('Træk MCP developer assistant running on stdio')
+	const transport = new StdioServerTransport();
+	await server.connect(transport);
+	console.error('Træk MCP developer assistant running on stdio');
 }
 
 main().catch((err) => {
-	console.error('Fatal error:', err)
-	process.exit(1)
-})
+	console.error('Fatal error:', err);
+	process.exit(1);
+});

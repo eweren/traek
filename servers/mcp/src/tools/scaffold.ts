@@ -1,30 +1,30 @@
-import { z } from 'zod'
-import { getSnippet, listSnippets } from '../data/snippets'
+import { z } from 'zod/v3';
+import { getSnippet, listSnippets } from '../data/snippets';
 
 /** Generate a complete SvelteKit page scaffold based on the requested features. */
 function generateScaffold(options: {
-	streaming: boolean
-	persistence: boolean
-	customNode: boolean
-	theme: 'dark' | 'light' | 'none'
+	streaming: boolean;
+	persistence: boolean;
+	customNode: boolean;
+	theme: 'dark' | 'light' | 'none';
 }): string {
 	const imports: string[] = [
-		`import { TraekEngine, TraekCanvas, type MessageNode } from '@traek/sdk'`,
-	]
-	const extras: string[] = []
-	const instanceCode: string[] = ['const engine = new TraekEngine()']
-	const sendMessageLines: string[] = []
-	const templateParts: string[] = []
+		`import { TraekEngine, TraekCanvas, type MessageNode } from '@traek/sdk'`
+	];
+	const extras: string[] = [];
+	const instanceCode: string[] = ['const engine = new TraekEngine()'];
+	const sendMessageLines: string[] = [];
+	const templateParts: string[] = [];
 
 	if (options.persistence) {
-		imports.push(`import { ConversationStore, ChatList, SaveIndicator } from '@traek/sdk'`)
-		instanceCode.push(`const store = new ConversationStore(engine)`)
-		extras.push(`$effect(() => { store.init() })`)
+		imports.push(`import { ConversationStore, ChatList, SaveIndicator } from '@traek/sdk'`);
+		instanceCode.push(`const store = new ConversationStore(engine)`);
+		extras.push(`$effect(() => { store.init() })`);
 	}
 
 	if (options.customNode) {
-		imports.push(`import ImageNode from '$lib/ImageNode.svelte'`)
-		instanceCode.push(`const componentMap = { image: ImageNode }`)
+		imports.push(`import ImageNode from '$lib/ImageNode.svelte'`);
+		instanceCode.push(`const componentMap = { image: ImageNode }`);
 	}
 
 	if (options.streaming) {
@@ -65,26 +65,26 @@ function generateScaffold(options: {
 			`      status: 'error',`,
 			`      errorMessage: err instanceof Error ? err.message : String(err)`,
 			`    })`,
-			`  }`,
-		)
+			`  }`
+		);
 	} else {
 		sendMessageLines.push(
 			`  engine.addNode('Response to: ' + input, 'assistant', {`,
 			`    parentIds: [userNode.id],`,
 			`    status: 'done'`,
-			`  })`,
-		)
+			`  })`
+		);
 	}
 
-	const canvasProps: string[] = ['{engine}', 'onSendMessage={handleSend}']
+	const canvasProps: string[] = ['{engine}', 'onSendMessage={handleSend}'];
 	if (options.persistence) {
-		canvasProps.push("onNodesChanged={() => store.save()}")
+		canvasProps.push('onNodesChanged={() => store.save()}');
 	}
 	if (options.customNode) {
-		canvasProps.push('{componentMap}')
+		canvasProps.push('{componentMap}');
 	}
 
-	const canvasTag = `<TraekCanvas ${canvasProps.join(' ')} />`
+	const canvasTag = `<TraekCanvas ${canvasProps.join(' ')} />`;
 
 	if (options.persistence) {
 		templateParts.push(
@@ -97,19 +97,19 @@ function generateScaffold(options: {
 			`    <SaveIndicator {store} />`,
 			`    ${canvasTag}`,
 			`  </main>`,
-			`</div>`,
-		)
+			`</div>`
+		);
 	} else {
-		templateParts.push(`<div style="height: 100dvh; width: 100%;">`, `  ${canvasTag}`, `</div>`)
+		templateParts.push(`<div style="height: 100dvh; width: 100%;">`, `  ${canvasTag}`, `</div>`);
 	}
 
-	const styleLines: string[] = []
+	const styleLines: string[] = [];
 	if (options.persistence) {
 		styleLines.push(
 			`.layout { display: flex; height: 100dvh; }`,
 			`.sidebar { width: 240px; overflow-y: auto; border-right: 1px solid var(--traek-color-border); padding: 8px; }`,
-			`main { flex: 1; position: relative; }`,
-		)
+			`main { flex: 1; position: relative; }`
+		);
 	}
 
 	const scriptLines = [
@@ -120,8 +120,8 @@ function generateScaffold(options: {
 		``,
 		`async function handleSend(input: string, userNode: MessageNode) {`,
 		...sendMessageLines,
-		`}`,
-	]
+		`}`
+	];
 
 	const lines = [
 		`<script lang="ts">`,
@@ -131,10 +131,10 @@ function generateScaffold(options: {
 		...templateParts,
 		...(styleLines.length > 0
 			? [``, `<style>`, ...styleLines.map((l) => `  ${l}`), `</style>`]
-			: []),
-	]
+			: [])
+	];
 
-	return lines.join('\n')
+	return lines.join('\n');
 }
 
 function generateApiRoute(options: { provider: 'openai' | 'none' }): string {
@@ -151,7 +151,7 @@ export const POST: RequestHandler = async ({ request }) => {
   return new Response(response, {
     headers: { 'Content-Type': 'text/plain; charset=utf-8' }
   })
-}`
+}`;
 	}
 
 	return `// src/routes/api/chat/+server.ts
@@ -185,7 +185,7 @@ export const POST: RequestHandler = async ({ request }) => {
   return new Response(readable, {
     headers: { 'Content-Type': 'text/plain; charset=utf-8' }
   })
-}`
+}`;
 }
 
 function generateCustomNodeComponent(): string {
@@ -234,7 +234,7 @@ function generateCustomNodeComponent(): string {
     cursor: pointer;
     font-size: var(--traek-font-size-sm);
   }
-</style>`
+</style>`;
 }
 
 export const scaffoldTools = [
@@ -246,40 +246,40 @@ export const scaffoldTools = [
 			id: z
 				.string()
 				.describe(
-					'Snippet ID. Run list_snippets to see all available IDs. Common ones: basic-setup, controlled-engine, openai-streaming, openai-streaming-page, custom-node, custom-node-usage, persistence, serialization, theming, slash-commands, sveltekit-layout',
-				),
+					'Snippet ID. Run list_snippets to see all available IDs. Common ones: basic-setup, controlled-engine, openai-streaming, openai-streaming-page, custom-node, custom-node-usage, persistence, serialization, theming, slash-commands, sveltekit-layout'
+				)
 		},
 		handler: async ({ id }: { id: string }) => {
-			const snippet = getSnippet(id)
+			const snippet = getSnippet(id);
 			if (!snippet) {
 				const available = listSnippets()
 					.map((s) => s.id)
-					.join(', ')
+					.join(', ');
 				return {
 					content: [
 						{
 							type: 'text' as const,
-							text: `No snippet found for "${id}". Available: ${available}`,
-						},
+							text: `No snippet found for "${id}". Available: ${available}`
+						}
 					],
-					isError: true,
-				}
+					isError: true
+				};
 			}
 
 			const related =
 				snippet.relatedSnippets && snippet.relatedSnippets.length > 0
 					? `\n\n---\nRelated snippets: ${snippet.relatedSnippets.join(', ')}`
-					: ''
+					: '';
 
 			return {
 				content: [
 					{
 						type: 'text' as const,
-						text: `# ${snippet.title}\n\n${snippet.description}\n\n\`\`\`${snippet.language}\n${snippet.code}\n\`\`\`${related}`,
-					},
-				],
-			}
-		},
+						text: `# ${snippet.title}\n\n${snippet.description}\n\n\`\`\`${snippet.language}\n${snippet.code}\n\`\`\`${related}`
+					}
+				]
+			};
+		}
 	},
 
 	{
@@ -306,37 +306,37 @@ export const scaffoldTools = [
 			includeApiRoute: z
 				.boolean()
 				.default(true)
-				.describe('Also generate the /api/chat +server.ts file. Default: true'),
+				.describe('Also generate the /api/chat +server.ts file. Default: true')
 		},
 		handler: async ({
 			streaming,
 			persistence,
 			customNode,
 			apiProvider,
-			includeApiRoute,
+			includeApiRoute
 		}: {
-			streaming: boolean
-			persistence: boolean
-			customNode: boolean
-			apiProvider: 'openai' | 'none'
-			includeApiRoute: boolean
+			streaming: boolean;
+			persistence: boolean;
+			customNode: boolean;
+			apiProvider: 'openai' | 'none';
+			includeApiRoute: boolean;
 		}) => {
-			const files: Array<{ path: string; language: string; content: string }> = []
+			const files: Array<{ path: string; language: string; content: string }> = [];
 
 			// Main page
 			files.push({
 				path: 'src/routes/+page.svelte',
 				language: 'svelte',
-				content: generateScaffold({ streaming, persistence, customNode, theme: 'dark' }),
-			})
+				content: generateScaffold({ streaming, persistence, customNode, theme: 'dark' })
+			});
 
 			// API route
 			if (includeApiRoute && streaming) {
 				files.push({
 					path: 'src/routes/api/chat/+server.ts',
 					language: 'typescript',
-					content: generateApiRoute({ provider: apiProvider }),
-				})
+					content: generateApiRoute({ provider: apiProvider })
+				});
 			}
 
 			// Custom node component
@@ -344,37 +344,36 @@ export const scaffoldTools = [
 				files.push({
 					path: 'src/lib/ImageNode.svelte',
 					language: 'svelte',
-					content: generateCustomNodeComponent(),
-				})
+					content: generateCustomNodeComponent()
+				});
 			}
 
 			const output = files
-				.map(
-					(f) =>
-						`## \`${f.path}\`\n\n\`\`\`${f.language}\n${f.content}\n\`\`\``,
-				)
-				.join('\n\n---\n\n')
+				.map((f) => `## \`${f.path}\`\n\n\`\`\`${f.language}\n${f.content}\n\`\`\``)
+				.join('\n\n---\n\n');
 
-			const notes: string[] = []
+			const notes: string[] = [];
 			if (apiProvider === 'openai' && streaming) {
-				notes.push('Add `OPENAI_API_KEY=sk-...` to your `.env` file.')
-				notes.push('Run `npm install openai` in your project.')
+				notes.push('Add `OPENAI_API_KEY=sk-...` to your `.env` file.');
+				notes.push('Run `npm install openai` in your project.');
 			}
 			if (persistence) {
-				notes.push('ConversationStore persists to localStorage under the key `traek-conversations`.')
+				notes.push(
+					'ConversationStore persists to localStorage under the key `traek-conversations`.'
+				);
 			}
 
 			const noteSection =
-				notes.length > 0 ? `\n\n## Setup notes\n\n${notes.map((n) => `- ${n}`).join('\n')}` : ''
+				notes.length > 0 ? `\n\n## Setup notes\n\n${notes.map((n) => `- ${n}`).join('\n')}` : '';
 
 			return {
 				content: [
 					{
 						type: 'text' as const,
-						text: `# Scaffolded Træk Integration\n\n${output}${noteSection}`,
-					},
-				],
-			}
-		},
-	},
-]
+						text: `# Scaffolded Træk Integration\n\n${output}${noteSection}`
+					}
+				]
+			};
+		}
+	}
+];

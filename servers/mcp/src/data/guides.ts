@@ -4,10 +4,10 @@
  */
 
 export interface Guide {
-	id: string
-	title: string
-	description: string
-	content: string
+	id: string;
+	title: string;
+	description: string;
+	content: string;
 }
 
 export const guides: Record<string, Guide> = {
@@ -66,7 +66,7 @@ Create a SvelteKit route:
 - Connect a real AI: see the **OpenAI Streaming** guide
 - Save conversations: see the **Persistence** guide
 - Customize rendering: see the **Custom Nodes** guide
-`,
+`
 	},
 
 	'openai-streaming': {
@@ -206,13 +206,14 @@ Or add it as a node:
 \`\`\`typescript
 engine.addNode('You are a helpful assistant.', 'system')
 \`\`\`
-`,
+`
 	},
 
 	'custom-nodes': {
 		id: 'custom-nodes',
 		title: 'Building Custom Node Types',
-		description: 'Create custom Svelte components for non-text content like images, charts, or code results.',
+		description:
+			'Create custom Svelte components for non-text content like images, charts, or code results.',
 		content: `# Custom Node Types
 
 ## When to use custom nodes
@@ -331,13 +332,14 @@ interface ImageNodeData {
 // In your component:
 const data = $derived(node.data as ImageNodeData)
 \`\`\`
-`,
+`
 	},
 
 	persistence: {
 		id: 'persistence',
 		title: 'Conversation Persistence',
-		description: 'Auto-save and load conversations using ConversationStore or manual serialization.',
+		description:
+			'Auto-save and load conversations using ConversationStore or manual serialization.',
 		content: `# Conversation Persistence
 
 Træk provides two persistence options:
@@ -422,7 +424,7 @@ interface SerializedNode {
 \`\`\`
 
 Validate with Zod: \`conversationSnapshotSchema.parse(raw)\`
-`,
+`
 	},
 
 	theming: {
@@ -486,7 +488,7 @@ All Træk styles use \`--traek-*\` CSS custom properties. Override them anywhere
 | \`--traek-color-border\` | \`#2a2a3a\` | Node borders, dividers |
 | \`--traek-radius-node\` | \`12px\` | Node border radius |
 | \`--traek-font-family\` | \`'Space Grotesk', system-ui\` | All UI text |
-`,
+`
 	},
 
 	'sveltekit-setup': {
@@ -573,30 +575,30 @@ See the **OpenAI Streaming** guide for the full API route.
 ## Adapter
 
 For deployment, use \`@sveltejs/adapter-node\`, \`@sveltejs/adapter-vercel\`, or \`@sveltejs/adapter-cloudflare\` — Træk works with all of them.
-`,
-	},
-}
+`
+	}
+};
 
 export function getGuide(id: string): Guide | null {
-	return guides[id] ?? null
+	return guides[id] ?? null;
 }
 
 export function listGuides(): Array<{ id: string; title: string; description: string }> {
-	return Object.values(guides).map(({ id, title, description }) => ({ id, title, description }))
+	return Object.values(guides).map(({ id, title, description }) => ({ id, title, description }));
 }
 
 export function searchGuides(query: string): Array<{ guide: string; excerpt: string }> {
-	const lower = query.toLowerCase()
-	const results: Array<{ guide: string; excerpt: string }> = []
+	const lower = query.toLowerCase();
+	const results: Array<{ guide: string; excerpt: string }> = [];
 
 	for (const [id, guide] of Object.entries(guides)) {
-		const text = `${guide.title} ${guide.description} ${guide.content}`
+		const text = `${guide.title} ${guide.description} ${guide.content}`;
 		if (text.toLowerCase().includes(lower)) {
-			const idx = text.toLowerCase().indexOf(lower)
-			const excerpt = text.slice(Math.max(0, idx - 40), idx + 120).trim()
-			results.push({ guide: id, excerpt: `...${excerpt}...` })
+			const idx = text.toLowerCase().indexOf(lower);
+			const excerpt = text.slice(Math.max(0, idx - 40), idx + 120).trim();
+			results.push({ guide: id, excerpt: `...${excerpt}...` });
 		}
 	}
 
-	return results
+	return results;
 }

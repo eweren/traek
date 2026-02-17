@@ -155,7 +155,7 @@
 
 		<div class="tour-footer">
 			<div class="tour-progress-dots" role="list" aria-label="Tour Fortschritt">
-				{#each Array(totalSteps) as _, i (i)}
+				{#each Array(totalSteps) as _step, i (i)}
 					<span
 						class="tour-dot"
 						class:active={i === currentStep}

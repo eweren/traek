@@ -1,55 +1,51 @@
-import { z } from 'zod'
-import {
-	componentDocs,
-	getComponentDoc,
-	searchComponentDocs,
-} from '../data/components'
-import { getGuide, listGuides, searchGuides } from '../data/guides'
-import { listSnippets } from '../data/snippets'
+import { z } from 'zod/v3';
+import { componentDocs, getComponentDoc, searchComponentDocs } from '../data/components';
+import { getGuide, listGuides, searchGuides } from '../data/guides';
+import { listSnippets } from '../data/snippets';
 
 function formatPropTable(props: NonNullable<ReturnType<typeof getComponentDoc>>['props']): string {
-	if (!props || props.length === 0) return ''
+	if (!props || props.length === 0) return '';
 	return props
 		.map(
 			(p) =>
-				`**${p.name}** \`${p.type}\`${p.required ? ' *(required)*' : ''}\n  ${p.description}${p.default ? `\n  Default: \`${p.default}\`` : ''}`,
+				`**${p.name}** \`${p.type}\`${p.required ? ' *(required)*' : ''}\n  ${p.description}${p.default ? `\n  Default: \`${p.default}\`` : ''}`
 		)
-		.join('\n\n')
+		.join('\n\n');
 }
 
 function formatMethodList(
-	methods: NonNullable<ReturnType<typeof getComponentDoc>>['methods'],
+	methods: NonNullable<ReturnType<typeof getComponentDoc>>['methods']
 ): string {
-	if (!methods || methods.length === 0) return ''
+	if (!methods || methods.length === 0) return '';
 	return methods
 		.map((m) => `**\`${m.name}\`** — \`${m.signature}\`\n  ${m.description}`)
-		.join('\n\n')
+		.join('\n\n');
 }
 
 function formatComponentDoc(doc: ReturnType<typeof getComponentDoc>): string {
-	if (!doc) return ''
-	const parts: string[] = []
+	if (!doc) return '';
+	const parts: string[] = [];
 
-	parts.push(`# ${doc.name}\n\nimport { ${doc.name} } from '${doc.importPath}'\n`)
-	parts.push(doc.description)
+	parts.push(`# ${doc.name}\n\nimport { ${doc.name} } from '${doc.importPath}'\n`);
+	parts.push(doc.description);
 
 	if (doc.props && doc.props.length > 0) {
-		parts.push(`\n## Props\n\n${formatPropTable(doc.props)}`)
+		parts.push(`\n## Props\n\n${formatPropTable(doc.props)}`);
 	}
 	if (doc.stateProps && doc.stateProps.length > 0) {
-		parts.push(`\n## Reactive State\n\n${formatPropTable(doc.stateProps)}`)
+		parts.push(`\n## Reactive State\n\n${formatPropTable(doc.stateProps)}`);
 	}
 	if (doc.methods && doc.methods.length > 0) {
-		parts.push(`\n## Methods\n\n${formatMethodList(doc.methods)}`)
+		parts.push(`\n## Methods\n\n${formatMethodList(doc.methods)}`);
 	}
 	if (doc.notes && doc.notes.length > 0) {
-		parts.push(`\n## Notes\n\n${doc.notes.map((n) => `- ${n}`).join('\n')}`)
+		parts.push(`\n## Notes\n\n${doc.notes.map((n) => `- ${n}`).join('\n')}`);
 	}
 	if (doc.example) {
-		parts.push(`\n## Example\n\n\`\`\`svelte\n${doc.example}\n\`\`\``)
+		parts.push(`\n## Example\n\n\`\`\`svelte\n${doc.example}\n\`\`\``);
 	}
 
-	return parts.join('\n')
+	return parts.join('\n');
 }
 
 export const docTools = [
@@ -61,27 +57,27 @@ export const docTools = [
 			component: z
 				.string()
 				.describe(
-					'Name of the component or class. One of: TraekCanvas, TraekEngine, TextNode, ConversationStore, ReplayController, NodeTypeRegistry, ThemeProvider',
-				),
+					'Name of the component or class. One of: TraekCanvas, TraekEngine, TextNode, ConversationStore, ReplayController, NodeTypeRegistry, ThemeProvider'
+				)
 		},
 		handler: async ({ component }: { component: string }) => {
-			const doc = getComponentDoc(component)
+			const doc = getComponentDoc(component);
 			if (!doc) {
-				const available = Object.keys(componentDocs).join(', ')
+				const available = Object.keys(componentDocs).join(', ');
 				return {
 					content: [
 						{
 							type: 'text' as const,
-							text: `No docs found for "${component}". Available: ${available}`,
-						},
+							text: `No docs found for "${component}". Available: ${available}`
+						}
 					],
-					isError: true,
-				}
+					isError: true
+				};
 			}
 			return {
-				content: [{ type: 'text' as const, text: formatComponentDoc(doc) }],
-			}
-		},
+				content: [{ type: 'text' as const, text: formatComponentDoc(doc) }]
+			};
+		}
 	},
 
 	{
@@ -173,10 +169,10 @@ export const docTools = [
 - \`TraekNodeComponentProps\` — Props every custom node component receives
 - \`NodeComponentMap\` — Map from type string to Svelte component
 - \`TraekEngineConfig\` — Engine configuration
-- \`AddNodePayload\` — Payload for bulk addNodes()`
+- \`AddNodePayload\` — Payload for bulk addNodes()`;
 
-			return { content: [{ type: 'text' as const, text }] }
-		},
+			return { content: [{ type: 'text' as const, text }] };
+		}
 	},
 
 	{
@@ -185,16 +181,12 @@ export const docTools = [
 			'List all available integration guides. Returns guide IDs you can pass to get_guide.',
 		inputSchema: {},
 		handler: async () => {
-			const guides = listGuides()
-			const text = guides
-				.map((g) => `**${g.id}** — ${g.title}\n  ${g.description}`)
-				.join('\n\n')
+			const guides = listGuides();
+			const text = guides.map((g) => `**${g.id}** — ${g.title}\n  ${g.description}`).join('\n\n');
 			return {
-				content: [
-					{ type: 'text' as const, text: `# Available Guides\n\n${text}` },
-				],
-			}
-		},
+				content: [{ type: 'text' as const, text: `# Available Guides\n\n${text}` }]
+			};
+		}
 	},
 
 	{
@@ -205,27 +197,27 @@ export const docTools = [
 			guide: z
 				.string()
 				.describe(
-					'Guide ID. One of: getting-started, openai-streaming, custom-nodes, persistence, theming, sveltekit-setup',
-				),
+					'Guide ID. One of: getting-started, openai-streaming, custom-nodes, persistence, theming, sveltekit-setup'
+				)
 		},
 		handler: async ({ guide }: { guide: string }) => {
-			const doc = getGuide(guide)
+			const doc = getGuide(guide);
 			if (!doc) {
 				const available = listGuides()
 					.map((g) => g.id)
-					.join(', ')
+					.join(', ');
 				return {
 					content: [
 						{
 							type: 'text' as const,
-							text: `No guide found for "${guide}". Available: ${available}`,
-						},
+							text: `No guide found for "${guide}". Available: ${available}`
+						}
 					],
-					isError: true,
-				}
+					isError: true
+				};
 			}
-			return { content: [{ type: 'text' as const, text: doc.content }] }
-		},
+			return { content: [{ type: 'text' as const, text: doc.content }] };
+		}
 	},
 
 	{
@@ -233,38 +225,30 @@ export const docTools = [
 		description:
 			'Full-text search across all Træk documentation: component APIs, guides, and snippet descriptions. Use this when you need to find something but are not sure which component or guide covers it.',
 		inputSchema: {
-			query: z.string().describe('Search query — a term, concept, or feature name'),
+			query: z.string().describe('Search query — a term, concept, or feature name')
 		},
 		handler: async ({ query }: { query: string }) => {
-			const componentResults = searchComponentDocs(query)
-			const guideResults = searchGuides(query)
+			const componentResults = searchComponentDocs(query);
+			const guideResults = searchGuides(query);
 
-			const parts: string[] = [`# Search results for "${query}"\n`]
+			const parts: string[] = [`# Search results for "${query}"\n`];
 
 			if (componentResults.length > 0) {
-				parts.push('## Component API matches\n')
-				parts.push(
-					componentResults
-						.map((r) => `**${r.component}**: ${r.excerpt}`)
-						.join('\n\n'),
-				)
+				parts.push('## Component API matches\n');
+				parts.push(componentResults.map((r) => `**${r.component}**: ${r.excerpt}`).join('\n\n'));
 			}
 
 			if (guideResults.length > 0) {
-				parts.push('\n## Guide matches\n')
-				parts.push(
-					guideResults
-						.map((r) => `**Guide: ${r.guide}**: ${r.excerpt}`)
-						.join('\n\n'),
-				)
+				parts.push('\n## Guide matches\n');
+				parts.push(guideResults.map((r) => `**Guide: ${r.guide}**: ${r.excerpt}`).join('\n\n'));
 			}
 
 			if (componentResults.length === 0 && guideResults.length === 0) {
-				parts.push('No results found. Try: streaming, engine, node, persistence, theme, canvas')
+				parts.push('No results found. Try: streaming, engine, node, persistence, theme, canvas');
 			}
 
-			return { content: [{ type: 'text' as const, text: parts.join('\n') }] }
-		},
+			return { content: [{ type: 'text' as const, text: parts.join('\n') }] };
+		}
 	},
 
 	{
@@ -273,15 +257,11 @@ export const docTools = [
 			'List all available code snippets. Returns snippet IDs you can pass to get_snippet.',
 		inputSchema: {},
 		handler: async () => {
-			const items = listSnippets()
-			const text = items
-				.map((s) => `**${s.id}** — ${s.title}\n  ${s.description}`)
-				.join('\n\n')
+			const items = listSnippets();
+			const text = items.map((s) => `**${s.id}** — ${s.title}\n  ${s.description}`).join('\n\n');
 			return {
-				content: [
-					{ type: 'text' as const, text: `# Available Code Snippets\n\n${text}` },
-				],
-			}
-		},
-	},
-]
+				content: [{ type: 'text' as const, text: `# Available Code Snippets\n\n${text}` }]
+			};
+		}
+	}
+];
