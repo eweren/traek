@@ -66,7 +66,7 @@ async function main() {
 				if (raw) {
 					try {
 						body = JSON.parse(raw);
-					} catch { }
+					} catch {}
 				}
 			}
 

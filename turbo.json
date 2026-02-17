@@ -16,6 +16,7 @@
 			"dependsOn": ["^build"]
 		},
 		"clean": {},
+		"format": {},
 		"lint": {
 			"dependsOn": ["^lint"]
 		},

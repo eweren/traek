@@ -10,7 +10,7 @@
 		"build": "turbo build",
 		"test": "turbo test",
 		"lint": "turbo lint",
-		"format": "prettier --write .",
+		"format": "prettier --write . && turbo format",
 		"check": "turbo check"
 	},
 	"devDependencies": {
