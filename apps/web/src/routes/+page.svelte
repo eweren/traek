@@ -606,7 +606,7 @@ npm install traek
 		}
 
 		.demo-frame {
-			height: 360px;
+			height: 420px;
 		}
 
 		.two-column,
@@ -631,7 +631,8 @@ npm install traek
 		}
 
 		.demo-frame {
-			height: 320px;
+			height: 60dvh;
+			min-height: 360px;
 		}
 	}
 </style>
