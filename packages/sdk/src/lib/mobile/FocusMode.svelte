@@ -542,7 +542,7 @@
 <style>
 	.focus-mode {
 		width: 100%;
-		height: 100dvh;
+		height: 100%;
 		background-color: var(--traek-canvas-bg, #0b0b0b);
 		position: relative;
 		overflow: hidden;
