@@ -1,0 +1,64 @@
+{
+	"name": "@traek/vue",
+	"version": "0.0.3",
+	"description": "Vue 3 adapter for Træk – spatial tree-chat UI for AI agents",
+	"author": "Nico Hülscher",
+	"license": "MIT",
+	"type": "module",
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js"
+		}
+	},
+	"files": [
+		"dist",
+		"!dist/**/*.test.*",
+		"!dist/**/*.spec.*"
+	],
+	"scripts": {
+		"build": "vue-tsc --project tsconfig.build.json && node scripts/fixExtensions.js",
+		"check": "vue-tsc --noEmit",
+		"lint": "prettier --check . && eslint .",
+		"clean": "rm -rf node_modules dist coverage .turbo",
+		"format": "prettier --write . && eslint . --fix",
+		"test": "vitest run"
+	},
+	"dependencies": {
+		"@traek/core": "workspace:*",
+		"dompurify": "^3.3.1",
+		"highlight.js": "^11.11.1",
+		"marked": "^17.0.1",
+		"marked-highlight": "^2.2.3"
+	},
+	"peerDependencies": {
+		"vue": "^3.4.0"
+	},
+	"devDependencies": {
+		"@types/dompurify": "^3.0.5",
+		"@types/node": "^24",
+		"@vitejs/plugin-vue": "^5.0.0",
+		"prettier": "^3.8.1",
+		"typescript": "^5.9.3",
+		"vite": "^7.3.1",
+		"vitest": "^4.0.18",
+		"vue": "^3.4.0",
+		"vue-tsc": "^2.0.0"
+	},
+	"keywords": [
+		"vue",
+		"vue3",
+		"ai",
+		"chat",
+		"agent",
+		"tree",
+		"conversation",
+		"spatial"
+	],
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/gettraek/traek.git"
+	}
+}

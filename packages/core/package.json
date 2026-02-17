@@ -1,0 +1,51 @@
+{
+	"name": "@traek/core",
+	"version": "0.0.3",
+	"description": "Framework-agnostic core engine for Træk – spatial tree-chat UI for AI agents",
+	"author": "Nico Hülscher",
+	"license": "MIT",
+	"type": "module",
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js"
+		}
+	},
+	"files": [
+		"dist",
+		"!dist/**/*.test.*",
+		"!dist/**/*.spec.*"
+	],
+	"scripts": {
+		"build": "tsc --project tsconfig.build.json",
+		"check": "tsc --noEmit",
+		"lint": "prettier --check . && eslint .",
+		"clean": "rm -rf node_modules dist coverage .turbo",
+		"format": "prettier --write . && eslint . --fix",
+		"test": "vitest run"
+	},
+	"dependencies": {
+		"zod": "^4.3.6"
+	},
+	"devDependencies": {
+		"@types/node": "^24",
+		"prettier": "^3.8.1",
+		"typescript": "^5.9.3",
+		"vitest": "^4.0.18"
+	},
+	"keywords": [
+		"ai",
+		"chat",
+		"agent",
+		"tree",
+		"conversation",
+		"spatial",
+		"framework-agnostic"
+	],
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/gettraek/traek.git"
+	}
+}

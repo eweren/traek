@@ -1,61 +1,31 @@
 import type { Component } from 'svelte';
 import { SvelteSet } from 'svelte/reactivity';
-import { conversationSnapshotSchema, type ConversationSnapshot } from '$lib/persistence/schemas';
+import { conversationSnapshotSchema } from '$lib/persistence/schemas';
 import { searchNodes as searchNodesUtil } from '$lib/search/searchUtils';
 
-export type NodeStatus = 'streaming' | 'done' | 'error';
+// Shared types and utilities from the framework-agnostic core package.
+// Re-exported here so that consumers of @traek/svelte don't need to
+// depend on @traek/core separately.
+export { wouldCreateCycle, BasicNodeTypes, DEFAULT_TRACK_ENGINE_CONFIG } from '@traek/core';
+export type {
+	Node,
+	MessageNode,
+	AddNodePayload,
+	NodeStatus,
+	TraekEngineConfig,
+	ConversationSnapshot
+} from '@traek/core';
 
-export enum BasicNodeTypes {
-	TEXT = 'text',
-	CODE = 'code',
-	THOUGHT = 'thought'
-}
-
-export interface Node {
-	id: string;
-	parentIds: string[];
-	role: 'user' | 'assistant' | 'system';
-	type: BasicNodeTypes | string;
-	status?: NodeStatus;
-	errorMessage?: string;
-	createdAt?: number;
-	metadata?: {
-		x: number;
-		y: number;
-		height?: number;
-		[key: string]: unknown;
-	};
-	data?: unknown;
-}
-
-/** Check whether adding an edge from parentId → childId would create a cycle. */
-export function wouldCreateCycle(nodes: Node[], parentId: string, childId: string): boolean {
-	// If parentId === childId, it's a self-loop
-	if (parentId === childId) return true;
-	// DFS from parentId upward: if we reach childId, it would create a cycle
-	// eslint-disable-next-line svelte/prefer-svelte-reactivity
-	const visited = new Set<string>();
-	const stack = [parentId];
-	while (stack.length > 0) {
-		const current = stack.pop()!;
-		if (current === childId) return true;
-		if (visited.has(current)) continue;
-		visited.add(current);
-		const node = nodes.find((n) => n.id === current);
-		if (node) {
-			for (const pid of node.parentIds) {
-				stack.push(pid);
-			}
-		}
-	}
-	return false;
-}
-
-export type CustomTraekNode = Node & {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	component: Component<any>;
-	props?: Record<string, unknown>;
-};
+// Internal imports for use in this file
+import {
+	wouldCreateCycle,
+	DEFAULT_TRACK_ENGINE_CONFIG,
+	type Node,
+	type MessageNode,
+	type AddNodePayload,
+	type TraekEngineConfig,
+	type ConversationSnapshot
+} from '@traek/core';
 
 /** Props every custom node component receives from the canvas. Use this to type your component's $props(). */
 export type TraekNodeComponentProps = {
@@ -65,65 +35,22 @@ export type TraekNodeComponentProps = {
 };
 
 /**
- * Map node.type (e.g. 'debugNode', 'image') to Svelte component for custom nodes.
+ * A Svelte-specific node that renders a Svelte component on the canvas.
+ * For the framework-agnostic equivalent, see CustomTraekNode in @traek/core.
+ */
+export type CustomTraekNode = Node & {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	component: Component<any>;
+	props?: Record<string, unknown>;
+};
+
+/**
+ * Map node.type (e.g. 'debugNode', 'image') to a Svelte component for custom nodes.
  * Use with a union of your custom types for type-safe keys: NodeComponentMap<'debugNode' | 'image'>.
  */
 export type NodeComponentMap<T extends string = string> = Partial<
 	Record<T, Component<TraekNodeComponentProps & Record<string, unknown>>>
 >;
-
-export interface MessageNode extends Node {
-	content: string;
-}
-
-/** Payload for bulk add; id optional (for saved projects). Parents must appear earlier in list or be already in engine. */
-export interface AddNodePayload {
-	id?: string;
-	parentIds: string[];
-	content: string;
-	role: 'user' | 'assistant' | 'system';
-	type?: MessageNode['type'];
-	status?: NodeStatus;
-	errorMessage?: string;
-	createdAt?: number;
-	metadata?: Partial<NonNullable<MessageNode['metadata']>>;
-	data?: unknown;
-}
-
-export interface TraekEngineConfig {
-	focusDurationMs: number;
-	zoomSpeed: number;
-	zoomLineModeBoost: number;
-	scaleMin: number;
-	scaleMax: number;
-	nodeWidth: number;
-	nodeHeightDefault: number;
-	streamIntervalMs: number;
-	rootNodeOffsetX: number;
-	rootNodeOffsetY: number;
-	layoutGapX: number;
-	layoutGapY: number;
-	heightChangeThreshold: number;
-	/** Pixels per grid unit; positions (metadata.x, metadata.y) are in grid units. */
-	gridStep: number;
-}
-
-export const DEFAULT_TRACK_ENGINE_CONFIG: TraekEngineConfig = {
-	focusDurationMs: 280,
-	zoomSpeed: 0.004,
-	zoomLineModeBoost: 20,
-	scaleMin: 0.05,
-	scaleMax: 8,
-	nodeWidth: 350,
-	nodeHeightDefault: 100,
-	streamIntervalMs: 30,
-	rootNodeOffsetX: -175,
-	rootNodeOffsetY: -50,
-	layoutGapX: 35,
-	layoutGapY: 50,
-	heightChangeThreshold: 5,
-	gridStep: 20
-};
 
 export class TraekEngine {
 	nodes = $state<Node[]>([]);
@@ -713,7 +640,7 @@ export class TraekEngine {
 	private storeDeletedBuffer(nodes: Node[]): void {
 		clearTimeout(this.deleteUndoTimeoutId);
 		this.lastDeletedBuffer = {
-			nodes: nodes.map((n) => structuredClone($state.snapshot(n))),
+			nodes: nodes.map((n) => structuredClone(n)),
 			activeNodeId: this.activeNodeId,
 			timestamp: Date.now()
 		};
