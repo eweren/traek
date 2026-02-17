@@ -1,18 +1,18 @@
-# træk
+# traek
 
 > **Follow ideas, not threads.**
 
-**træk** is a spatial conversation engine designed to go beyond traditional chat UIs for AI applications.
+**traek** is a Svelte 5 UI library for building spatial, tree-structured AI conversation interfaces.
 
-_træk (/træk/) comes from Danish **træ** (tree) and English **track** (path)._
+_traek (/traek/) comes from Danish **trae** (tree) and English **track** (path)._
 
-Most chat interfaces force complex thinking into a linear stream of messages. træk breaks that constraint by turning conversations into **navigable structures** — paths you can branch, explore, and revisit.
+Most chat interfaces force complex thinking into a linear stream of messages. traek breaks that constraint by turning conversations into **navigable structures** -- paths you can branch, explore, and revisit.
 
 Built for AI-native products where reasoning is not linear.
 
 ---
 
-## 🚨 The Problem with Chat UIs
+## The Problem with Chat UIs
 
 Classic chat layouts work well for simple back-and-forth messaging.
 
@@ -28,95 +28,112 @@ Important context gets buried.
 Alternative approaches disappear.
 Thinking becomes flattened.
 
-**If AI thinking branches — your UI should too.**
+**If AI thinking branches -- your UI should too.**
 
 ---
 
-## ✅ What træk Enables
+## What traek Enables
 
-træk replaces the timeline with a **spatial mental model**:
+traek replaces the timeline with a **spatial mental model**:
 
-- 🌿 Branch conversations without losing history
-- 🧭 Navigate discussions like a map, not a log
-- 🧠 Keep reasoning visible but structured
-- 🔁 Revisit earlier paths instantly
-- 🔎 Compare alternative outputs side‑by‑side
+- Branch conversations without losing history
+- Navigate discussions like a map, not a log
+- Keep reasoning visible but structured
+- Revisit earlier paths instantly
+- Compare alternative outputs side-by-side
 
 This is not "chat with nicer bubbles."
 It is infrastructure for **non-linear AI interaction**.
 
 ---
 
-## 🧬 Core Concept
+## Core Concept
 
-Conversations in træk form a tree:
+Conversations in traek form a tree:
 
 ```
 Message
- └─ Reply
-     ├─ Alternative path
-     ├─ Deeper exploration
-     └─ Agent branch
+ +-- Reply
+      |-- Alternative path
+      |-- Deeper exploration
+      +-- Agent branch
 ```
 
 Every message is a node.
 Every reply is a possible direction.
 
-You don’t scroll conversations.
+You don't scroll conversations.
 
 **You navigate them.**
 
 ---
 
-## ✨ Key Features
+## Key Features
 
-- **Branching conversations**
-  Explore alternatives without overwriting the past.
+### Spatial Canvas
 
-- **Spatial layout**
-  Parents stay above, replies spread horizontally — structure remains readable as complexity grows.
+- **Pan & zoom canvas** -- Move through large conversations like a diagram
+- **Spatial layout** -- Parents stay above, replies spread horizontally
+- **Minimap** -- Bird's-eye overview of the conversation tree
+- **Breadcrumb navigation** -- Always see the path from root to current node
 
-- **Streaming-first**
-  Render token-by-token output in place while keeping the conversation topology intact.
+### Branching & Comparison
 
-- **Thought nodes**
-  Attach reasoning steps without polluting the primary path.
+- **Branching conversations** -- Explore alternatives without overwriting the past
+- **Branch comparison** -- Side-by-side word-diff of alternative response paths
+- **Copy branch** -- Export any path as Markdown to clipboard
 
-- **Pan & zoom canvas**
-  Move through large conversations like a diagram.
+### Streaming & Rendering
 
-- **Markdown support**
-  Safe rendering with images, lists, and code blocks.
+- **Streaming-first** -- Render token-by-token output while keeping topology intact
+- **Markdown support** -- Safe rendering with images, lists, code highlighting (highlight.js)
+- **Thought nodes** -- Attach reasoning steps without polluting the primary path
 
-- **Fully configurable engine**
-  Control layout, spacing, zoom behavior, and interaction tuning.
+### Navigation
+
+- **Keyboard navigation** -- Full Vim-inspired shortcuts: arrow keys, Home/End, number keys for quick-jump, chord sequences
+- **Fuzzy search** -- Search across all nodes with `/`
+- **Text search** -- `Ctrl+F` / `Cmd+F` to search message content with match highlighting
+- **Help overlay** -- `?` to show all keyboard shortcuts
+
+### Mobile
+
+- **Focus mode** -- Mobile-optimized single-node interface with swipe gestures
+- **Swipe navigation** -- Up/down to traverse the tree, left/right for sibling branches
+- **Haptic feedback** -- Vibration on supported devices
+- **Onboarding tutorial** -- Guided walkthrough for mobile gestures
+
+### Persistence & Replay
+
+- **Conversation storage** -- IndexedDB with localStorage fallback via `ConversationStore`
+- **Snapshot export** -- `snapshotToJSON()` and `snapshotToMarkdown()` for portable exports
+- **Replay controller** -- Step-through playback of conversation history with speed control
+- **Save indicator** -- Visual feedback for auto-save state
+
+### Node Actions
+
+- **Built-in actions** -- Duplicate, delete (with descendant variants), retry, edit, copy branch, compare
+- **Action system** -- Two-stage resolver with keyword matching and optional semantic search
+- **Slash commands** -- `/` command dropdown in the input
+- **Custom node types** -- Register your own node types via `NodeTypeRegistry`
+
+### Theming & i18n
+
+- **Theme system** -- Built-in dark, light, and high-contrast themes with `ThemeProvider`
+- **Custom themes** -- `createCustomTheme()` from a base theme + accent color
+- **CSS custom properties** -- All `--traek-*` variables scoped to the `base` layer for easy overrides
+- **Internationalization** -- All user-facing strings are customizable via the `translations` prop
+- **Tag system** -- Predefined and custom tags with filtering support
+
+### Accessibility
+
+- **ARIA live regions** -- Screen reader announcements for dynamic updates
+- **Keyboard-first** -- Full keyboard navigation without requiring a mouse
+- **Semantic HTML** -- Proper roles, labels, and landmarks throughout
 
 ---
 
-## 🧠 Mental Model
-
-træk separates **conversation structure** from **message rendering**.
-
-### TraekEngine
-
-Handles nodes, relationships, layout logic, and state.
-
-### TraekCanvas
-
-Renders the spatial UI and manages interaction.
-
-You control:
-
-- message creation
-- streaming
-- persistence
-- model orchestration
-
-træk keeps everything **navigable and coherent**.
-
----
-
-## 🚀 Quick Start
+## Quick Start
 
 Install the package:
 
@@ -128,25 +145,25 @@ Create a spatial AI chat:
 
 ```svelte
 <script lang="ts">
-	import { TraekCanvas, TraekEngine, DEFAULT_TRACK_ENGINE_CONFIG, type MessageNode } from 'traek';
+  import { TraekCanvas, TraekEngine, DEFAULT_TRACK_ENGINE_CONFIG, type MessageNode } from 'traek';
 
-	const engine = new TraekEngine(DEFAULT_TRACK_ENGINE_CONFIG);
+  const engine = new TraekEngine(DEFAULT_TRACK_ENGINE_CONFIG);
 
-	function onSendMessage(input: string, _userNode: MessageNode) {
-		engine.addNode(input, 'user');
+  function onSendMessage(input: string, _userNode: MessageNode) {
+    engine.addNode(input, 'user');
 
-		const assistantNode = engine.addNode('', 'assistant', {
-			autofocus: true
-		});
+    const assistantNode = engine.addNode('', 'assistant', {
+      autofocus: true
+    });
 
-		engine.updateNode(assistantNode.id, { status: 'streaming' });
+    engine.updateNode(assistantNode.id, { status: 'streaming' });
 
-		// stream chunks
-		// engine.updateNode(assistantNode.id, { content });
+    // stream chunks
+    // engine.updateNode(assistantNode.id, { content });
 
-		// when finished
-		// engine.updateNode(assistantNode.id, { status: 'done' });
-	}
+    // when finished
+    // engine.updateNode(assistantNode.id, { status: 'done' });
+  }
 </script>
 
 <TraekCanvas {engine} {onSendMessage} />
@@ -154,9 +171,215 @@ Create a spatial AI chat:
 
 ---
 
-## 🎯 Who træk Is For
+## Architecture
 
-træk is ideal if you are building:
+traek separates **conversation structure** from **message rendering**.
+
+### TraekEngine
+
+Core state management class. Manages the conversation tree: nodes, parent-child relationships, spatial layout (x/y coordinates), and operations like `addNode()`, `branchFrom()`, `focusOnNode()`, `moveNode()`.
+
+All data structures use Maps for O(1) lookups.
+
+### TraekCanvas
+
+Main exported component. Renders the interactive canvas with pan/zoom, message nodes, connection lines, and streaming input. Accepts `onSendMessage` callback and a customizable component map for node types.
+
+### Key Props
+
+```svelte
+<TraekCanvas
+  {engine}
+  {onSendMessage}
+  translations={{ canvas: { emptyStateTitle: 'Your custom title' } }}
+  nodeActions={createDefaultNodeActions({ onRetry, onEditNode })}
+  componentMap={{ text: CustomTextNode }}
+/>
+```
+
+You control:
+
+- message creation
+- streaming
+- persistence
+- model orchestration
+
+traek keeps everything **navigable and coherent**.
+
+---
+
+## Internationalization (i18n)
+
+All user-facing strings can be customized. Pass a partial translations object -- only override what you need:
+
+```svelte
+<TraekCanvas
+  {engine}
+  {onSendMessage}
+  translations={{
+    canvas: {
+      emptyStateTitle: 'Starte eine Konversation',
+      emptyStateSubtitle: 'Schreibe eine Nachricht'
+    },
+    input: {
+      placeholder: 'Frag den Experten...'
+    },
+    search: {
+      placeholder: 'Suchen...'
+    }
+  }}
+/>
+```
+
+The translations object is organized by feature area: `canvas`, `input`, `zoom`, `search`, `keyboard`, `fuzzySearch`, `nodeActions`, `textNode`, `toast`, `onboarding`, `tour`, `breadcrumb`, `loading`, `toolbar`, `replay`.
+
+Import the types for full IntelliSense:
+
+```typescript
+import type { TraekTranslations, PartialTraekTranslations } from 'traek';
+import { DEFAULT_TRANSLATIONS, mergeTranslations } from 'traek';
+```
+
+---
+
+## Theming
+
+traek ships with three built-in themes and a programmatic API:
+
+```svelte
+<script lang="ts">
+  import { ThemeProvider, ThemePicker, darkTheme, lightTheme, createCustomTheme } from 'traek';
+</script>
+
+<ThemeProvider theme={darkTheme}>
+  <TraekCanvas {engine} {onSendMessage} />
+  <ThemePicker />
+</ThemeProvider>
+```
+
+Or use CSS custom properties directly. All variables are scoped to the `base` layer:
+
+```css
+:root {
+  --traek-canvas-bg: #050816;
+  --traek-node-bg: #0b1020;
+  --traek-node-active-border: #4ade80;
+}
+```
+
+See the full list of `--traek-*` variables in the [theming docs](https://docs.gettraek.com).
+
+---
+
+## Persistence
+
+Save and load conversations with the built-in store:
+
+```typescript
+import { ConversationStore, snapshotToJSON, snapshotToMarkdown, downloadFile } from 'traek';
+
+const store = new ConversationStore();
+
+// Save
+await store.save(engine.snapshot());
+
+// Load
+const conversations = await store.list();
+const snapshot = await store.load(conversations[0].id);
+engine.restore(snapshot);
+
+// Export
+downloadFile('chat.json', snapshotToJSON(engine.snapshot()));
+downloadFile('chat.md', snapshotToMarkdown(engine.snapshot()));
+```
+
+---
+
+## Replay
+
+Step through conversation history:
+
+```svelte
+<script lang="ts">
+  import { ReplayController, ReplayControls } from 'traek';
+
+  const replay = new ReplayController(engine);
+</script>
+
+<ReplayControls controller={replay} />
+```
+
+---
+
+## Adding the traek MCP to Your Project
+
+The traek MCP (Model Context Protocol) server gives AI assistants like Claude Code full knowledge of the traek API, guides, and code snippets. It helps you integrate traek faster by providing your AI assistant with component docs, integration guides, and ready-to-use scaffolding.
+
+### What the MCP provides
+
+| Tool | Description |
+|------|-------------|
+| `get_component_api` | Full prop/method API for TraekCanvas, TraekEngine, etc. |
+| `list_exports` | All traek exports grouped by category |
+| `list_guides` | Available integration guides |
+| `get_guide` | Full text of an integration guide |
+| `search_docs` | Full-text search across all docs |
+| `list_snippets` | Available code snippets |
+| `get_snippet` | Runnable code snippet for a scenario |
+| `scaffold_page` | Generate a complete SvelteKit page + API route |
+
+### Option 1: Remote MCP (recommended)
+
+Add to your `.mcp.json` (project root) or `~/.claude/claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "traek": {
+      "type": "url",
+      "url": "https://mcp.gettraek.com"
+    }
+  }
+}
+```
+
+### Option 2: Local via npx
+
+```json
+{
+  "mcpServers": {
+    "traek": {
+      "command": "npx",
+      "args": ["-y", "@gettraek/mcp"]
+    }
+  }
+}
+```
+
+### Option 3: Install locally
+
+```bash
+npm install -D @gettraek/mcp
+```
+
+```json
+{
+  "mcpServers": {
+    "traek": {
+      "command": "node",
+      "args": ["node_modules/@gettraek/mcp/dist/index.js"]
+    }
+  }
+}
+```
+
+Once configured, your AI assistant can query traek docs, generate integration code, and scaffold pages directly.
+
+---
+
+## Who traek Is For
+
+traek is ideal if you are building:
 
 - AI chat products
 - agent interfaces
@@ -165,119 +388,48 @@ træk is ideal if you are building:
 - reasoning-heavy workflows
 - multi-path generation UIs
 
-If you only need a simple message list — træk is probably not the right tool.
+If you only need a simple message list -- traek is probably not the right tool.
 
 ---
 
-## 🎨 Styling & Theming
+## Exports
 
-træk ships unopinionated about your design system, but you can use CSS variables for basic color theming of the core engine elements without searching for specific classes. All styles and variables are scoped to the `base` layer, so you can easily override them without worrying about specificity issues.
+The main `traek` package exports:
 
-All variables live on `:root` (see `src/app.css` in this repo). The most important ones for the **engine UI** are:
+**Components:** `TraekCanvas`, `TextNode`, `DefaultLoadingOverlay`, `FocusMode`, `ReplayControls`, `SaveIndicator`, `ChatList`, `HeaderBar`, `ToastContainer`, `Toast`, `ThemeProvider`, `ThemePicker`, `DesktopTour`, `ActionBadges`, `SlashCommandDropdown`, `TagBadges`, `TagDropdown`, `TagFilter`
 
-```css
-/* Canvas + nodes */
---traek-canvas-bg: #0b0b0b;
---traek-node-bg: #161616;
---traek-node-border: #2a2a2a;
---traek-node-text: #dddddd;
---traek-node-active-border: #00d8ff;
---traek-node-active-glow: rgba(0, 216, 255, 0.15);
---traek-node-user-border-top: #00d8ff;
---traek-node-assistant-border-top: #ff3e00;
+**Engine:** `TraekEngine`, `DEFAULT_TRACK_ENGINE_CONFIG`, `wouldCreateCycle()`
 
---traek-connection-stroke: #333333;
---traek-connection-highlight: #00d8ff;
+**Actions:** `createDefaultNodeActions()`, `createDuplicateAction()`, `createDeleteAction()`, `createCopyBranchAction()`, `createRetryAction()`, `createEditAction()`, `createCompareAction()`, `ActionResolver`
 
-/* Floating input / context bar */
---traek-input-bg: rgba(30, 30, 30, 0.8);
---traek-input-border: #444444;
---traek-input-shadow: rgba(0, 0, 0, 0.4);
---traek-input-button-bg: #00d8ff;
---traek-input-button-text: #000000;
---traek-input-context-bg: rgba(0, 0, 0, 0.4);
---traek-input-context-text: #888888;
---traek-input-dot: #00d8ff;
---traek-input-dot-muted: #555555;
---traek-stats-text: #555555;
+**Persistence:** `ConversationStore`, `ReplayController`, `snapshotToJSON()`, `snapshotToMarkdown()`, `downloadFile()`
 
-/* Message text / markdown */
---traek-textnode-text: #dddddd;
---traek-textnode-bg: #222222;
---traek-markdown-quote-border: #444444;
---traek-markdown-quote-text: #999999;
---traek-markdown-hr: #333333;
---traek-scroll-hint-bg: linear-gradient(transparent, rgba(0, 0, 0, 0.5));
---traek-scroll-hint-text: #444444;
---traek-scrollbar-thumb: #333333;
---traek-scrollbar-thumb-hover: #444444;
---traek-typing-cursor: #ff3e00;
+**Theming:** `darkTheme`, `lightTheme`, `highContrastTheme`, `createCustomTheme()`, `applyThemeToRoot()`
 
-/* Thought / reasoning panel (MessageNodeWrapper) */
---traek-thought-panel-bg: rgba(22, 22, 22, 0.9);
---traek-thought-panel-border: #333333;
---traek-thought-panel-border-active: #00d8ff;
---traek-thought-panel-glow: rgba(0, 216, 255, 0.15);
+**i18n:** `DEFAULT_TRANSLATIONS`, `setTraekI18n()`, `getTraekI18n()`, `mergeTranslations()`
 
---traek-thought-header-bg: rgba(255, 255, 255, 0.03);
---traek-thought-header-border: #222222;
---traek-thought-header-muted: #666666;
---traek-thought-header-accent: #888888;
+**Node Types:** `NodeTypeRegistry`, `textNodeDefinition`, `thoughtNodeDefinition`
 
---traek-thought-tag-cyan: #00d8ff;
---traek-thought-tag-orange: #ff3e00;
---traek-thought-tag-gray: #444444;
+**Tags:** `PREDEFINED_TAGS`, `getNodeTags()`, `getTagConfig()`, `matchesTagFilter()`
 
---traek-thought-divider: rgba(255, 255, 255, 0.06);
---traek-thought-row-muted-1: #888888;
---traek-thought-row-muted-2: #aaaaaa;
---traek-thought-row-muted-3: #999999;
---traek-thought-row-muted-4: #666666;
---traek-thought-badge-cyan: #00dddd;
---traek-thought-footer-muted: #bbbbbb;
---traek-thought-footer-bg: rgba(0, 0, 0, 0.2);
---traek-thought-footer-border: rgba(255, 255, 255, 0.05);
---traek-thought-toggle-bg: #444444;
---traek-thought-toggle-border: #555555;
+**Validation:** Zod schemas for snapshots, configs, node types, and actions
 
-/* Global overlays (e.g. initial loading overlay) */
---traek-overlay-gradient-1: rgba(0, 0, 0, 0.7);
---traek-overlay-gradient-2: rgba(0, 0, 0, 0.9);
---traek-overlay-gradient-3: rgba(0, 0, 0, 1);
---traek-overlay-card-bg: rgba(15, 15, 15, 0.9);
---traek-overlay-card-border: rgba(255, 255, 255, 0.08);
---traek-overlay-card-shadow: rgba(0, 0, 0, 0.8);
---traek-overlay-text: #e5e5e5;
---traek-overlay-pill-bg: #00d8ff;
---traek-overlay-pill-shadow: rgba(0, 216, 255, 0.7);
-```
+---
 
-You can override any of these in your app’s `:root` (or a scoped container) to align træk with your own design system:
+## Status
 
-```css
-:root {
-	--traek-canvas-bg: #050816;
-	--traek-node-bg: #0b1020;
-	--traek-accent-cyan: #4ade80;
-}
-```
-
-For a complete list, check `src/app.css` in this repository.
-
-## 📦 Status
-
-træk is under active development and evolving quickly.
+traek is under active development and evolving quickly.
 
 Feedback, ideas, and contributions are welcome.
 
 ---
 
-## 🌲 Philosophy
+## Philosophy
 
 > AI conversations are not linear.
 > Stop designing them that way.
 
-**træk helps you build interfaces that think the way AI does.**
+**traek helps you build interfaces that think the way AI does.**
 
 ## License
 
