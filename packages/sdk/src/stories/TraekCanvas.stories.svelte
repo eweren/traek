@@ -1,12 +1,12 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
-	import TraekCanvas from '$lib/TraekCanvas.svelte';
+	import TraekCanvas from '../TraekCanvas.svelte';
 	import {
 		TraekEngine,
 		DEFAULT_TRACK_ENGINE_CONFIG,
 		type TraekEngineConfig,
 		type MessageNode
-	} from '$lib/TraekEngine.svelte';
+	} from '../TraekEngine.svelte';
 	import BenchmarkCanvas from './BenchmarkCanvas.svelte';
 	import StreamingStoryWrapper from './StreamingStoryWrapper.svelte';
 

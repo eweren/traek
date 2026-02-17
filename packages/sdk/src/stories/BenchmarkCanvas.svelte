@@ -1,10 +1,10 @@
 <script lang="ts">
-	import TraekCanvas from '$lib/TraekCanvas.svelte';
+	import TraekCanvas from '../TraekCanvas.svelte';
 	import {
 		TraekEngine,
 		DEFAULT_TRACK_ENGINE_CONFIG,
 		type AddNodePayload
-	} from '$lib/TraekEngine.svelte';
+	} from '../TraekEngine.svelte';
 
 	const LOG_CONTEXT = 'BenchmarkCanvas';
 

@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import TraekCanvas from '$lib/TraekCanvas.svelte';
+	import TraekCanvas from '../TraekCanvas.svelte';
 	import {
 		TraekEngine,
 		DEFAULT_TRACK_ENGINE_CONFIG,
 		type MessageNode
-	} from '$lib/TraekEngine.svelte';
+	} from '../TraekEngine.svelte';
 
 	const STREAMING_CONTENT = `Based on what you’ve shared, I’d start by narrowing the question to one main decision or outcome you need help with. Add 2–3 short context bullets and any constraints (time, budget, team). That’s usually enough for a useful first answer.
 
