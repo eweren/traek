@@ -1,7 +1,7 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
-	import BranchCompare from '$lib/compare/BranchCompare.svelte';
-	import { TraekEngine, DEFAULT_TRACK_ENGINE_CONFIG } from '$lib/TraekEngine.svelte';
+	import BranchCompare from './BranchCompare.svelte';
+	import { TraekEngine, DEFAULT_TRACK_ENGINE_CONFIG } from '../TraekEngine.svelte';
 
 	const { Story } = defineMeta({
 		title: 'Organisms/BranchCompare',

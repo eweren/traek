@@ -1,7 +1,7 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
-	import Toast from '$lib/toast/Toast.svelte';
-	import type { Toast as ToastType } from '$lib/toast/toastStore.svelte';
+	import Toast from './Toast.svelte';
+	import type { Toast as ToastType } from './toastStore.svelte';
 
 	const { Story } = defineMeta({
 		title: 'Atoms/Toast',

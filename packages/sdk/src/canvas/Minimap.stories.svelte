@@ -1,8 +1,8 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
-	import Minimap from '$lib/canvas/Minimap.svelte';
-	import { ViewportManager } from '$lib/canvas/ViewportManager.svelte';
-	import { TraekEngine, DEFAULT_TRACK_ENGINE_CONFIG } from '$lib/TraekEngine.svelte';
+	import Minimap from './Minimap.svelte';
+	import { ViewportManager } from './ViewportManager.svelte';
+	import { TraekEngine, DEFAULT_TRACK_ENGINE_CONFIG } from '../TraekEngine.svelte';
 
 	const { Story } = defineMeta({
 		title: 'Molecules/Minimap',

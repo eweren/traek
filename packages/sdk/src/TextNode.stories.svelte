@@ -1,7 +1,7 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
-	import TextNode from '$lib/TextNode.svelte';
-	import { TraekEngine, DEFAULT_TRACK_ENGINE_CONFIG } from '$lib/TraekEngine.svelte';
+	import TextNode from './TextNode.svelte';
+	import { TraekEngine, DEFAULT_TRACK_ENGINE_CONFIG } from './TraekEngine.svelte';
 
 	const { Story } = defineMeta({
 		title: 'Atoms/TextNode',

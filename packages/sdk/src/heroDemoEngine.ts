@@ -2,7 +2,7 @@ import {
 	TraekEngine,
 	DEFAULT_TRACK_ENGINE_CONFIG,
 	type TraekEngineConfig
-} from '$lib/TraekEngine.svelte';
+} from './TraekEngine.svelte';
 import ExampleCustomComponent from './ExampleCustomComponent.svelte';
 
 /**

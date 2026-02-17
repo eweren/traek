@@ -1,6 +1,6 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
-	import SearchBar from '$lib/search/SearchBar.svelte';
+	import SearchBar from './SearchBar.svelte';
 
 	const { Story } = defineMeta({
 		title: 'Molecules/SearchBar',

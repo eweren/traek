@@ -1,7 +1,7 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
-	import TraekNodeWrapper from '$lib/TraekNodeWrapper.svelte';
-	import { TraekEngine, DEFAULT_TRACK_ENGINE_CONFIG } from '$lib/TraekEngine.svelte';
+	import TraekNodeWrapper from './TraekNodeWrapper.svelte';
+	import { TraekEngine, DEFAULT_TRACK_ENGINE_CONFIG } from './TraekEngine.svelte';
 
 	const { Story } = defineMeta({
 		title: 'Molecules/TraekNodeWrapper',
