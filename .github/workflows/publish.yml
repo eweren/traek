@@ -32,17 +32,22 @@ jobs:
     needs: validate
     permissions:
       contents: read
-      id-token: write
+      id-token: write # Required for npm OIDC trusted publishing
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24 # Node 22.14+ / npm 11.5.1+ required for OIDC
           cache: pnpm
           registry-url: https://registry.npmjs.org
       - run: pnpm install --frozen-lockfile
       - run: pnpm run build
 
+      # Trusted publishing (OIDC): no NODE_AUTH_TOKEN. Ensure the package has
+      # a trusted publisher on npm (Settings → Trusted publishing) with workflow
+      # filename exactly "publish.yml" and this repo.
       - name: Publish
         run: pnpm --filter traek publish
+        env:
+          NODE_AUTH_TOKEN: '' # Force OIDC; remove any repo secret NPM_TOKEN/NODE_AUTH_TOKEN
