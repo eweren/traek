@@ -1,7 +1,7 @@
 import { ResourceTemplate } from '@modelcontextprotocol/sdk/server/mcp.js'
-import { getComponentDoc, componentDocs } from '../data/components.js'
-import { getGuide } from '../data/guides.js'
-import { getSnippet } from '../data/snippets.js'
+import { getComponentDoc, componentDocs } from '../data/components'
+import { getGuide } from '../data/guides'
+import { getSnippet } from '../data/snippets'
 
 function formatComponentAsMarkdown(name: string): string {
 	const doc = getComponentDoc(name)

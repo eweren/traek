@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { getSnippet, listSnippets } from '../data/snippets.js'
+import { getSnippet, listSnippets } from '../data/snippets'
 
 /** Generate a complete SvelteKit page scaffold based on the requested features. */
 function generateScaffold(options: {

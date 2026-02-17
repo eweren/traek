@@ -3,9 +3,9 @@ import {
 	componentDocs,
 	getComponentDoc,
 	searchComponentDocs,
-} from '../data/components.js'
-import { getGuide, listGuides, searchGuides } from '../data/guides.js'
-import { listSnippets } from '../data/snippets.js'
+} from '../data/components'
+import { getGuide, listGuides, searchGuides } from '../data/guides'
+import { listSnippets } from '../data/snippets'
 
 function formatPropTable(props: NonNullable<ReturnType<typeof getComponentDoc>>['props']): string {
 	if (!props || props.length === 0) return ''

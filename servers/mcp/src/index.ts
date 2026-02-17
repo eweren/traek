@@ -22,9 +22,9 @@
  */
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
-import { docTools } from './tools/docs.js'
-import { scaffoldTools } from './tools/scaffold.js'
-import { resourceHandlers } from './resources/docs.js'
+import { docTools } from './tools/docs'
+import { scaffoldTools } from './tools/scaffold'
+import { resourceHandlers } from './resources/docs'
 
 const server = new McpServer({
 	name: 'traek-mcp',
