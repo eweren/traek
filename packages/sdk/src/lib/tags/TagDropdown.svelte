@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { slide } from 'svelte/transition';
 	import type { Node, TraekEngine } from '../TraekEngine.svelte';
 	import { PREDEFINED_TAGS, getNodeTags } from './tagUtils';
 
@@ -8,10 +7,28 @@
 
 	let isOpen = $state(false);
 	let customTagInput = $state('');
+	let triggerEl = $state<HTMLButtonElement | null>(null);
+	let panelTop = $state(0);
+	let panelLeft = $state(0);
 
 	const nodeTags = $derived(getNodeTags(node));
 
+	/** Svelte action that teleports an element to document.body, escaping any overflow/transform context. */
+	function portal(el: HTMLElement) {
+		document.body.appendChild(el);
+		return {
+			destroy() {
+				el.remove();
+			}
+		};
+	}
+
 	function toggleDropdown() {
+		if (!isOpen && triggerEl) {
+			const rect = triggerEl.getBoundingClientRect();
+			panelTop = rect.bottom + 4;
+			panelLeft = rect.left;
+		}
 		isOpen = !isOpen;
 	}
 
@@ -69,6 +86,7 @@
 		role="presentation"
 		tabindex="-1"
 		onclick={handleBackdropClick}
+		use:portal
 	></div>
 {/if}
 
@@ -76,6 +94,7 @@
 	<button
 		type="button"
 		class="tag-dropdown-trigger"
+		bind:this={triggerEl}
 		onclick={toggleDropdown}
 		title="Manage tags"
 		aria-expanded={isOpen}
@@ -88,7 +107,7 @@
 	</button>
 
 	{#if isOpen}
-		<div class="tag-dropdown-panel" transition:slide={{ duration: 200 }}>
+		<div class="tag-dropdown-panel" style:top="{panelTop}px" style:left="{panelLeft}px" use:portal>
 			<div class="tag-dropdown-header">Add Tags</div>
 
 			<div class="tag-list">
@@ -193,10 +212,7 @@
 	}
 
 	.tag-dropdown-panel {
-		position: absolute;
-		top: 100%;
-		left: 0;
-		margin-top: 4px;
+		position: fixed;
 		min-width: 200px;
 		background: var(--traek-thought-panel-bg, rgba(22, 22, 22, 0.95));
 		border: 1px solid var(--traek-thought-panel-border, #333333);

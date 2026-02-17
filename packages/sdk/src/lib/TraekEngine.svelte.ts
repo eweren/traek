@@ -1,8 +1,7 @@
-import { browser } from '$app/environment';
 import type { Component } from 'svelte';
 import { SvelteSet } from 'svelte/reactivity';
-import { conversationSnapshotSchema } from './persistence/schemas.js';
-import { searchNodes as searchNodesUtil } from './search/searchUtils.js';
+import { conversationSnapshotSchema, type ConversationSnapshot } from '$lib/persistence/schemas';
+import { searchNodes as searchNodesUtil } from '$lib/search/searchUtils';
 
 export type NodeStatus = 'streaming' | 'done' | 'error';
 
@@ -298,7 +297,7 @@ export class TraekEngine {
 
 		this.onNodeCreated?.(newNode);
 
-		if (options.autofocus && browser) {
+		if (options.autofocus && typeof window !== 'undefined') {
 			requestAnimationFrame(() => {
 				this.pendingFocusNodeId = newNode.id;
 			});
@@ -353,7 +352,7 @@ export class TraekEngine {
 
 		this.onNodeCreated?.(newNode);
 
-		if (options.autofocus && browser) {
+		if (options.autofocus && typeof window !== 'undefined') {
 			requestAnimationFrame(() => {
 				this.pendingFocusNodeId = newNode.id;
 			});
@@ -1293,7 +1292,7 @@ export class TraekEngine {
 
 	/** Create an engine from a serialized snapshot. Validates input with Zod. */
 	static fromSnapshot(
-		snapshot: import('./persistence/types.js').ConversationSnapshot,
+		snapshot: ConversationSnapshot,
 		config?: Partial<TraekEngineConfig>
 	): TraekEngine {
 		const result = conversationSnapshotSchema.safeParse(snapshot);

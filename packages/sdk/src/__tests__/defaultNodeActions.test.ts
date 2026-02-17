@@ -5,8 +5,8 @@ import {
 	createRetryAction,
 	createEditAction,
 	createDefaultNodeActions
-} from '../defaultNodeActions';
-import type { Node, TraekEngine } from '../TraekEngine.svelte';
+} from '../lib/defaultNodeActions';
+import type { Node, TraekEngine } from '../lib/TraekEngine.svelte';
 
 function createMockNode(overrides: Partial<Node> = {}): Node {
 	return {

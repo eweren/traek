@@ -8,6 +8,8 @@
 		config,
 		activeAncestorIds,
 		hoveredNodeId = null,
+		focusedNodeId = null,
+		activeNodeId = null,
 		hoveredConnection = $bindable(null),
 		connectionDrag,
 		collapsedNodes = new Set(),
@@ -18,12 +20,17 @@
 		config: TraekEngineConfig;
 		activeAncestorIds: Set<string> | null;
 		hoveredNodeId?: string | null;
+		focusedNodeId?: string | null;
+		activeNodeId?: string | null;
 		hoveredConnection: { parentId: string; childId: string } | null;
 		connectionDrag: ConnectionDragState | null;
 		collapsedNodes?: Set<string>;
 		visibleNodeIds?: Set<string>;
 		onDeleteConnection: (parentId: string, childId: string) => void;
 	} = $props();
+
+	/** Node whose path to root should be highlighted (hover > focus > active/click). */
+	const highlightNodeId = $derived(hoveredNodeId ?? focusedNodeId ?? activeNodeId ?? null);
 
 	/**
 	 * Get the CSS color variable for a node role.
@@ -97,50 +104,24 @@
 	}
 
 	/**
-	 * Get direct children IDs of a node.
+	 * Ancestors of the highlight node (path from node up to root). Used to mark all
+	 * connections that lead TO this node (backtracked to root).
 	 */
-	function getDirectChildrenIds(nodeId: string): Set<string> {
-		// eslint-disable-next-line svelte/prefer-svelte-reactivity
-		const childIds = new Set<string>();
-		for (const node of nodes) {
-			if (node.parentIds.includes(nodeId) && node.type !== 'thought') {
-				childIds.add(node.id);
-			}
-		}
-		return childIds;
-	}
+	const highlightAncestors = $derived(highlightNodeId ? getAncestorIds(highlightNodeId) : null);
 
-	/**
-	 * Compute hover-related sets ONCE per render, outside the connection loop.
-	 * A connection should be highlighted if:
-	 * 1. Both parent and child are on the ancestor path to the hovered node, OR
-	 * 2. The parent is the hovered node and the child is a direct child
-	 */
-	const hoveredAncestors = $derived(hoveredNodeId ? getAncestorIds(hoveredNodeId) : null);
-	const hoveredChildren = $derived(hoveredNodeId ? getDirectChildrenIds(hoveredNodeId) : null);
-
+	/** True if this edge (parent → child) lies on any path from root to the highlight node. */
 	function isConnectionHighlighted(parentId: string, childId: string): boolean {
-		if (!hoveredNodeId || !hoveredAncestors || !hoveredChildren) return false;
+		if (!highlightNodeId || !highlightAncestors) return false;
 
-		// Case 1: Connection on ancestor path (both parent and child are ancestors OR child is hovered node)
-		const parentIsAncestor = hoveredAncestors.has(parentId);
-		const childIsAncestor = hoveredAncestors.has(childId);
-		const childIsHovered = childId === hoveredNodeId;
+		const parentIsAncestor = highlightAncestors.has(parentId);
+		const childIsAncestor = highlightAncestors.has(childId);
+		const childIsHighlightNode = childId === highlightNodeId;
 
-		if (parentIsAncestor && (childIsAncestor || childIsHovered)) {
-			return true;
-		}
-
-		// Case 2: Direct child connection (parent is hovered, child is direct child)
-		if (parentId === hoveredNodeId && hoveredChildren.has(childId)) {
-			return true;
-		}
-
-		return false;
+		return parentIsAncestor && (childIsAncestor || childIsHighlightNode);
 	}
 </script>
 
-<!-- SVG defs for gradients -->
+<!-- SVG defs for gradients (userSpaceOnUse so vertical lines get a valid gradient) -->
 <defs>
 	{#each nodes as node (node.id)}
 		{#if node.parentIds.length > 0 && node.type !== 'thought'}
@@ -150,7 +131,23 @@
 					{@const gradientId = `gradient-${pid}-${node.id}`}
 					{@const parentColor = getRoleColor(parent.role)}
 					{@const childColor = getRoleColor(node.role)}
-					<linearGradient id={gradientId} x1="0%" y1="0%" x2="0%" y2="100%">
+					{@const gParentX = (parent.metadata?.x ?? 0) * config.gridStep}
+					{@const gParentY = (parent.metadata?.y ?? 0) * config.gridStep}
+					{@const gParentH = parent.metadata?.height ?? config.nodeHeightDefault}
+					{@const gChildX = (node.metadata?.x ?? 0) * config.gridStep}
+					{@const gChildY = (node.metadata?.y ?? 0) * config.gridStep}
+					{@const gx1 = gParentX + config.nodeWidth / 2}
+					{@const gy1 = gParentY + gParentH}
+					{@const gx2 = gChildX + config.nodeWidth / 2}
+					{@const gy2 = gChildY}
+					<linearGradient
+						id={gradientId}
+						gradientUnits="userSpaceOnUse"
+						x1={gx1}
+						y1={gy1}
+						x2={gx2}
+						y2={gy2}
+					>
 						<stop offset="0%" stop-color={parentColor} />
 						<stop offset="100%" stop-color={childColor} />
 					</linearGradient>

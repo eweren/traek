@@ -4,7 +4,9 @@
 	"type": "module",
 	"packageManager": "pnpm@10.29.3",
 	"scripts": {
-		"dev": "turbo dev --filter=@traek/web",
+		"dev": "turbo dev --filter=@traek/web --continue && pnpm run turbo watch",
+		"watch": "turbo watch",
+		"clean": "turbo clean && rm -rf node_modules .svelte-kit build coverage .turbo .pnpm-store dist test-results",
 		"build": "turbo build",
 		"test": "turbo test",
 		"lint": "turbo lint",

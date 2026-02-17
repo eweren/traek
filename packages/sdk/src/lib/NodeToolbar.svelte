@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Icon from '@iconify/svelte';
-	import type { NodeTypeAction, ActionVariant } from './node-types/types.js';
+	import type { NodeTypeAction, ActionVariant } from './node-types/types';
 	import type { Node, TraekEngine } from './TraekEngine.svelte';
 	import TagDropdown from './tags/TagDropdown.svelte';
 

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { markdownToHtml } from '../utils';
+import { markdownToHtml } from '../lib/utils';
 
 describe('markdownToHtml', () => {
 	describe('basic markdown rendering', () => {

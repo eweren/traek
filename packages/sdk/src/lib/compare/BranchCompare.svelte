@@ -142,7 +142,7 @@
 				</div>
 				<div class="compare-pane-body">
 					<div class="compare-text">
-						{#each leftSegments as segment (segment)}
+						{#each leftSegments as segment, i (i)}
 							<span class="diff-segment diff-segment--{segment.type}">{segment.text}</span>
 						{/each}
 					</div>
@@ -162,7 +162,7 @@
 				</div>
 				<div class="compare-pane-body">
 					<div class="compare-text">
-						{#each rightSegments as segment (segment)}
+						{#each rightSegments as segment, i (i)}
 							<span class="diff-segment diff-segment--{segment.type}">{segment.text}</span>
 						{/each}
 					</div>

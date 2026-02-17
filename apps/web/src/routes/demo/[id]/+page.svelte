@@ -163,17 +163,110 @@
 			| MessageNode
 			| undefined;
 		if (!userNode) return;
-		// Delete the assistant node and its descendants
-		engine.deleteNodeAndDescendants(nodeId);
-		// Re-send with the original user message
+		// Retry only the selected node: re-stream into it and mark its descendants as outdated
 		const userContent = userNode.content ?? '';
-		const actions = (userNode.data as { actions?: string[] })?.actions;
-		onSendMessage(userContent, userNode, actions);
+		onSendMessage(userContent, userNode, undefined, nodeId);
 	}
 
-	async function onSendMessage(input: string, userNode: MessageNode, action?: string | string[]) {
+	async function onSendMessage(
+		input: string,
+		userNode: MessageNode,
+		action?: string | string[],
+		retryNodeId?: string
+	) {
 		const eng = engine;
 		if (!eng || !id) return;
+
+		// --- Retry path: stream into existing node, no delete; mark dependent nodes outdated ---
+		if (retryNodeId) {
+			const path = pathToUserNode(eng, userNode);
+			const messages = path.map((n) => ({
+				role: n.role,
+				content: (n.content ?? '').trim()
+			}));
+
+			const descendants = eng.getDescendants(retryNodeId);
+			for (const desc of descendants) {
+				if (desc.role === 'assistant' && desc.metadata) {
+					eng.updateNode(desc.id, { metadata: { ...desc.metadata, outdated: true } });
+				}
+			}
+
+			eng.updateNode(retryNodeId, {
+				status: 'streaming',
+				errorMessage: undefined,
+				content: ''
+			});
+
+			const thoughtChildren = eng.getChildren(retryNodeId).filter((c) => c.type === 'thought');
+			const thoughtNodeId =
+				thoughtChildren.length > 0
+					? thoughtChildren[0].id
+					: eng.addNode('Thinking...', 'assistant', {
+							type: 'thought',
+							parentIds: [retryNodeId]
+						}).id;
+
+			async function runOneBranch(responseNodeId: string, thoughtNodeId: string) {
+				if (!eng) return;
+				const e = eng;
+				function setThinkingDone() {
+					e.updateNode(thoughtNodeId, { content: 'Done' });
+				}
+				try {
+					const res = await fetch('/api/chat', {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({ messages })
+					});
+
+					if (!res.ok) {
+						setThinkingDone();
+						const err = await res.json().catch(() => ({ error: res.statusText }));
+						const data = err as { error?: string; retryAfter?: number };
+						let msg = data.error ?? 'Request failed';
+						if (res.status === 429 && data.retryAfter != null) {
+							const hours = Math.ceil(data.retryAfter / 3600);
+							msg += hours > 0 ? ` Try again in ${hours} hour(s).` : ' Try again later.';
+						}
+						eng.updateNode(responseNodeId, { status: 'error', errorMessage: msg });
+						return;
+					}
+
+					const reader = res.body?.getReader();
+					if (!reader) {
+						setThinkingDone();
+						eng.updateNode(responseNodeId, { status: 'done' });
+						return;
+					}
+
+					const decoder = new TextDecoder();
+					let content = '';
+					let thinkingDone = false;
+					while (true) {
+						const { done, value } = await reader.read();
+						if (done) break;
+						content += decoder.decode(value, { stream: true });
+						if (!thinkingDone && content.length > 0) {
+							thinkingDone = true;
+							setThinkingDone();
+						}
+						eng.updateNode(responseNodeId, { content });
+					}
+					if (!thinkingDone) setThinkingDone();
+					eng.updateNode(responseNodeId, { status: 'done' });
+				} catch (err) {
+					setThinkingDone();
+					eng.updateNode(responseNodeId, {
+						status: 'error',
+						errorMessage: err instanceof Error ? err.message : 'Stream failed'
+					});
+				}
+			}
+
+			await runOneBranch(retryNodeId, thoughtNodeId);
+			return;
+		}
 
 		const selected = Array.isArray(action) ? (action as string[]) : action ? [action] : [];
 		track('demo-send-message', {

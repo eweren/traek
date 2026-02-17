@@ -9,11 +9,13 @@
 		},
 		"dev": {
 			"cache": false,
-			"persistent": true
+			"persistent": true,
+			"env": ["OPENAI_API_KEY", "CHAT_DAILY_LIMIT_PER_IP"]
 		},
 		"check": {
 			"dependsOn": ["^build"]
 		},
+		"clean": {},
 		"lint": {
 			"dependsOn": ["^lint"]
 		},

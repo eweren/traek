@@ -20,6 +20,7 @@
 		viewportResizeVersion = 0,
 		scale = 1,
 		onRetry,
+		onNodeActivated,
 		children
 	}: {
 		node: Node;
@@ -32,6 +33,8 @@
 		viewportResizeVersion?: number;
 		scale?: number;
 		onRetry?: (nodeId: string) => void;
+		/** Called when the user explicitly selects this node (click or Enter/Space on header). */
+		onNodeActivated?: (nodeId: string) => void;
 		children: import('svelte').Snippet;
 	} = $props();
 
@@ -167,18 +170,26 @@
 			onclick={(e) => {
 				e.stopPropagation();
 				if (engine) engine.activeNodeId = node.id;
+				onNodeActivated?.(node.id);
 			}}
 			onkeydown={(e) => {
 				if (e.key === 'Enter' || e.key === ' ') {
 					e.preventDefault();
 					if (engine) engine.activeNodeId = node.id;
+					onNodeActivated?.(node.id);
 				}
 			}}
 		>
 			<span class="role-indicator">
 				{node.role === 'user' ? '● User' : '◆ Assistant'}
 				{#if isOutdated}
-					<span class="header-status header-status--outdated">· Outdated</span>
+					<span
+						class="header-status header-status--outdated"
+						title="This reply was based on a previous version of the message above."
+						aria-label="Outdated: this reply was based on a previous version of the message above."
+					>
+						· Outdated
+					</span>
 				{:else if node.status === 'streaming'}
 					<span class="header-status header-status--streaming" role="status">
 						<span class="header-status-spinner"></span>
@@ -212,6 +223,7 @@
 				{isCollapsed ? '+' : '−'}
 			</button>
 		{/if}
+		<TagBadges {node} {engine} />
 	</div>
 	{#if isCollapsed && hiddenCount > 0}
 		<div class="hidden-count-badge">
@@ -260,7 +272,6 @@
 			</div>
 		</div>
 	{/if}
-	<TagBadges {node} {engine} />
 	{#if thoughtChild}
 		<div class="thought-inline">
 			<button

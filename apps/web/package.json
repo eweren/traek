@@ -8,6 +8,7 @@
 		"build": "vite build",
 		"preview": "vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"clean": "rm -rf node_modules dist .svelte-kit coverage build .turbo",
 		"lint": "eslint .",
 		"format": "prettier --write .",
 		"test:e2e": "playwright test",
@@ -42,6 +43,7 @@
 		"svelte-check": "^4.3.6",
 		"typescript": "^5.9.3",
 		"typescript-eslint": "^8.56.0",
-		"vite": "^7.3.1"
+		"vite": "^7.3.1",
+		"vitest": "^4.0.18"
 	}
 }

@@ -285,6 +285,12 @@
 	let editingNodeId = $state<string | null>(null);
 	let lastEditedNodeId = $state<string | null>(null);
 
+	/** Node the user explicitly selected (click/Enter). Used for path highlight only — not set when activeNodeId is set by code (e.g. new node). */
+	let userSelectedNodeId = $state<string | null>(null);
+	$effect(() => {
+		if (!engine?.activeNodeId) userSelectedNodeId = null;
+	});
+
 	// Branch celebration tracking
 	let celebratedBranches = $state(new Set<string>());
 	let branchCelebration = $state<string | null>(null);
@@ -450,8 +456,11 @@
 		onSendMessage?.(lastInput, userNode, actionArg);
 	}
 
+	const activeNodeIdForHighlight = $derived(userSelectedNodeId ?? engine?.activeNodeId ?? null);
 	const activeAncestorIds = $derived(
-		engine?.activeNodeId ? new Set(engine.getAncestorPath(engine.activeNodeId)) : null
+		activeNodeIdForHighlight && engine
+			? new Set(engine.getAncestorPath(activeNodeIdForHighlight))
+			: null
 	);
 
 	function handleBuiltInEdit(nodeId: string) {
@@ -535,6 +544,12 @@
 		const filtered = merged.filter((a) => {
 			if (a.id === 'retry' && activeNode.role !== 'assistant') return false;
 			if (a.id === 'edit' && activeNode.role !== 'user') return false;
+			if (a.id === 'compare') {
+				const branchChildren = engine
+					.getChildren(activeNode.id)
+					.filter((c) => c.type !== 'thought');
+				if (branchChildren.length < 2) return false;
+			}
 			return true;
 		});
 
@@ -612,6 +627,8 @@
 								{config}
 								{activeAncestorIds}
 								hoveredNodeId={interaction.hoveredNodeId}
+								focusedNodeId={keyboardNavigator?.focusedNodeId ?? null}
+								activeNodeId={userSelectedNodeId}
 								bind:hoveredConnection={interaction.hoveredConnection}
 								connectionDrag={interaction.connectionDrag}
 								collapsedNodes={engine.collapsedNodes}
@@ -638,6 +655,7 @@
 					onEditCancel={handleEditCancel}
 					onEditNode={onEditNode ?? handleBuiltInEdit}
 					{onRetry}
+					onNodeActivated={(nodeId) => (userSelectedNodeId = nodeId)}
 					focusedNodeId={keyboardNavigator?.focusedNodeId}
 				/>
 
@@ -809,7 +827,7 @@
 	@layer base {
 		.viewport {
 			width: 100%;
-			height: 100vh;
+			height: 100%;
 			background-color: var(--traek-canvas-bg, #0b0b0b);
 			overflow: hidden;
 			position: relative;

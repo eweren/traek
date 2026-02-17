@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { tick } from 'svelte';
-	import { fadedSlide } from './transitions.js';
+	import { fadedSlide } from './transitions';
 	import type { TraekEngine } from './TraekEngine.svelte';
 	import TraekNodeWrapper from './TraekNodeWrapper.svelte';
 	import { markdownToHtml } from './utils';
@@ -143,6 +143,79 @@
 			}
 		}
 	});
+
+	/**
+	 * Walk all text nodes inside container and wrap every occurrence of query
+	 * in a <mark class="search-highlight"> element.
+	 * Clears previous highlights before applying new ones.
+	 */
+	function highlightTextInDom(container: HTMLElement, query: string) {
+		// Remove existing highlights by unwrapping <mark class="search-highlight"> elements
+		container.querySelectorAll('mark.search-highlight').forEach((mark) => {
+			const parent = mark.parentNode;
+			if (parent) {
+				parent.replaceChild(document.createTextNode(mark.textContent ?? ''), mark);
+				parent.normalize();
+			}
+		});
+
+		if (!query.trim()) return;
+
+		const lowerQuery = query.toLowerCase();
+		const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
+		const textNodes: Text[] = [];
+		let current: Text | null;
+		while ((current = walker.nextNode() as Text | null)) {
+			textNodes.push(current);
+		}
+
+		for (const textNode of textNodes) {
+			const text = textNode.textContent ?? '';
+			const lowerText = text.toLowerCase();
+
+			// Collect all match positions in this text node
+			const positions: { start: number; end: number }[] = [];
+			let pos = 0;
+			while (pos < lowerText.length) {
+				const idx = lowerText.indexOf(lowerQuery, pos);
+				if (idx === -1) break;
+				positions.push({ start: idx, end: idx + query.length });
+				pos = idx + 1;
+			}
+
+			if (positions.length === 0) continue;
+
+			const frag = document.createDocumentFragment();
+			let lastEnd = 0;
+
+			for (const { start, end } of positions) {
+				if (start > lastEnd) {
+					frag.appendChild(document.createTextNode(text.slice(lastEnd, start)));
+				}
+				const mark = document.createElement('mark');
+				mark.className = 'search-highlight';
+				mark.textContent = text.slice(start, end);
+				frag.appendChild(mark);
+				lastEnd = end;
+			}
+
+			if (lastEnd < text.length) {
+				frag.appendChild(document.createTextNode(text.slice(lastEnd)));
+			}
+
+			textNode.parentNode?.replaceChild(frag, textNode);
+		}
+	}
+
+	// Apply search highlights whenever searchQuery or rendered content changes
+	$effect(() => {
+		const query = engine?.searchQuery ?? '';
+		// Access renderedContent to re-run when content changes (e.g. during streaming)
+		const _content = renderedContent;
+		const container = scrollContainer;
+		if (!container) return;
+		tick().then(() => highlightTextInDom(container, query));
+	});
 </script>
 
 <TraekNodeWrapper
@@ -177,7 +250,6 @@
 		</div>
 	{:else if detailLevel === 'full'}
 		<!-- Full detail: render complete markdown -->
-		<!-- svelte-ignore a11y_no_static_element_interactions -->
 		<div
 			bind:this={scrollContainer}
 			class="content-area custom-scrollbar"
@@ -325,6 +397,13 @@
 			width: 8px;
 			animation: blink 1s infinite;
 			color: var(--traek-typing-cursor, #ff3e00);
+		}
+
+		:global(.search-highlight) {
+			background: rgba(255, 200, 0, 0.35);
+			color: inherit;
+			border-radius: 2px;
+			padding: 0 1px;
 		}
 
 		@keyframes blink {

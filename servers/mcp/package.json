@@ -14,6 +14,7 @@
 		"build": "tsup src/index.ts --format esm --out-dir dist --clean",
 		"start": "node dist/index.js",
 		"lint": "prettier --check .",
+		"clean": "rm -rf node_modules dist .svelte-kit coverage build .turbo",
 		"format": "prettier --write .",
 		"check": "tsc --noEmit"
 	},

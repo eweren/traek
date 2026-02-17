@@ -6,7 +6,8 @@
 	"scripts": {
 		"dev": "astro dev",
 		"build": "astro build",
-		"preview": "astro preview"
+		"preview": "astro preview",
+		"clean": "rm -rf node_modules dist coverage build .turbo"
 	},
 	"dependencies": {
 		"@astrojs/starlight": "^0.37.6",

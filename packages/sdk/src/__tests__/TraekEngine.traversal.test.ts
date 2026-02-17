@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { TraekEngine } from '../TraekEngine.svelte';
+import { TraekEngine } from '../lib/TraekEngine.svelte';
 
 beforeEach(() => {
 	globalThis.requestAnimationFrame = (cb: FrameRequestCallback) => {

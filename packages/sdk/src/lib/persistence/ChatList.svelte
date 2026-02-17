@@ -5,11 +5,10 @@
 	interface Props {
 		store: ConversationStore;
 		onSelect: (id: string) => void;
-		onCreate?: () => void;
 		class?: string;
 	}
 
-	let { store, onSelect, onCreate, class: className = '' }: Props = $props();
+	let { store, onSelect, class: className = '' }: Props = $props();
 
 	const conversations = $derived(store.conversations);
 	let editingId = $state<string | null>(null);
@@ -101,20 +100,6 @@
 </script>
 
 <div class="chat-list {className}">
-	<div class="header">
-		{#if onCreate}
-			<button type="button" class="new-chat" onclick={onCreate}>
-				<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-					<path
-						d="M8 0a1 1 0 0 1 1 1v6h6a1 1 0 1 1 0 2H9v6a1 1 0 1 1-2 0V9H1a1 1 0 0 1 0-2h6V1a1 1 0 0 1 1-1z"
-						fill="currentColor"
-					/>
-				</svg>
-				<span>New chat</span>
-			</button>
-		{/if}
-	</div>
-
 	<div class="list">
 		{#if conversations.length === 0}
 			<div class="empty">

@@ -1,5 +1,5 @@
 import type { ConversationSnapshot, SerializedNode } from './types.js';
-import { TraekEngine, type TraekEngineConfig } from '../TraekEngine.svelte';
+import { TraekEngine, type TraekEngineConfig } from '../TraekEngine.svelte.js';
 
 /**
  * Replays a conversation snapshot step by step, adding nodes

@@ -14,7 +14,7 @@
 </script>
 
 {#if tags.length > 0}
-	<div class="tag-badges">
+	<span class="tag-badges">
 		{#each tags as tag (tag)}
 			{@const config = getTagConfig(tag)}
 			<button
@@ -33,26 +33,26 @@
 				<span class="tag-badge-remove">×</span>
 			</button>
 		{/each}
-	</div>
+	</span>
 {/if}
 
 <style>
 	.tag-badges {
-		display: flex;
+		display: inline-flex;
 		flex-wrap: wrap;
+		align-items: center;
 		gap: 4px;
-		padding: 6px 14px 8px;
-		border-bottom: 1px solid var(--traek-thought-divider, rgba(255, 255, 255, 0.06));
+		padding: 0 8px 0 4px;
 	}
 
 	.tag-badge {
 		display: inline-flex;
 		align-items: center;
-		gap: 4px;
-		padding: 3px 8px;
+		gap: 3px;
+		padding: 2px 6px;
 		border: 1px solid;
 		border-radius: 999px;
-		font-size: 10px;
+		font-size: 9px;
 		font-weight: 500;
 		letter-spacing: 0.3px;
 		cursor: pointer;
@@ -60,6 +60,7 @@
 			opacity 0.15s,
 			transform 0.15s;
 		text-transform: uppercase;
+		line-height: 1;
 	}
 
 	.tag-badge:hover {
@@ -77,7 +78,7 @@
 	}
 
 	.tag-badge-remove {
-		font-size: 14px;
+		font-size: 12px;
 		line-height: 1;
 		opacity: 0.7;
 	}

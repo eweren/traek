@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { TraekEngine, wouldCreateCycle } from '../../TraekEngine.svelte';
-import { ReplayController } from '../ReplayController.svelte';
+import { TraekEngine, wouldCreateCycle } from '../../TraekEngine.svelte.js';
+import { ReplayController } from '../ReplayController.svelte.js';
 import type { ConversationSnapshot, SerializedNode } from '../types.js';
 import { serializedNodeSchema, conversationSnapshotSchema } from '../schemas.js';
 

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { TraekEngine, DEFAULT_TRACK_ENGINE_CONFIG } from '../TraekEngine.svelte';
-import { ViewportTracker } from '../canvas/ViewportTracker.svelte';
+import { TraekEngine, DEFAULT_TRACK_ENGINE_CONFIG } from '../lib/TraekEngine.svelte';
+import { ViewportTracker } from '../lib/canvas/ViewportTracker.svelte';
 
 /**
  * Performance benchmark suite for TraekEngine and ViewportTracker.

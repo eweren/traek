@@ -22,6 +22,7 @@
 		onEditCancel,
 		onEditNode,
 		onRetry,
+		onNodeActivated,
 		focusedNodeId = null
 	}: {
 		engine: TraekEngine;
@@ -37,6 +38,7 @@
 		onEditCancel: () => void;
 		onEditNode: (nodeId: string) => void;
 		onRetry?: (nodeId: string) => void;
+		onNodeActivated?: (nodeId: string) => void;
 		focusedNodeId?: string | null;
 	} = $props();
 </script>
@@ -83,6 +85,7 @@
 						{viewportResizeVersion}
 						{scale}
 						{onRetry}
+						{onNodeActivated}
 					>
 						<ResolvedComponent {node} {engine} {isActive} {...uiData?.props ?? {}} />
 					</TraekNodeWrapper>
@@ -100,6 +103,7 @@
 					{viewportResizeVersion}
 					{scale}
 					{onRetry}
+					{onNodeActivated}
 				>
 					<div class="node-card error">
 						<div class="role-tag">{node.type}</div>

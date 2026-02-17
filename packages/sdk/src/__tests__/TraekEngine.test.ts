@@ -1,5 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { TraekEngine, wouldCreateCycle, type MessageNode, type Node } from '../TraekEngine.svelte';
+import {
+	TraekEngine,
+	wouldCreateCycle,
+	type MessageNode,
+	type Node
+} from '../lib/TraekEngine.svelte';
 
 beforeEach(() => {
 	globalThis.requestAnimationFrame = (cb: FrameRequestCallback) => {
@@ -1020,7 +1025,7 @@ describe('TraekEngine', () => {
 				nodes: []
 			};
 			const engine = TraekEngine.fromSnapshot(
-				snapshot as import('../persistence/types.js').ConversationSnapshot,
+				snapshot as import('../lib/persistence/types.js').ConversationSnapshot,
 				{ nodeWidth: 500 }
 			);
 			expect(engine.nodes).toHaveLength(0);
