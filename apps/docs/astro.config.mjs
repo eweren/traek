@@ -6,9 +6,10 @@ export default defineConfig({
 		starlight({
 			title: 'Træk',
 			description: 'Spatial tree-chat UI for AI agents',
-			social: {
-				github: 'https://github.com/gettraek/traek'
-			},
+			head: [],
+			social: [
+				{ icon: 'github', label: 'GitHub', href: 'https://github.com/gettraek/traek' },
+			],
 			sidebar: [
 				{
 					label: 'Getting Started',

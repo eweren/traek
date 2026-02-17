@@ -42,3 +42,5 @@ apps/*/dist
 apps/*/.svelte-kit
 packages/*/dist
 servers/*/dist
+build/
+.astro/
