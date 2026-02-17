@@ -1,0 +1,30 @@
+{
+	"$schema": "https://turbo.build/schema.json",
+	"ui": "tui",
+	"tasks": {
+		"build": {
+			"dependsOn": ["^build"],
+			"inputs": ["$TURBO_DEFAULT$", ".env*"],
+			"outputs": ["dist/**", ".svelte-kit/**"]
+		},
+		"dev": {
+			"cache": false,
+			"persistent": true
+		},
+		"check": {
+			"dependsOn": ["^build"]
+		},
+		"lint": {
+			"dependsOn": ["^lint"]
+		},
+		"test": {
+			"dependsOn": ["^build"]
+		},
+		"test:unit": {
+			"dependsOn": ["^build"]
+		},
+		"test:e2e": {
+			"dependsOn": ["build"]
+		}
+	}
+}
