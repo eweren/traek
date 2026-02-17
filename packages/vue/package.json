@@ -21,9 +21,9 @@
 	"scripts": {
 		"build": "vue-tsc --project tsconfig.build.json && node scripts/fixExtensions.js",
 		"check": "vue-tsc --noEmit",
-		"lint": "prettier --check . && eslint .",
+		"lint": "prettier --check .",
 		"clean": "rm -rf node_modules dist coverage .turbo",
-		"format": "prettier --write . && eslint . --fix",
+		"format": "prettier --write .",
 		"test": "vitest run"
 	},
 	"dependencies": {

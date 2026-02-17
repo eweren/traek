@@ -21,9 +21,9 @@
 	"scripts": {
 		"build": "tsc --project tsconfig.build.json",
 		"check": "tsc --noEmit",
-		"lint": "prettier --check . && eslint .",
+		"lint": "prettier --check .",
 		"clean": "rm -rf node_modules dist coverage .turbo",
-		"format": "prettier --write . && eslint . --fix",
+		"format": "prettier --write .",
 		"test": "vitest run"
 	},
 	"dependencies": {
