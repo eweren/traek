@@ -1,9 +1,9 @@
 // Main canvas component
-export { default as TraekCanvas } from './components/TraekCanvas.vue'
+export { default as TraekCanvas } from './components/TraekCanvas.vue';
 
 // Composables
-export { useTraekEngine, useCreateTraekEngine } from './composables/useTraekEngine.js'
-export type { TraekEngineRefs } from './composables/useTraekEngine.js'
+export { useTraekEngine, useCreateTraekEngine } from './composables/useTraekEngine.js';
+export type { TraekEngineRefs } from './composables/useTraekEngine.js';
 
 // Re-export everything from @traek/core for convenience
 export {
@@ -18,7 +18,7 @@ export {
 	serializedNodeSchema,
 	conversationSnapshotSchema,
 	saveStateSchema
-} from '@traek/core'
+} from '@traek/core';
 export type {
 	Node,
 	MessageNode,
@@ -34,4 +34,4 @@ export type {
 	ConversationListItem,
 	Unsubscribe,
 	Subscriber
-} from '@traek/core'
+} from '@traek/core';

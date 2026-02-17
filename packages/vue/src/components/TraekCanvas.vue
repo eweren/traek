@@ -1,120 +1,120 @@
 <script setup lang="ts">
-import { computed, ref, watch, type Component } from 'vue'
-import { TraekEngine } from '@traek/core'
-import type { Node, MessageNode, TraekEngineConfig } from '@traek/core'
-import { useTraekEngine, useCreateTraekEngine } from '../composables/useTraekEngine.js'
+import { computed, ref, watch, type Component } from 'vue';
+import { TraekEngine } from '@traek/core';
+import type { Node, MessageNode, TraekEngineConfig } from '@traek/core';
+import { useTraekEngine, useCreateTraekEngine } from '../composables/useTraekEngine.js';
 
 export interface TraekCanvasProps {
 	/** Provide an existing engine or let the canvas create one. */
-	engine?: TraekEngine
-	config?: Partial<TraekEngineConfig>
+	engine?: TraekEngine;
+	config?: Partial<TraekEngineConfig>;
 	/** Called when the user submits a message. */
-	onSendMessage?: (input: string, userNode: MessageNode, action?: string | string[]) => void
+	onSendMessage?: (input: string, userNode: MessageNode, action?: string | string[]) => void;
 	/** Called whenever any node changes. */
-	onNodesChanged?: () => void
+	onNodesChanged?: () => void;
 	/** Initial zoom scale (default 1). */
-	initialScale?: number
+	initialScale?: number;
 	/** Custom node component map: `{ myType: MyNodeComponent }`. */
-	componentMap?: Record<string, Component>
+	componentMap?: Record<string, Component>;
 }
 
 const props = withDefaults(defineProps<TraekCanvasProps>(), {
 	initialScale: 1
-})
+});
 
 const emit = defineEmits<{
-	nodesChanged: []
-}>()
+	nodesChanged: [];
+}>();
 
 // Engine setup
-const internalEngine = useCreateTraekEngine(props.config)
-const activeEngine = computed(() => props.engine ?? internalEngine)
-const { nodes, activeNodeId, pendingFocusNodeId } = useTraekEngine(activeEngine.value)
+const internalEngine = useCreateTraekEngine(props.config);
+const activeEngine = computed(() => props.engine ?? internalEngine);
+const { nodes, activeNodeId, pendingFocusNodeId } = useTraekEngine(activeEngine.value);
 
 // Viewport state
-const scale = ref(props.initialScale)
-const offset = ref({ x: 0, y: 0 })
-const inputValue = ref('')
-const isPanning = ref(false)
-const lastPointer = ref({ x: 0, y: 0 })
-const containerRef = ref<HTMLDivElement | null>(null)
+const scale = ref(props.initialScale);
+const offset = ref({ x: 0, y: 0 });
+const inputValue = ref('');
+const isPanning = ref(false);
+const lastPointer = ref({ x: 0, y: 0 });
+const containerRef = ref<HTMLDivElement | null>(null);
 
-const gridStep = computed(() => props.config?.gridStep ?? 20)
-const nodeWidth = computed(() => props.config?.nodeWidth ?? 350)
+const gridStep = computed(() => props.config?.gridStep ?? 20);
+const nodeWidth = computed(() => props.config?.nodeWidth ?? 350);
 
 // Center on pending focus node
 watch(pendingFocusNodeId, (nodeId) => {
-	if (!nodeId) return
-	const engine = activeEngine.value
-	const node = engine.getNode(nodeId)
+	if (!nodeId) return;
+	const engine = activeEngine.value;
+	const node = engine.getNode(nodeId);
 	if (!node?.metadata) {
-		engine.clearPendingFocus()
-		return
+		engine.clearPendingFocus();
+		return;
 	}
-	const container = containerRef.value
+	const container = containerRef.value;
 	if (container) {
-		const { width, height } = container.getBoundingClientRect()
-		const step = gridStep.value
+		const { width, height } = container.getBoundingClientRect();
+		const step = gridStep.value;
 		offset.value = {
 			x: width / 2 - node.metadata.x * step * scale.value,
 			y: height / 2 - node.metadata.y * step * scale.value
-		}
+		};
 	}
-	engine.clearPendingFocus()
-})
+	engine.clearPendingFocus();
+});
 
 // Watch node changes
 watch(nodes, () => {
-	props.onNodesChanged?.()
-	emit('nodesChanged')
-})
+	props.onNodesChanged?.();
+	emit('nodesChanged');
+});
 
 // Pan handlers
 function onPointerDown(e: PointerEvent) {
-	if (e.button !== 0) return
-	const target = e.target as HTMLElement
-	if (target.closest('button, input, textarea, [data-no-pan]')) return
-	isPanning.value = true
-	lastPointer.value = { x: e.clientX, y: e.clientY }
-	;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
+	if (e.button !== 0) return;
+	const target = e.target as HTMLElement;
+	if (target.closest('button, input, textarea, [data-no-pan]')) return;
+	isPanning.value = true;
+	lastPointer.value = { x: e.clientX, y: e.clientY };
+	(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
 }
 
 function onPointerMove(e: PointerEvent) {
-	if (!isPanning.value) return
-	const dx = e.clientX - lastPointer.value.x
-	const dy = e.clientY - lastPointer.value.y
-	lastPointer.value = { x: e.clientX, y: e.clientY }
-	offset.value = { x: offset.value.x + dx, y: offset.value.y + dy }
+	if (!isPanning.value) return;
+	const dx = e.clientX - lastPointer.value.x;
+	const dy = e.clientY - lastPointer.value.y;
+	lastPointer.value = { x: e.clientX, y: e.clientY };
+	offset.value = { x: offset.value.x + dx, y: offset.value.y + dy };
 }
 
 function onPointerUp() {
-	isPanning.value = false
+	isPanning.value = false;
 }
 
 function onWheel(e: WheelEvent) {
-	e.preventDefault()
-	const rect = containerRef.value?.getBoundingClientRect()
-	if (!rect) return
-	const mouseX = e.clientX - rect.left
-	const mouseY = e.clientY - rect.top
-	const delta = -e.deltaY * 0.001
-	const newScale = Math.min(8, Math.max(0.05, scale.value * (1 + delta)))
+	e.preventDefault();
+	const rect = containerRef.value?.getBoundingClientRect();
+	if (!rect) return;
+	const mouseX = e.clientX - rect.left;
+	const mouseY = e.clientY - rect.top;
+	const delta = -e.deltaY * 0.001;
+	const newScale = Math.min(8, Math.max(0.05, scale.value * (1 + delta)));
 	offset.value = {
 		x: mouseX - (mouseX - offset.value.x) * (newScale / scale.value),
 		y: mouseY - (mouseY - offset.value.y) * (newScale / scale.value)
-	}
-	scale.value = newScale
+	};
+	scale.value = newScale;
 }
 
 // Submit message
 function handleSubmit(e: Event) {
-	e.preventDefault()
-	const text = inputValue.value.trim()
-	if (!text) return
-	const engine = activeEngine.value
-	const userNode = engine.addNode(text, 'user')
-	inputValue.value = ''
-	props.onSendMessage?.(text, userNode)
+	e.preventDefault();
+	const text = inputValue.value.trim();
+	if (!text) return;
+	const engine = activeEngine.value;
+	const userNode = engine.addNode(text, 'user');
+	inputValue.value = '';
+	props.onSendMessage?.(text, userNode);
 }
 
 function getNodeStyle(node: Node) {
@@ -124,30 +124,30 @@ function getNodeStyle(node: Node) {
 		top: `${(node.metadata?.y ?? 0) * gridStep.value}px`,
 		width: `${nodeWidth.value}px`,
 		boxSizing: 'border-box' as const
-	}
+	};
 }
 
 function getNodeComponent(node: Node): Component | null {
-	return props.componentMap?.[node.type] ?? null
+	return props.componentMap?.[node.type] ?? null;
 }
 
 function isNodeActive(node: Node): boolean {
-	return activeNodeId.value === node.id
+	return activeNodeId.value === node.id;
 }
 
 function isNodeVisible(node: Node): boolean {
-	return !activeEngine.value.isInCollapsedSubtree(node.id)
+	return !activeEngine.value.isInCollapsedSubtree(node.id);
 }
 
 function activateNode(node: Node) {
-	activeEngine.value.branchFrom(node.id)
+	activeEngine.value.branchFrom(node.id);
 }
 
 const canvasTransform = computed(
 	() => `translate(${offset.value.x}px, ${offset.value.y}px) scale(${scale.value})`
-)
+);
 
-const zoomLabel = computed(() => `${Math.round(scale.value * 100)}%`)
+const zoomLabel = computed(() => `${Math.round(scale.value * 100)}%`);
 </script>
 
 <template>

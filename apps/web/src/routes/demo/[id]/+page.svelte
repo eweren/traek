@@ -14,7 +14,7 @@
 		type ConversationSnapshot,
 		ConversationStore,
 		HeaderBar
-	} from 'traek';
+	} from '@traek/svelte';
 	import ExampleCustomComponent from '$lib/components/ExampleCustomComponent.svelte';
 	import ImageDemoNode from '$lib/components/ImageDemoNode.svelte';
 	import { track } from '$lib/umami';

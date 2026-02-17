@@ -1,6 +1,6 @@
 <script lang="ts">
 	import '../app.css';
-	import { ThemeProvider } from 'traek';
+	import { ThemeProvider } from '@traek/svelte';
 	import type { Snippet } from 'svelte';
 
 	let { children }: { children: Snippet } = $props();

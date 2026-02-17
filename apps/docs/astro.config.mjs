@@ -1,8 +1,14 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import react from '@astrojs/react';
+import svelte from '@astrojs/svelte';
+import vue from '@astrojs/vue';
 
 export default defineConfig({
 	integrations: [
+		react(),
+		svelte(),
+		vue(),
 		starlight({
 			title: 'Træk',
 			description: 'Spatial tree-chat UI for AI agents',
@@ -18,20 +24,31 @@ export default defineConfig({
 					]
 				},
 				{
+					label: 'Frameworks',
+					items: [
+						{ label: 'Svelte', slug: 'frameworks/svelte' },
+						{ label: 'React', slug: 'frameworks/react' },
+						{ label: 'Vue', slug: 'frameworks/vue' },
+						{ label: 'Vanilla JS / TypeScript', slug: 'frameworks/vanilla' }
+					]
+				},
+				{
 					label: 'API Reference',
 					items: [
-						{ label: 'TraekCanvas', slug: 'api/traek-canvas' },
-						{ label: 'TraekEngine', slug: 'api/traek-engine' },
+						{ label: 'TraekEngine (@traek/core)', slug: 'api/traek-engine' },
+						{ label: 'TraekCanvas – Svelte', slug: 'api/traek-canvas-svelte' },
+						{ label: 'TraekCanvas – React', slug: 'api/traek-canvas-react' },
+						{ label: 'TraekCanvas – Vue', slug: 'api/traek-canvas-vue' },
 						{ label: 'TextNode', slug: 'api/text-node' },
 						{ label: 'Types', slug: 'api/types' }
 					]
 				},
 				{
-					label: 'Integration Guide',
+					label: 'Guides',
 					items: [
-						{ label: 'With SvelteKit', slug: 'guides/sveltekit' },
+						{ label: 'Custom Node Types', slug: 'guides/custom-nodes' },
 						{ label: 'OpenAI Streaming', slug: 'guides/openai-streaming' },
-						{ label: 'Custom Node Types', slug: 'guides/custom-nodes' }
+						{ label: 'With SvelteKit', slug: 'guides/sveltekit' }
 					]
 				}
 			]

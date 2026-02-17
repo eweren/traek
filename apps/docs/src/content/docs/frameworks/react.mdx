@@ -1,0 +1,105 @@
+---
+title: React
+description: Using @traek/react in a React 18+ project.
+---
+
+import ReactDemo from '../../../components/demos/ReactDemo.tsx';
+
+# React Adapter
+
+`@traek/react` provides hooks and a `TraekCanvas` component for **React 18+**.
+
+## Install
+
+```bash
+pnpm add @traek/react
+```
+
+Peer dependencies: `react@^18 || ^19`, `react-dom@^18 || ^19`
+
+## Quick Setup
+
+```tsx
+import { useEffect } from 'react';
+import { TraekCanvas, useCreateTraekEngine } from '@traek/react';
+import type { SendEvent } from '@traek/core';
+
+export default function App() {
+	const engine = useCreateTraekEngine();
+
+	useEffect(() => {
+		engine.addNode({ role: 'assistant', content: 'Hello! How can I help?' });
+	}, [engine]);
+
+	async function handleSend({ content, parentId }: SendEvent) {
+		const userNode = engine.addNode({
+			role: 'user',
+			content,
+			parentIds: parentId ? [parentId] : []
+		});
+
+		const res = await fetch('/api/chat', {
+			method: 'POST',
+			body: JSON.stringify({
+				messages: engine.contextPath.map((n) => ({ role: n.role, content: n.content }))
+			})
+		});
+
+		const assistantNode = engine.addNode({
+			role: 'assistant',
+			content: '',
+			parentIds: [userNode.id],
+			status: 'streaming'
+		});
+
+		const reader = res.body!.getReader();
+		const decoder = new TextDecoder();
+		let done = false;
+		while (!done) {
+			const { value, done: d } = await reader.read();
+			done = d;
+			if (value) engine.appendToNode(assistantNode.id, decoder.decode(value));
+		}
+		engine.updateNode(assistantNode.id, { status: 'done' });
+	}
+
+	return <TraekCanvas engine={engine} onSendMessage={handleSend} />;
+}
+```
+
+## Live Demo
+
+<ReactDemo client:load />
+
+## Hooks
+
+### `useCreateTraekEngine(config?)`
+
+Creates a stable `TraekEngine` instance for the lifetime of the component.
+
+```tsx
+import { useCreateTraekEngine } from '@traek/react';
+
+const engine = useCreateTraekEngine({ layoutGapX: 40 });
+```
+
+### `useTraekEngine(engine)`
+
+Subscribes to an external `TraekEngine` and returns a reactive snapshot. Use this when you create the engine outside React.
+
+```tsx
+import { useTraekEngine } from '@traek/react';
+
+const { nodes, activeNodeId } = useTraekEngine(myEngine);
+```
+
+## API
+
+### `TraekCanvas` Props
+
+| Prop            | Type                     | Required | Description                       |
+| --------------- | ------------------------ | -------- | --------------------------------- |
+| `engine`        | `TraekEngine`            | Yes      | Engine instance                   |
+| `onSendMessage` | `(e: SendEvent) => void` | Yes      | Fired when user submits a message |
+| `components`    | `ComponentMap`           | No       | Override default node renderers   |
+| `className`     | `string`                 | No       | Additional CSS classes            |

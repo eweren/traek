@@ -1,11 +1,11 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
-import type { TraekEngine, Node, MessageNode } from '@traek/core'
-import { highlightMatch } from '@traek/core'
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import type { TraekEngine, Node, MessageNode } from '@traek/core';
+import { highlightMatch } from '@traek/core';
 
 export interface TextNodeProps {
-	node: Node
-	engine: TraekEngine
-	isActive: boolean
+	node: Node;
+	engine: TraekEngine;
+	isActive: boolean;
 }
 
 /**
@@ -13,10 +13,10 @@ export interface TextNodeProps {
  * Renders markdown content with basic streaming support.
  */
 export function TextNode({ node, engine, isActive }: TextNodeProps) {
-	const messageNode = node as MessageNode
-	const content = messageNode.content ?? ''
-	const isStreaming = node.status === 'streaming'
-	const isError = node.status === 'error'
+	const messageNode = node as MessageNode;
+	const content = messageNode.content ?? '';
+	const isStreaming = node.status === 'streaming';
+	const isError = node.status === 'error';
 
 	const containerStyle: React.CSSProperties = {
 		borderRadius: '12px',
@@ -27,7 +27,7 @@ export function TextNode({ node, engine, isActive }: TextNodeProps) {
 		boxShadow: isActive ? '0 0 0 1px var(--traek-accent, #0ff)' : 'none',
 		overflow: 'hidden',
 		transition: 'border-color 0.2s, box-shadow 0.2s'
-	}
+	};
 
 	const headerStyle: React.CSSProperties = {
 		padding: '8px 12px',
@@ -37,15 +37,15 @@ export function TextNode({ node, engine, isActive }: TextNodeProps) {
 		borderBottom: '1px solid var(--traek-border, rgba(255,255,255,0.06))',
 		fontSize: '11px',
 		color: 'var(--traek-text-muted, rgba(255,255,255,0.5))'
-	}
+	};
 
 	const roleColors: Record<string, string> = {
 		user: '#0ff',
 		assistant: '#a78bfa',
 		system: '#fb923c'
-	}
+	};
 
-	const roleColor = roleColors[node.role] ?? '#888'
+	const roleColor = roleColors[node.role] ?? '#888';
 
 	return (
 		<div style={containerStyle}>
@@ -64,9 +64,7 @@ export function TextNode({ node, engine, isActive }: TextNodeProps) {
 				{isStreaming && (
 					<span style={{ marginLeft: 'auto', color: 'var(--traek-accent, #0ff)' }}>●</span>
 				)}
-				{isError && (
-					<span style={{ marginLeft: 'auto', color: '#f87171' }}>Error</span>
-				)}
+				{isError && <span style={{ marginLeft: 'auto', color: '#f87171' }}>Error</span>}
 			</div>
 
 			{/* Content */}
@@ -104,5 +102,5 @@ export function TextNode({ node, engine, isActive }: TextNodeProps) {
 				</div>
 			)}
 		</div>
-	)
+	);
 }

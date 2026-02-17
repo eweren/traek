@@ -1,6 +1,6 @@
-import { useCallback, useMemo, useSyncExternalStore } from 'react'
-import { TraekEngine } from '@traek/core'
-import type { TraekEngineConfig } from '@traek/core'
+import { useCallback, useMemo, useSyncExternalStore } from 'react';
+import { TraekEngine } from '@traek/core';
+import type { TraekEngineConfig } from '@traek/core';
 
 /**
  * Subscribe to a TraekEngine instance and return its current reactive state.
@@ -16,7 +16,7 @@ import type { TraekEngineConfig } from '@traek/core'
  * ```
  */
 export function useTraekEngine(engine: TraekEngine) {
-	const getSnapshot = useCallback(() => engine.getSnapshot(), [engine])
+	const getSnapshot = useCallback(() => engine.getSnapshot(), [engine]);
 
 	// useSyncExternalStore requires the subscribe callback NOT to call the
 	// listener immediately (React calls getSnapshot() separately), but the
@@ -24,20 +24,20 @@ export function useTraekEngine(engine: TraekEngine) {
 	// the immediate call.
 	const subscribe = useCallback(
 		(onStoreChange: () => void) => {
-			let initialized = false
+			let initialized = false;
 			const unsub = engine.subscribe(() => {
 				if (!initialized) {
-					initialized = true
-					return
+					initialized = true;
+					return;
 				}
-				onStoreChange()
-			})
-			return unsub
+				onStoreChange();
+			});
+			return unsub;
 		},
 		[engine]
-	)
+	);
 
-	return useSyncExternalStore(subscribe, getSnapshot)
+	return useSyncExternalStore(subscribe, getSnapshot);
 }
 
 /**
@@ -55,5 +55,5 @@ export function useTraekEngine(engine: TraekEngine) {
 export function useCreateTraekEngine(config?: Partial<TraekEngineConfig>): TraekEngine {
 	// useMemo with no deps creates the engine once per component mount.
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	return useMemo(() => new TraekEngine(config), [])
+	return useMemo(() => new TraekEngine(config), []);
 }

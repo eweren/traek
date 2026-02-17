@@ -1,13 +1,13 @@
 // Main canvas component
-export { TraekCanvas } from './components/TraekCanvas.js'
-export type { TraekCanvasProps } from './components/TraekCanvas.js'
+export { TraekCanvas } from './components/TraekCanvas.js';
+export type { TraekCanvasProps } from './components/TraekCanvas.js';
 
 // Default node renderer
-export { TextNode } from './components/TextNode.js'
-export type { TextNodeProps } from './components/TextNode.js'
+export { TextNode } from './components/TextNode.js';
+export type { TextNodeProps } from './components/TextNode.js';
 
 // Hooks
-export { useTraekEngine, useCreateTraekEngine } from './hooks/useTraekEngine.js'
+export { useTraekEngine, useCreateTraekEngine } from './hooks/useTraekEngine.js';
 
 // Re-export everything from @traek/core for convenience
 export {
@@ -22,7 +22,7 @@ export {
 	serializedNodeSchema,
 	conversationSnapshotSchema,
 	saveStateSchema
-} from '@traek/core'
+} from '@traek/core';
 export type {
 	Node,
 	MessageNode,
@@ -38,4 +38,4 @@ export type {
 	ConversationListItem,
 	Unsubscribe,
 	Subscriber
-} from '@traek/core'
+} from '@traek/core';

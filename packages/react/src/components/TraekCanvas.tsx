@@ -1,34 +1,27 @@
-import React, {
-	useCallback,
-	useEffect,
-	useLayoutEffect,
-	useMemo,
-	useRef,
-	useState
-} from 'react'
-import { TraekEngine } from '@traek/core'
-import type { Node, MessageNode, TraekEngineConfig } from '@traek/core'
-import { useTraekEngine, useCreateTraekEngine } from '../hooks/useTraekEngine.js'
-import { TextNode } from './TextNode.js'
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { TraekEngine } from '@traek/core';
+import type { Node, MessageNode, TraekEngineConfig } from '@traek/core';
+import { useTraekEngine, useCreateTraekEngine } from '../hooks/useTraekEngine.js';
+import { TextNode } from './TextNode.js';
 
 export interface TraekCanvasProps {
 	/** Provide an existing engine or let the canvas create one. */
-	engine?: TraekEngine
-	config?: Partial<TraekEngineConfig>
+	engine?: TraekEngine;
+	config?: Partial<TraekEngineConfig>;
 	/** Called when the user submits a message. */
-	onSendMessage?: (input: string, userNode: MessageNode, action?: string | string[]) => void
+	onSendMessage?: (input: string, userNode: MessageNode, action?: string | string[]) => void;
 	/** Called whenever any node changes. */
-	onNodesChanged?: () => void
+	onNodesChanged?: () => void;
 	/** Initial zoom scale (default 1). */
-	initialScale?: number
+	initialScale?: number;
 	/** Custom node renderer map: `{ myType: MyNodeComponent }`. */
 	componentMap?: Record<
 		string,
 		React.ComponentType<{ node: Node; engine: TraekEngine; isActive: boolean }>
-	>
+	>;
 	/** CSS class added to the root element. */
-	className?: string
-	style?: React.CSSProperties
+	className?: string;
+	style?: React.CSSProperties;
 }
 
 /**
@@ -64,121 +57,121 @@ export function TraekCanvas({
 	className,
 	style
 }: TraekCanvasProps) {
-	const internalEngine = useCreateTraekEngine(config)
-	const engine = externalEngine ?? internalEngine
+	const internalEngine = useCreateTraekEngine(config);
+	const engine = externalEngine ?? internalEngine;
 
 	// Subscribe to engine state changes
-	const state = useTraekEngine(engine)
+	const state = useTraekEngine(engine);
 
 	// Viewport state
-	const [scale, setScale] = useState(initialScale)
-	const [offset, setOffset] = useState({ x: 0, y: 0 })
-	const [inputValue, setInputValue] = useState('')
+	const [scale, setScale] = useState(initialScale);
+	const [offset, setOffset] = useState({ x: 0, y: 0 });
+	const [inputValue, setInputValue] = useState('');
 
-	const canvasRef = useRef<HTMLDivElement>(null)
-	const containerRef = useRef<HTMLDivElement>(null)
-	const isPanning = useRef(false)
-	const lastPointer = useRef({ x: 0, y: 0 })
+	const canvasRef = useRef<HTMLDivElement>(null);
+	const containerRef = useRef<HTMLDivElement>(null);
+	const isPanning = useRef(false);
+	const lastPointer = useRef({ x: 0, y: 0 });
 
 	// Notify parent on node changes
 	useEffect(() => {
-		onNodesChanged?.()
-	}, [state.nodes, onNodesChanged])
+		onNodesChanged?.();
+	}, [state.nodes, onNodesChanged]);
 
 	// Center on pending focus node
 	useEffect(() => {
-		if (!state.pendingFocusNodeId) return
-		const node = engine.getNode(state.pendingFocusNodeId)
+		if (!state.pendingFocusNodeId) return;
+		const node = engine.getNode(state.pendingFocusNodeId);
 		if (!node?.metadata) {
-			engine.clearPendingFocus()
-			return
+			engine.clearPendingFocus();
+			return;
 		}
-		const { x, y } = node.metadata
-		const container = containerRef.current
+		const { x, y } = node.metadata;
+		const container = containerRef.current;
 		if (container) {
-			const { width, height } = container.getBoundingClientRect()
-			const step = (config?.gridStep ?? 20)
+			const { width, height } = container.getBoundingClientRect();
+			const step = config?.gridStep ?? 20;
 			setOffset({
 				x: width / 2 - x * step * scale,
 				y: height / 2 - y * step * scale
-			})
+			});
 		}
-		engine.clearPendingFocus()
-	}, [state.pendingFocusNodeId, engine, scale, config?.gridStep])
+		engine.clearPendingFocus();
+	}, [state.pendingFocusNodeId, engine, scale, config?.gridStep]);
 
 	// Pan interaction
 	const onPointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
-		if (e.button !== 0) return
-		const target = e.target as HTMLElement
+		if (e.button !== 0) return;
+		const target = e.target as HTMLElement;
 		// Don't start pan on interactive elements
-		if (target.closest('button, input, textarea, [data-no-pan]')) return
-		isPanning.current = true
-		lastPointer.current = { x: e.clientX, y: e.clientY }
-		e.currentTarget.setPointerCapture(e.pointerId)
-	}, [])
+		if (target.closest('button, input, textarea, [data-no-pan]')) return;
+		isPanning.current = true;
+		lastPointer.current = { x: e.clientX, y: e.clientY };
+		e.currentTarget.setPointerCapture(e.pointerId);
+	}, []);
 
 	const onPointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
-		if (!isPanning.current) return
-		const dx = e.clientX - lastPointer.current.x
-		const dy = e.clientY - lastPointer.current.y
-		lastPointer.current = { x: e.clientX, y: e.clientY }
-		setOffset((prev) => ({ x: prev.x + dx, y: prev.y + dy }))
-	}, [])
+		if (!isPanning.current) return;
+		const dx = e.clientX - lastPointer.current.x;
+		const dy = e.clientY - lastPointer.current.y;
+		lastPointer.current = { x: e.clientX, y: e.clientY };
+		setOffset((prev) => ({ x: prev.x + dx, y: prev.y + dy }));
+	}, []);
 
 	const onPointerUp = useCallback(() => {
-		isPanning.current = false
-	}, [])
+		isPanning.current = false;
+	}, []);
 
 	// Zoom with wheel
 	const onWheel = useCallback(
 		(e: React.WheelEvent<HTMLDivElement>) => {
-			e.preventDefault()
-			const rect = containerRef.current?.getBoundingClientRect()
-			if (!rect) return
-			const mouseX = e.clientX - rect.left
-			const mouseY = e.clientY - rect.top
-			const delta = -e.deltaY * 0.001
-			const newScale = Math.min(8, Math.max(0.05, scale * (1 + delta)))
+			e.preventDefault();
+			const rect = containerRef.current?.getBoundingClientRect();
+			if (!rect) return;
+			const mouseX = e.clientX - rect.left;
+			const mouseY = e.clientY - rect.top;
+			const delta = -e.deltaY * 0.001;
+			const newScale = Math.min(8, Math.max(0.05, scale * (1 + delta)));
 			// Zoom toward mouse position
 			setOffset((prev) => ({
 				x: mouseX - (mouseX - prev.x) * (newScale / scale),
 				y: mouseY - (mouseY - prev.y) * (newScale / scale)
-			}))
-			setScale(newScale)
+			}));
+			setScale(newScale);
 		},
 		[scale]
-	)
+	);
 
 	// Submit message
 	const handleSubmit = useCallback(
 		(e: React.FormEvent) => {
-			e.preventDefault()
-			const text = inputValue.trim()
-			if (!text) return
-			const userNode = engine.addNode(text, 'user')
-			setInputValue('')
-			onSendMessage?.(text, userNode)
+			e.preventDefault();
+			const text = inputValue.trim();
+			if (!text) return;
+			const userNode = engine.addNode(text, 'user');
+			setInputValue('');
+			onSendMessage?.(text, userNode);
 		},
 		[inputValue, engine, onSendMessage]
-	)
+	);
 
-	const gridStep = config?.gridStep ?? 20
-	const nodeWidth = config?.nodeWidth ?? 350
+	const gridStep = config?.gridStep ?? 20;
+	const nodeWidth = config?.nodeWidth ?? 350;
 
 	// Resolve component for a node type
 	const resolveComponent = useCallback(
 		(node: Node) => {
 			if (componentMap?.[node.type]) {
-				return componentMap[node.type]!
+				return componentMap[node.type]!;
 			}
 			return TextNode as React.ComponentType<{
-				node: Node
-				engine: TraekEngine
-				isActive: boolean
-			}>
+				node: Node;
+				engine: TraekEngine;
+				isActive: boolean;
+			}>;
 		},
 		[componentMap]
-	)
+	);
 
 	return (
 		<div
@@ -212,11 +205,11 @@ export function TraekCanvas({
 			>
 				{/* Render nodes */}
 				{state.nodes.map((node) => {
-					if (engine.isInCollapsedSubtree(node.id)) return null
-					const NodeComponent = resolveComponent(node)
-					const x = (node.metadata?.x ?? 0) * gridStep
-					const y = (node.metadata?.y ?? 0) * gridStep
-					const isActive = state.activeNodeId === node.id
+					if (engine.isInCollapsedSubtree(node.id)) return null;
+					const NodeComponent = resolveComponent(node);
+					const x = (node.metadata?.x ?? 0) * gridStep;
+					const y = (node.metadata?.y ?? 0) * gridStep;
+					const isActive = state.activeNodeId === node.id;
 
 					return (
 						<div
@@ -230,13 +223,13 @@ export function TraekCanvas({
 								boxSizing: 'border-box'
 							}}
 							onClick={(e) => {
-								e.stopPropagation()
-								engine.branchFrom(node.id)
+								e.stopPropagation();
+								engine.branchFrom(node.id);
 							}}
 						>
 							<NodeComponent node={node} engine={engine} isActive={isActive} />
 						</div>
-					)
+					);
 				})}
 			</div>
 
@@ -250,8 +243,7 @@ export function TraekCanvas({
 					left: 0,
 					right: 0,
 					padding: '16px',
-					background:
-						'linear-gradient(to top, var(--traek-canvas-bg, #0d0d0d) 60%, transparent)',
+					background: 'linear-gradient(to top, var(--traek-canvas-bg, #0d0d0d) 60%, transparent)',
 					display: 'flex',
 					gap: '8px'
 				}}
@@ -272,8 +264,8 @@ export function TraekCanvas({
 					}}
 					onKeyDown={(e) => {
 						if (e.key === 'Enter' && !e.shiftKey) {
-							e.preventDefault()
-							handleSubmit(e)
+							e.preventDefault();
+							handleSubmit(e);
 						}
 					}}
 				/>
@@ -330,7 +322,7 @@ export function TraekCanvas({
 				</button>
 			</div>
 		</div>
-	)
+	);
 }
 
 const zoomBtnStyle: React.CSSProperties = {
@@ -345,4 +337,4 @@ const zoomBtnStyle: React.CSSProperties = {
 	display: 'flex',
 	alignItems: 'center',
 	justifyContent: 'center'
-}
+};

@@ -12,35 +12,35 @@
  * - Any other observer-pattern consumer
  */
 
-export type Unsubscribe = () => void
-export type Subscriber<T> = (value: T) => void
+export type Unsubscribe = () => void;
+export type Subscriber<T> = (value: T) => void;
 
 /**
  * A reactive value container that notifies subscribers on every mutation.
  * Follows the Svelte store contract for maximum framework compatibility.
  */
 export class Store<T> {
-	#value: T
-	#subscribers = new Set<Subscriber<T>>()
+	#value: T;
+	#subscribers = new Set<Subscriber<T>>();
 
 	constructor(initial: T) {
-		this.#value = initial
+		this.#value = initial;
 	}
 
 	/** Current value (non-reactive getter; use subscribe() for reactive access). */
 	get value(): T {
-		return this.#value
+		return this.#value;
 	}
 
 	/** Replace the stored value and notify all subscribers. */
 	set(newValue: T): void {
-		this.#value = newValue
-		for (const sub of this.#subscribers) sub(newValue)
+		this.#value = newValue;
+		for (const sub of this.#subscribers) sub(newValue);
 	}
 
 	/** Update the stored value with a transform function and notify subscribers. */
 	update(fn: (current: T) => T): void {
-		this.set(fn(this.#value))
+		this.set(fn(this.#value));
 	}
 
 	/**
@@ -49,14 +49,14 @@ export class Store<T> {
 	 * Returns an unsubscribe function.
 	 */
 	subscribe(subscriber: Subscriber<T>): Unsubscribe {
-		this.#subscribers.add(subscriber)
-		subscriber(this.#value)
-		return () => this.#subscribers.delete(subscriber)
+		this.#subscribers.add(subscriber);
+		subscriber(this.#value);
+		return () => this.#subscribers.delete(subscriber);
 	}
 
 	/** Returns current subscriber count (useful for debugging / testing). */
 	get subscriberCount(): number {
-		return this.#subscribers.size
+		return this.#subscribers.size;
 	}
 }
 
@@ -65,46 +65,46 @@ export class Store<T> {
  * Exposes a read-only Set snapshot via `subscribe`.
  */
 export class ObservableSet<T> {
-	#set: Set<T>
-	#subscribers = new Set<Subscriber<ReadonlySet<T>>>()
+	#set: Set<T>;
+	#subscribers = new Set<Subscriber<ReadonlySet<T>>>();
 
 	constructor(initial?: Iterable<T>) {
-		this.#set = new Set(initial)
+		this.#set = new Set(initial);
 	}
 
 	get size(): number {
-		return this.#set.size
+		return this.#set.size;
 	}
 
 	has(value: T): boolean {
-		return this.#set.has(value)
+		return this.#set.has(value);
 	}
 
 	add(value: T): void {
-		if (this.#set.has(value)) return
-		this.#set.add(value)
-		this.#notify()
+		if (this.#set.has(value)) return;
+		this.#set.add(value);
+		this.#notify();
 	}
 
 	delete(value: T): boolean {
-		const deleted = this.#set.delete(value)
-		if (deleted) this.#notify()
-		return deleted
+		const deleted = this.#set.delete(value);
+		if (deleted) this.#notify();
+		return deleted;
 	}
 
 	clear(): void {
-		if (this.#set.size === 0) return
-		this.#set.clear()
-		this.#notify()
+		if (this.#set.size === 0) return;
+		this.#set.clear();
+		this.#notify();
 	}
 
 	[Symbol.iterator](): IterableIterator<T> {
-		return this.#set[Symbol.iterator]()
+		return this.#set[Symbol.iterator]();
 	}
 
 	/** Returns a frozen snapshot (not the live internal Set). */
 	snapshot(): ReadonlySet<T> {
-		return new Set(this.#set)
+		return new Set(this.#set);
 	}
 
 	/**
@@ -113,13 +113,13 @@ export class ObservableSet<T> {
 	 * Returns an unsubscribe function.
 	 */
 	subscribe(subscriber: Subscriber<ReadonlySet<T>>): Unsubscribe {
-		this.#subscribers.add(subscriber)
-		subscriber(this.snapshot())
-		return () => this.#subscribers.delete(subscriber)
+		this.#subscribers.add(subscriber);
+		subscriber(this.snapshot());
+		return () => this.#subscribers.delete(subscriber);
 	}
 
 	#notify(): void {
-		const snap = this.snapshot()
-		for (const sub of this.#subscribers) sub(snap)
+		const snap = this.snapshot();
+		for (const sub of this.#subscribers) sub(snap);
 	}
 }

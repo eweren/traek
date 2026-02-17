@@ -1,6 +1,6 @@
-import { z } from 'zod'
+import { z } from 'zod';
 
-const nodeStatusSchema = z.enum(['streaming', 'done', 'error'])
+const nodeStatusSchema = z.enum(['streaming', 'done', 'error']);
 
 export const serializedNodeSchema = z.object({
 	id: z.string(),
@@ -17,7 +17,7 @@ export const serializedNodeSchema = z.object({
 		tags: z.array(z.string()).optional()
 	}),
 	data: z.unknown().optional()
-})
+});
 
 /**
  * Legacy schema that accepts old snapshots with `parentId: string | null` per node.
@@ -50,10 +50,10 @@ const legacySerializedNodeSchema = z
 		createdAt: n.createdAt,
 		metadata: n.metadata,
 		data: n.data
-	}))
+	}));
 
 /** Accepts both new (parentIds) and legacy (parentId) node formats. Normalizes to parentIds. */
-export const serializedNodeFlexSchema = z.union([serializedNodeSchema, legacySerializedNodeSchema])
+export const serializedNodeFlexSchema = z.union([serializedNodeSchema, legacySerializedNodeSchema]);
 
 export const conversationSnapshotSchema = z.object({
 	version: z.literal(1),
@@ -69,13 +69,13 @@ export const conversationSnapshotSchema = z.object({
 		.optional(),
 	activeNodeId: z.string().nullable(),
 	nodes: z.array(serializedNodeFlexSchema)
-})
+});
 
-export type SerializedNode = z.infer<typeof serializedNodeSchema>
-export type ConversationSnapshot = z.infer<typeof conversationSnapshotSchema>
+export type SerializedNode = z.infer<typeof serializedNodeSchema>;
+export type ConversationSnapshot = z.infer<typeof conversationSnapshotSchema>;
 
-export const saveStateSchema = z.enum(['idle', 'saving', 'saved', 'error'])
-export type SaveState = z.infer<typeof saveStateSchema>
+export const saveStateSchema = z.enum(['idle', 'saving', 'saved', 'error']);
+export type SaveState = z.infer<typeof saveStateSchema>;
 
 export const storedConversationSchema = z.object({
 	id: z.string(),
@@ -83,7 +83,7 @@ export const storedConversationSchema = z.object({
 	createdAt: z.number(),
 	updatedAt: z.number(),
 	snapshot: conversationSnapshotSchema
-})
+});
 
 export const conversationListItemSchema = z.object({
 	id: z.string(),
@@ -92,7 +92,7 @@ export const conversationListItemSchema = z.object({
 	updatedAt: z.number(),
 	nodeCount: z.number(),
 	preview: z.string()
-})
+});
 
-export type StoredConversation = z.infer<typeof storedConversationSchema>
-export type ConversationListItem = z.infer<typeof conversationListItemSchema>
+export type StoredConversation = z.infer<typeof storedConversationSchema>;
+export type ConversationListItem = z.infer<typeof conversationListItemSchema>;

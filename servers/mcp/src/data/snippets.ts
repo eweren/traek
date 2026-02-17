@@ -21,7 +21,7 @@ export const snippets: Record<string, Snippet> = {
 		language: 'svelte',
 		code: `<!-- src/routes/+page.svelte -->
 <script lang="ts">
-  import { TraekCanvas } from 'traek'
+  import { TraekCanvas } from '@traek/svelte'
 
   async function handleSend(input: string, userNode: import('traek').MessageNode) {
     // userNode has already been added. Add the assistant response:
@@ -43,7 +43,7 @@ export const snippets: Record<string, Snippet> = {
 		language: 'svelte',
 		code: `<!-- src/routes/+page.svelte -->
 <script lang="ts">
-  import { TraekEngine, TraekCanvas, type MessageNode } from 'traek'
+  import { TraekEngine, TraekCanvas, type MessageNode } from '@traek/svelte'
 
   // Engine is Svelte 5 reactive — create it at module level or in a class
   const engine = new TraekEngine()
@@ -133,7 +133,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		language: 'svelte',
 		code: `<!-- src/routes/+page.svelte -->
 <script lang="ts">
-  import { TraekEngine, TraekCanvas, type MessageNode } from 'traek'
+  import { TraekEngine, TraekCanvas, type MessageNode } from '@traek/svelte'
 
   const engine = new TraekEngine()
 
@@ -193,7 +193,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		language: 'svelte',
 		code: `<!-- src/lib/ImageNode.svelte -->
 <script lang="ts">
-  import type { TraekNodeComponentProps } from 'traek'
+  import type { TraekNodeComponentProps } from '@traek/svelte'
 
   // Every custom node gets exactly these three props
   let { node, engine, isActive }: TraekNodeComponentProps = $props()
@@ -223,7 +223,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		language: 'svelte',
 		code: `<!-- src/routes/+page.svelte -->
 <script lang="ts">
-  import { TraekEngine, TraekCanvas, type MessageNode } from 'traek'
+  import { TraekEngine, TraekCanvas, type MessageNode } from '@traek/svelte'
   import ImageNode from '$lib/ImageNode.svelte'
 
   const engine = new TraekEngine()
@@ -266,7 +266,7 @@ export const POST: RequestHandler = async ({ request }) => {
   import {
     TraekEngine, TraekCanvas,
     createDefaultRegistry, type NodeTypeDefinition
-  } from 'traek'
+  } from '@traek/svelte'
   import ImageNode from '$lib/ImageNode.svelte'
 
   const engine = new TraekEngine()
@@ -315,7 +315,7 @@ export const POST: RequestHandler = async ({ request }) => {
   import {
     TraekEngine, TraekCanvas, ConversationStore,
     ChatList, SaveIndicator, type MessageNode
-  } from 'traek'
+  } from '@traek/svelte'
 
   const engine = new TraekEngine()
   const store = new ConversationStore(engine)
@@ -362,8 +362,8 @@ export const POST: RequestHandler = async ({ request }) => {
 		description:
 			'Serialize the engine state to JSON for custom persistence (database, file, URL), and restore it.',
 		language: 'typescript',
-		code: `import { TraekEngine } from 'traek'
-import type { ConversationSnapshot } from 'traek'
+		code: `import { TraekEngine } from '@traek/svelte'
+import type { ConversationSnapshot } from '@traek/svelte'
 
 // Create engine and add some nodes
 const engine = new TraekEngine()
@@ -396,7 +396,7 @@ const restored = TraekEngine.fromSnapshot(saved) // validates with Zod
     ThemeProvider,
     createCustomTheme,
     darkTheme
-  } from 'traek'
+  } from '@traek/svelte'
 
   const myTheme = createCustomTheme({
     ...darkTheme,
@@ -470,8 +470,8 @@ const restored = TraekEngine.fromSnapshot(saved) // validates with Zod
 		description: 'Add custom slash-command actions to the input bar that users can trigger with /.',
 		language: 'svelte',
 		code: `<script lang="ts">
-  import { TraekCanvas, type ActionDefinition, type MessageNode } from 'traek'
-  import { TraekEngine } from 'traek'
+  import { TraekCanvas, type ActionDefinition, type MessageNode } from '@traek/svelte'
+  import { TraekEngine } from '@traek/svelte'
 
   const engine = new TraekEngine()
 
@@ -522,7 +522,7 @@ const restored = TraekEngine.fromSnapshot(saved) // validates with Zod
 		language: 'svelte',
 		code: `<!-- src/routes/+layout.svelte -->
 <script lang="ts">
-  import { ThemeProvider } from 'traek'
+  import { ThemeProvider } from '@traek/svelte'
   import 'traek/styles' // if style exports are available; otherwise import your own
 
   let { children } = $props()

@@ -8,14 +8,16 @@ function generateScaffold(options: {
 	customNode: boolean;
 	theme: 'dark' | 'light' | 'none';
 }): string {
-	const imports: string[] = [`import { TraekEngine, TraekCanvas, type MessageNode } from 'traek'`];
+	const imports: string[] = [
+		`import { TraekEngine, TraekCanvas, type MessageNode } from '@traek/svelte'`
+	];
 	const extras: string[] = [];
 	const instanceCode: string[] = ['const engine = new TraekEngine()'];
 	const sendMessageLines: string[] = [];
 	const templateParts: string[] = [];
 
 	if (options.persistence) {
-		imports.push(`import { ConversationStore, ChatList, SaveIndicator } from 'traek'`);
+		imports.push(`import { ConversationStore, ChatList, SaveIndicator } from '@traek/svelte'`);
 		instanceCode.push(`const store = new ConversationStore(engine)`);
 		extras.push(`$effect(() => { store.init() })`);
 	}
@@ -189,7 +191,7 @@ export const POST: RequestHandler = async ({ request }) => {
 function generateCustomNodeComponent(): string {
 	return `<!-- src/lib/ImageNode.svelte -->
 <script lang="ts">
-  import type { TraekNodeComponentProps } from 'traek'
+  import type { TraekNodeComponentProps } from '@traek/svelte'
 
   // Every custom node must accept exactly these three props
   let { node, engine, isActive }: TraekNodeComponentProps = $props()

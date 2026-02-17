@@ -6,7 +6,7 @@
 		TraekCanvas,
 		DefaultLoadingOverlay,
 		createDefaultRegistry
-	} from 'traek';
+	} from '@traek/svelte';
 	import { createHeroEngine } from '$lib/heroDemoEngine';
 	import GravityDotsBackground from '$lib/components/GravityDotsBackground.svelte';
 	import highlightDarkUrl from 'highlight.js/styles/github-dark.css?url';
@@ -32,7 +32,7 @@ npm install traek
     TraekCanvas,
     TraekEngine,
     DEFAULT_TRACK_ENGINE_CONFIG
-  } from 'traek';
+  } from '@traek/svelte';
 
   const engine = new TraekEngine(DEFAULT_TRACK_ENGINE_CONFIG);
 

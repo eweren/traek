@@ -1,4 +1,4 @@
-export type NodeStatus = 'streaming' | 'done' | 'error'
+export type NodeStatus = 'streaming' | 'done' | 'error';
 
 export enum BasicNodeTypes {
 	TEXT = 'text',
@@ -7,24 +7,24 @@ export enum BasicNodeTypes {
 }
 
 export interface Node {
-	id: string
-	parentIds: string[]
-	role: 'user' | 'assistant' | 'system'
-	type: BasicNodeTypes | string
-	status?: NodeStatus
-	errorMessage?: string
-	createdAt?: number
+	id: string;
+	parentIds: string[];
+	role: 'user' | 'assistant' | 'system';
+	type: BasicNodeTypes | string;
+	status?: NodeStatus;
+	errorMessage?: string;
+	createdAt?: number;
 	metadata?: {
-		x: number
-		y: number
-		height?: number
-		[key: string]: unknown
-	}
-	data?: unknown
+		x: number;
+		y: number;
+		height?: number;
+		[key: string]: unknown;
+	};
+	data?: unknown;
 }
 
 export interface MessageNode extends Node {
-	content: string
+	content: string;
 }
 
 /**
@@ -35,47 +35,47 @@ export interface MessageNode extends Node {
  */
 export type CustomTraekNode = Node & {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	component: unknown
-	props?: Record<string, unknown>
-}
+	component: unknown;
+	props?: Record<string, unknown>;
+};
 
 /** Props every custom node component receives from the canvas. */
 export type TraekNodeComponentProps = {
-	node: Node
-	engine: unknown // typed as the framework-specific engine in each wrapper
-	isActive: boolean
-}
+	node: Node;
+	engine: unknown; // typed as the framework-specific engine in each wrapper
+	isActive: boolean;
+};
 
 /** Payload for bulk add; id optional (for saved projects). */
 export interface AddNodePayload {
-	id?: string
-	parentIds: string[]
-	content: string
-	role: 'user' | 'assistant' | 'system'
-	type?: MessageNode['type']
-	status?: NodeStatus
-	errorMessage?: string
-	createdAt?: number
-	metadata?: Partial<NonNullable<MessageNode['metadata']>>
-	data?: unknown
+	id?: string;
+	parentIds: string[];
+	content: string;
+	role: 'user' | 'assistant' | 'system';
+	type?: MessageNode['type'];
+	status?: NodeStatus;
+	errorMessage?: string;
+	createdAt?: number;
+	metadata?: Partial<NonNullable<MessageNode['metadata']>>;
+	data?: unknown;
 }
 
 export interface TraekEngineConfig {
-	focusDurationMs: number
-	zoomSpeed: number
-	zoomLineModeBoost: number
-	scaleMin: number
-	scaleMax: number
-	nodeWidth: number
-	nodeHeightDefault: number
-	streamIntervalMs: number
-	rootNodeOffsetX: number
-	rootNodeOffsetY: number
-	layoutGapX: number
-	layoutGapY: number
-	heightChangeThreshold: number
+	focusDurationMs: number;
+	zoomSpeed: number;
+	zoomLineModeBoost: number;
+	scaleMin: number;
+	scaleMax: number;
+	nodeWidth: number;
+	nodeHeightDefault: number;
+	streamIntervalMs: number;
+	rootNodeOffsetX: number;
+	rootNodeOffsetY: number;
+	layoutGapX: number;
+	layoutGapY: number;
+	heightChangeThreshold: number;
 	/** Pixels per grid unit; positions (metadata.x, metadata.y) are in grid units. */
-	gridStep: number
+	gridStep: number;
 }
 
 export const DEFAULT_TRACK_ENGINE_CONFIG: TraekEngineConfig = {
@@ -93,4 +93,4 @@ export const DEFAULT_TRACK_ENGINE_CONFIG: TraekEngineConfig = {
 	layoutGapY: 50,
 	heightChangeThreshold: 5,
 	gridStep: 20
-}
+};
