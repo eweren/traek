@@ -166,6 +166,23 @@
 		return () => keyboardNavigator?.destroy();
 	});
 
+	// Auto-focus viewport so keyboard navigation works immediately
+	$effect(() => {
+		if (viewport?.viewportEl && resolvedMode === 'canvas') {
+			viewport.viewportEl.focus({ preventScroll: true });
+		}
+	});
+
+	// Pan to keyboard-focused node when it changes
+	$effect(() => {
+		const focusedId = keyboardNavigator?.focusedNodeId;
+		if (!focusedId || !engine || !viewport) return;
+		const focusedNode = engine.getNode(focusedId);
+		if (focusedNode) {
+			viewport.centerOnNode(focusedNode, engine.nodes);
+		}
+	});
+
 	// Viewport-based mode detection
 	let viewportWidth = $state(typeof window !== 'undefined' ? window.innerWidth : 1024);
 	$effect(() => {
@@ -301,10 +318,10 @@
 	// Search state
 	let showSearchBar = $state(false);
 
-	// Desktop tour state
+	// Desktop tour state (tourDelay < 0 disables the tour entirely)
 	let showDesktopTour = $state(false);
 	$effect(() => {
-		if (typeof localStorage === 'undefined' || resolvedMode !== 'canvas') return;
+		if (tourDelay < 0 || typeof localStorage === 'undefined' || resolvedMode !== 'canvas') return;
 		const tourCompleted = localStorage.getItem('traek-desktop-tour-completed');
 		if (!tourCompleted) {
 			if (tourDelay > 0) {
@@ -598,7 +615,11 @@
 				}
 			}}
 			onwheel={interaction?.handleWheel}
-			onmousedown={interaction?.handleMouseDown}
+			onmousedown={(e) => {
+				interaction?.handleMouseDown(e);
+				// Re-focus viewport after click so keyboard navigation keeps working
+				viewport?.viewportEl?.focus({ preventScroll: true });
+			}}
 			onmousemove={interaction?.handleMouseMove}
 			onmouseup={interaction?.handleMouseUp}
 			onmouseleave={interaction?.handleMouseUp}
@@ -835,7 +856,9 @@
 			outline: none;
 		}
 		.viewport:focus-visible {
-			box-shadow: inset 0 0 0 2px var(--traek-input-button-bg, #00d8ff);
+			/* No visible focus ring on the viewport itself — keyboard focus is shown
+			   on individual nodes via the .keyboard-focused class */
+			box-shadow: none;
 		}
 		.viewport.grabbing {
 			cursor: grabbing;

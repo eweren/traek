@@ -110,7 +110,7 @@ npm install traek
 						showStats={false}
 						breadcrumbMinNodes={999}
 						minimapMinNodes={999}
-						tourDelay={999999}
+						tourDelay={-1}
 						initialScale={0.85}
 					>
 						{#snippet initialOverlay()}

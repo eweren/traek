@@ -11,6 +11,7 @@
 	let {
 		node,
 		isActive,
+		isFocused = false,
 		engine,
 		viewportRoot = null,
 		gridStep = 20,
@@ -24,6 +25,7 @@
 	} = $props<{
 		node: MessageNode;
 		isActive: boolean;
+		isFocused?: boolean;
 		engine?: TraekEngine;
 		viewportRoot?: HTMLElement | null;
 		gridStep?: number;
@@ -221,6 +223,7 @@
 <TraekNodeWrapper
 	{node}
 	{isActive}
+	{isFocused}
 	{engine}
 	{viewportRoot}
 	{gridStep}

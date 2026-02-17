@@ -321,8 +321,8 @@ export const highContrastTheme: TraekTheme = {
 		thoughtFooterMuted: '#ffffff',
 		thoughtFooterBg: 'rgba(255, 255, 255, 0.1)',
 		thoughtFooterBorder: 'rgba(255, 255, 255, 0.2)',
-		thoughtToggleBg: '#ffffff',
-		thoughtToggleBorder: '#00ffff',
+		thoughtToggleBg: '#000000',
+		thoughtToggleBorder: '#ffffff',
 
 		// Overlays
 		overlayGradient1: 'rgba(0, 0, 0, 0.9)',

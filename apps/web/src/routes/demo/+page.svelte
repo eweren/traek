@@ -40,7 +40,7 @@
 		</button>
 
 		<div class="chatlist-wrap">
-			<ChatList {store} onSelect={open} onCreate={newChat} />
+			<ChatList {store} onSelect={open} />
 		</div>
 
 		<details class="info-details">
