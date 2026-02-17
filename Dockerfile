@@ -8,6 +8,7 @@ RUN corepack enable
 COPY . .
 RUN pnpm install --frozen-lockfile
 RUN pnpm exec turbo build --filter=@traek/web... --no-daemon
+RUN pnpm --filter @traek/web deploy --prod /app/web-deploy
 
 # Production stage
 FROM node:22-alpine AS runner
@@ -18,6 +19,7 @@ ENV NODE_ENV=production
 ENV HOST=0.0.0.0
 ENV PORT=3000
 
+COPY --from=builder /app/web-deploy/node_modules ./node_modules
 COPY --from=builder /app/apps/web/build ./build
 
 EXPOSE 3000
