@@ -1,11 +1,45 @@
-import { useCallback, useMemo, useSyncExternalStore } from 'react';
+import { useCallback, useMemo, useRef, useSyncExternalStore } from 'react';
 import { TraekEngine } from '@traek/core';
-import type { TraekEngineConfig } from '@traek/core';
+import type { Node, TraekEngineConfig } from '@traek/core';
+
+type Snapshot = ReturnType<TraekEngine['getSnapshot']>;
+
+/** Cached empty snapshot for SSR; matches getSnapshot() shape. */
+const EMPTY_SNAPSHOT: Snapshot = {
+	nodes: [] as Node[],
+	activeNodeId: null,
+	collapsedNodes: new Set<string>(),
+	searchQuery: '',
+	searchMatches: [],
+	currentSearchIndex: 0,
+	pendingFocusNodeId: null
+};
+
+/** No-op subscribe when engine is missing (SSR/hydration). */
+function noopSubscribe(_onStoreChange: () => void): () => void {
+	return () => {};
+}
+
+function snapshotEqual(a: Snapshot, b: Snapshot): boolean {
+	return (
+		a.nodes === b.nodes &&
+		a.activeNodeId === b.activeNodeId &&
+		a.collapsedNodes === b.collapsedNodes &&
+		a.searchQuery === b.searchQuery &&
+		a.searchMatches === b.searchMatches &&
+		a.currentSearchIndex === b.currentSearchIndex &&
+		a.pendingFocusNodeId === b.pendingFocusNodeId
+	);
+}
 
 /**
  * Subscribe to a TraekEngine instance and return its current reactive state.
  *
  * Uses React 18's `useSyncExternalStore` for tear-free rendering.
+ * Caches snapshot by identity so we return the same reference when engine state
+ * is unchanged (core getSnapshot() returns a new object every time, which would
+ * otherwise cause infinite re-renders).
+ * If engine is undefined (e.g. during hydration), returns EMPTY_SNAPSHOT.
  *
  * @example
  * ```tsx
@@ -15,29 +49,26 @@ import type { TraekEngineConfig } from '@traek/core';
  * return <div>{state.nodes.length} nodes</div>
  * ```
  */
-export function useTraekEngine(engine: TraekEngine) {
-	const getSnapshot = useCallback(() => engine.getSnapshot(), [engine]);
+export function useTraekEngine(engine: TraekEngine | undefined) {
+	const lastSnapshotRef = useRef<Snapshot | null>(null);
 
-	// useSyncExternalStore requires the subscribe callback NOT to call the
-	// listener immediately (React calls getSnapshot() separately), but the
-	// TraekEngine.subscribe() does call immediately.  We wrap it to skip
-	// the immediate call.
 	const subscribe = useCallback(
-		(onStoreChange: () => void) => {
-			let initialized = false;
-			const unsub = engine.subscribe(() => {
-				if (!initialized) {
-					initialized = true;
-					return;
-				}
-				onStoreChange();
-			});
-			return unsub;
-		},
+		(onStoreChange: () => void) =>
+			engine ? engine.subscribe(onStoreChange) : noopSubscribe(onStoreChange),
 		[engine]
 	);
 
-	return useSyncExternalStore(subscribe, getSnapshot);
+	const getSnapshot = useCallback(() => {
+		const next = engine ? engine.getSnapshot() : EMPTY_SNAPSHOT;
+		const last = lastSnapshotRef.current;
+		if (last && snapshotEqual(last, next)) return last;
+		lastSnapshotRef.current = next;
+		return next;
+	}, [engine]);
+
+	const getServerSnapshot = useCallback(() => EMPTY_SNAPSHOT, []);
+
+	return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }
 
 /**

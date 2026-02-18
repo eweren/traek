@@ -5,6 +5,11 @@ import svelte from '@astrojs/svelte';
 import vue from '@astrojs/vue';
 
 export default defineConfig({
+	vite: {
+		resolve: {
+			dedupe: ['react', 'react-dom']
+		}
+	},
 	integrations: [
 		react(),
 		svelte(),

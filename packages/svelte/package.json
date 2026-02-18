@@ -1,6 +1,6 @@
 {
 	"name": "@traek/svelte",
-	"version": "0.0.3",
+	"version": "0.0.4",
 	"description": "Svelte 5 adapter for Træk – spatial tree-chat UI for AI agents",
 	"author": "Nico Hülscher",
 	"license": "MIT",

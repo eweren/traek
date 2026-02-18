@@ -38,6 +38,15 @@ importers:
       '@traek/core':
         specifier: workspace:*
         version: link:../../packages/core
+      '@traek/react':
+        specifier: workspace:*
+        version: link:../../packages/react
+      '@traek/svelte':
+        specifier: workspace:*
+        version: link:../../packages/svelte
+      '@traek/vue':
+        specifier: workspace:*
+        version: link:../../packages/vue
       astro:
         specifier: ^5.6.1
         version: 5.17.2(@types/node@24.10.13)(rollup@4.57.1)(tsx@4.21.0)(typescript@5.9.3)
@@ -74,7 +83,7 @@ importers:
         version: 5.2.1(svelte@5.51.2)
       '@traek/svelte':
         specifier: workspace:*
-        version: link:../../packages/sdk
+        version: link:../../packages/svelte
       dompurify:
         specifier: ^3.3.1
         version: 3.3.1
@@ -220,7 +229,7 @@ importers:
         specifier: ^4.0.18
         version: 4.0.18(@types/node@24.10.13)(jsdom@28.1.0)(tsx@4.21.0)
 
-  packages/sdk:
+  packages/svelte:
     dependencies:
       '@iconify/svelte':
         specifier: ^5.2.1
@@ -5974,8 +5983,8 @@ snapshots:
 
   '@typescript-eslint/project-service@8.54.0(typescript@5.9.3)':
     dependencies:
-      '@typescript-eslint/tsconfig-utils': 8.54.0(typescript@5.9.3)
-      '@typescript-eslint/types': 8.54.0
+      '@typescript-eslint/tsconfig-utils': 8.56.0(typescript@5.9.3)
+      '@typescript-eslint/types': 8.56.0
       debug: 4.4.3
       typescript: 5.9.3
     transitivePeerDependencies:

@@ -119,17 +119,12 @@
 
 	@layer base {
 		.floating-input-container {
-			position: fixed;
-			bottom: 20px;
-			left: 50%;
-			transform: translateX(-50%);
-			width: 100%;
-			max-width: calc(min(600px, 100vw) - 3rem);
-			z-index: 100;
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			gap: 12px;
+			position: absolute;
+			bottom: 0;
+			left: 0;
+			right: 0;
+			padding: 16px;
+			background: linear-gradient(to top, var(--traek-canvas-bg, #0d0d0d) 60%, transparent);
 		}
 
 		.input-wrapper {

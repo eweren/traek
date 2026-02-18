@@ -564,10 +564,53 @@ export class TraekEngine {
 
 	// ─── Undo buffer ──────────────────────────────────────────────────────────
 
+	/**
+	 * Clone a node for the undo buffer. Copies only serializable fields so we
+	 * avoid DataCloneError from structuredClone (e.g. CustomTraekNode.component,
+	 * or non-cloneable data/metadata).
+	 */
+	private cloneNodeForUndoBuffer(n: Node): Node {
+		let metadata: Node['metadata'];
+		if (n.metadata) {
+			try {
+				metadata = structuredClone(n.metadata);
+			} catch {
+				metadata = {
+					x: n.metadata.x ?? 0,
+					y: n.metadata.y ?? 0,
+					...(n.metadata.height != null && { height: n.metadata.height })
+				};
+			}
+		}
+		let data: unknown;
+		if (n.data != null) {
+			try {
+				data = structuredClone(n.data);
+			} catch {
+				data = undefined;
+			}
+		}
+		const base: Node = {
+			id: n.id,
+			parentIds: [...n.parentIds],
+			role: n.role,
+			type: n.type,
+			status: n.status,
+			errorMessage: n.errorMessage,
+			createdAt: n.createdAt,
+			metadata,
+			data
+		};
+		if ('content' in n && typeof (n as MessageNode).content === 'string') {
+			(base as MessageNode).content = (n as MessageNode).content;
+		}
+		return base;
+	}
+
 	private storeDeletedBuffer(nodes: Node[]): void {
 		clearTimeout(this.deleteUndoTimeoutId);
 		this.lastDeletedBuffer = {
-			nodes: nodes.map((n) => structuredClone(n)),
+			nodes: nodes.map((n) => this.cloneNodeForUndoBuffer(n)),
 			activeNodeId: this.activeNodeId,
 			timestamp: Date.now()
 		};

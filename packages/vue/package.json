@@ -19,7 +19,7 @@
 		"!dist/**/*.spec.*"
 	],
 	"scripts": {
-		"build": "vue-tsc --project tsconfig.build.json && node scripts/fixExtensions.js",
+		"build": "vue-tsc --project tsconfig.build.json",
 		"check": "vue-tsc --noEmit",
 		"lint": "prettier --check .",
 		"clean": "rm -rf node_modules dist coverage .turbo",
