@@ -5,7 +5,7 @@ description: What is Træk and why use it?
 
 # Introduction
 
-Træk (`traek`) is a Svelte 5 UI library for building **spatial, tree-structured AI conversation interfaces**.
+Træk (`traek`) is a UI library for building **spatial, tree-structured AI conversation interfaces**. Built with Svelte 5 at its core, with first-class support for **React**, **vanilla JavaScript**, and any framework via `@traek/elements`.
 
 Instead of the traditional linear chat UI, Træk renders messages as **nodes on a pannable/zoomable canvas** with full branching support. Users can explore multiple conversation branches, compare responses, and navigate complex AI interactions visually.
 
@@ -18,6 +18,7 @@ Instead of the traditional linear chat UI, Træk renders messages as **nodes on 
 - **Mobile Ready** — Touch gestures, swipe navigation, focus mode
 - **Dark Theme** — Beautiful dark-first design with CSS custom properties
 - **Extensible** — Custom node types and component overrides
+- **Multi-Framework** — Use with Svelte, React, Vue, or vanilla JS
 
 ## When to Use Træk
 

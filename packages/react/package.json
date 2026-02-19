@@ -1,0 +1,63 @@
+{
+	"name": "@traek/react",
+	"version": "0.0.3",
+	"description": "React wrapper for traek — spatial tree-chat UI for AI agents",
+	"author": "Nico Hülscher",
+	"license": "MIT",
+	"type": "module",
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js"
+		}
+	},
+	"files": [
+		"dist",
+		"!dist/**/*.test.*",
+		"!dist/**/*.spec.*"
+	],
+	"scripts": {
+		"build": "tsc",
+		"check": "tsc --noEmit",
+		"lint": "prettier --check . && eslint .",
+		"format": "prettier --write . && eslint . --fix",
+		"clean": "rm -rf node_modules dist .turbo",
+		"test": "echo 'no tests yet'"
+	},
+	"dependencies": {
+		"@traek/elements": "workspace:*"
+	},
+	"peerDependencies": {
+		"react": "^18.0.0 || ^19.0.0",
+		"react-dom": "^18.0.0 || ^19.0.0"
+	},
+	"devDependencies": {
+		"@eslint/compat": "2.0.2",
+		"@eslint/js": "9.39.2",
+		"@types/react": "^19.1.8",
+		"@types/react-dom": "^19.1.6",
+		"eslint": "^9.39.2",
+		"eslint-config-prettier": "10.1.8",
+		"globals": "17.3.0",
+		"react": "^19.1.0",
+		"react-dom": "^19.1.0",
+		"typescript": "^5.9.3",
+		"typescript-eslint": "^8.56.0"
+	},
+	"keywords": [
+		"traek",
+		"react",
+		"ai",
+		"chat",
+		"tree",
+		"conversation",
+		"canvas"
+	],
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/gettraek/traek.git",
+		"directory": "packages/react"
+	}
+}

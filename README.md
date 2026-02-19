@@ -2,7 +2,7 @@
 
 > **Follow ideas, not threads.**
 
-**traek** is a Svelte 5 UI library for building spatial, tree-structured AI conversation interfaces.
+**traek** is a UI library for building spatial, tree-structured AI conversation interfaces. Built with Svelte 5 at its core, with first-class support for **React**, **vanilla JavaScript**, and any framework via `@traek/elements`.
 
 _traek (/traek/) comes from Danish **trae** (tree) and English **track** (path)._
 
@@ -133,15 +133,21 @@ You don't scroll conversations.
 
 ---
 
-## Quick Start
+## Packages
 
-Install the package:
+| Package | Description |
+|---------|-------------|
+| [`traek`](./packages/sdk) | Core Svelte 5 library -- components, engine, themes, persistence |
+| [`@traek/elements`](./packages/elements) | Framework-agnostic mount API -- use in vanilla JS, Vue, Angular, etc. |
+| [`@traek/react`](./packages/react) | React wrapper -- `<TraekCanvas>` component and `useTraekEngine` hook |
+
+---
+
+## Quick Start (Svelte)
 
 ```bash
 npm install traek
 ```
-
-Create a spatial AI chat:
 
 ```svelte
 <script lang="ts">
@@ -168,6 +174,73 @@ Create a spatial AI chat:
 
 <TraekCanvas {engine} {onSendMessage} />
 ```
+
+---
+
+## Quick Start (React)
+
+```bash
+npm install @traek/react
+```
+
+```tsx
+import { TraekCanvas, useTraekEngine, type MessageNode } from '@traek/react';
+import '@traek/elements/styles.css';
+
+function App() {
+  const engine = useTraekEngine();
+
+  function onSendMessage(input: string, _userNode: MessageNode) {
+    engine.addNode(input, 'user');
+
+    const assistantNode = engine.addNode('', 'assistant', {
+      autofocus: true
+    });
+
+    engine.updateNode(assistantNode.id, { status: 'streaming' });
+    // stream chunks, then set status: 'done'
+  }
+
+  return (
+    <TraekCanvas
+      engine={engine}
+      onSendMessage={onSendMessage}
+      style={{ width: '100%', height: '100vh' }}
+    />
+  );
+}
+```
+
+---
+
+## Quick Start (Vanilla JS / Any Framework)
+
+```bash
+npm install @traek/elements
+```
+
+```js
+import { createTraekCanvas, TraekEngine } from '@traek/elements';
+import '@traek/elements/styles.css';
+
+const engine = new TraekEngine();
+
+const canvas = createTraekCanvas(document.getElementById('app'), {
+  engine,
+  onSendMessage: (input, userNode) => {
+    engine.addNode(input, 'user');
+
+    const reply = engine.addNode('', 'assistant', { autofocus: true });
+    engine.updateNode(reply.id, { status: 'streaming' });
+    // stream chunks, then set status: 'done'
+  }
+});
+
+// Later: clean up
+// canvas.destroy();
+```
+
+This also works with Vue, Angular, or any framework that can mount to a DOM element.
 
 ---
 
@@ -394,7 +467,7 @@ If you only need a simple message list -- traek is probably not the right tool.
 
 ## Exports
 
-The main `traek` package exports:
+### `traek` (Svelte)
 
 **Components:** `TraekCanvas`, `TextNode`, `DefaultLoadingOverlay`, `FocusMode`, `ReplayControls`, `SaveIndicator`, `ChatList`, `HeaderBar`, `ToastContainer`, `Toast`, `ThemeProvider`, `ThemePicker`, `DesktopTour`, `ActionBadges`, `SlashCommandDropdown`, `TagBadges`, `TagDropdown`, `TagFilter`
 
@@ -413,6 +486,20 @@ The main `traek` package exports:
 **Tags:** `PREDEFINED_TAGS`, `getNodeTags()`, `getTagConfig()`, `matchesTagFilter()`
 
 **Validation:** Zod schemas for snapshots, configs, node types, and actions
+
+### `@traek/elements` (Vanilla JS / Any Framework)
+
+**Mount API:** `createTraekCanvas()` -- mount a full TraekCanvas into any DOM element
+
+Re-exports engine, types, themes, i18n, persistence utilities, and Zod schemas from `traek` so non-Svelte consumers have a single import source. Svelte-specific features (Snippets, Component references) are omitted.
+
+### `@traek/react`
+
+**Components:** `TraekCanvas` -- React component wrapping the Svelte canvas
+
+**Hooks:** `useTraekEngine()` -- creates and memoizes a `TraekEngine` instance
+
+Re-exports all `@traek/elements` types for convenience.
 
 ---
 
