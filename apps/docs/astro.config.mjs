@@ -30,6 +30,8 @@ export default defineConfig({
 					label: 'Integration Guide',
 					items: [
 						{ label: 'With SvelteKit', slug: 'guides/sveltekit' },
+						{ label: 'With React', slug: 'guides/react' },
+						{ label: 'With Vanilla JS / Vue', slug: 'guides/vanilla-js' },
 						{ label: 'OpenAI Streaming', slug: 'guides/openai-streaming' },
 						{ label: 'Custom Node Types', slug: 'guides/custom-nodes' }
 					]
