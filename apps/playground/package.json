@@ -14,6 +14,7 @@
 	},
 	"dependencies": {
 		"@traek/svelte": "workspace:*",
+		"@traek/collab": "workspace:*",
 		"@lucia-auth/adapter-postgresql": "^1.0.1",
 		"lucia": "^3.2.2",
 		"@supabase/supabase-js": "^2.49.4",

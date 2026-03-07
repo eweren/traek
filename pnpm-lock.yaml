@@ -84,6 +84,9 @@ importers:
       '@supabase/supabase-js':
         specifier: ^2.49.4
         version: 2.98.0
+      '@traek/collab':
+        specifier: workspace:*
+        version: link:../../packages/collab
       '@traek/svelte':
         specifier: workspace:*
         version: link:../../packages/svelte

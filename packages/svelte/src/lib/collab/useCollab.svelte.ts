@@ -28,10 +28,13 @@
 
 import { CollabProvider } from '@traek/collab';
 import type { CollabConfig, CollabStatus, PresenceState } from '@traek/collab';
-import type { TraekEngine as CoreTraekEngine } from '@traek/core';
 
-// Accept either @traek/core or @traek/svelte TraekEngine — they share the same interface.
-type TraekEngine = CoreTraekEngine;
+/**
+ * Minimal structural interface accepted as the engine parameter.
+ * Both @traek/core and @traek/svelte TraekEngine satisfy this shape.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type TraekEngine = Record<string, any>;
 
 export interface CollabHandle {
 	/** The underlying provider instance. Pass to collab UI components. */
@@ -57,7 +60,7 @@ export interface CollabHandle {
  * Svelte 5 rune context) so that the cleanup `$effect` runs on destroy.
  */
 export function useCollab(engine: TraekEngine, config: CollabConfig): CollabHandle {
-	let provider = $state<CollabProvider>(new CollabProvider(engine as never, config));
+	const provider = $state<CollabProvider>(new CollabProvider(engine as never, config));
 	let status = $state<CollabStatus>('connecting');
 	let peers = $state<Map<number, PresenceState>>(new Map());
 
