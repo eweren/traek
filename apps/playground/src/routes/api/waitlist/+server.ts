@@ -5,7 +5,8 @@ import { sendWaitlistConfirmation } from '$lib/server/email';
 import type { RequestHandler } from './$types';
 
 const WaitlistSchema = z.object({
-	email: z.string().email('Invalid email address').max(320)
+	email: z.string().email('Invalid email address').max(320),
+	referral: z.string().max(100).optional()
 });
 
 export const POST: RequestHandler = async ({ request }) => {
@@ -22,14 +23,17 @@ export const POST: RequestHandler = async ({ request }) => {
 		return json({ error: firstIssue?.message ?? 'Invalid input' }, { status: 400 });
 	}
 
-	const { email } = parsed.data;
+	const { email, referral } = parsed.data;
 
 	try {
 		// Upsert into waitlist table (no-op if already exists)
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		const { error } = await (db() as any)
 			.from('waitlist')
-			.upsert({ email, joined_at: new Date().toISOString() }, { onConflict: 'email' });
+			.upsert(
+				{ email, joined_at: new Date().toISOString(), ...(referral ? { referral } : {}) },
+				{ onConflict: 'email' }
+			);
 
 		if (error) {
 			console.error('Waitlist upsert error:', error);

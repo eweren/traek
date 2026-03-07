@@ -1,21 +1,32 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import type { LayoutData } from './$types.js';
 
 	let { data }: { data: LayoutData } = $props();
 
 	let email = $state('');
+	let referral = $state('');
 	let waitlistStatus = $state<'idle' | 'loading' | 'done' | 'error'>('idle');
 	let waitlistError = $state('');
+
+	// Capture referral code from URL ?ref= param
+	onMount(() => {
+		const params = new URLSearchParams(window.location.search);
+		const ref = params.get('ref') ?? '';
+		if (ref) referral = ref;
+	});
 
 	async function joinWaitlist(e: SubmitEvent) {
 		e.preventDefault();
 		if (!email.trim()) return;
 		waitlistStatus = 'loading';
 		try {
+			const body: Record<string, string> = { email: email.trim() };
+			if (referral) body.referral = referral;
 			const res = await fetch('/api/waitlist', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ email: email.trim() })
+				body: JSON.stringify(body)
 			});
 			if (res.ok) {
 				waitlistStatus = 'done';
@@ -29,6 +40,35 @@
 			waitlistStatus = 'error';
 		}
 	}
+
+	// FAQ accordion
+	let openFaq = $state<number | null>(null);
+	function toggleFaq(i: number) {
+		openFaq = openFaq === i ? null : i;
+	}
+
+	const faqs = [
+		{
+			q: 'What is BYOK?',
+			a: 'BYOK stands for Bring Your Own Key. You connect your own OpenAI or Anthropic API key. Traek never stores or proxies your key — it stays in your browser and goes directly to the AI provider.'
+		},
+		{
+			q: 'Is my data safe?',
+			a: 'On the Free plan, all conversations are stored locally in your browser — we never see them. Pro subscribers get optional cloud sync with encryption at rest. Your API key is encrypted in your session and never logged.'
+		},
+		{
+			q: 'When does it launch?',
+			a: 'We are targeting a public launch in Q2 2026. Waitlist members get early access first, with a 30-day free Pro trial on signup.'
+		},
+		{
+			q: 'What models does it support?',
+			a: 'Any model available through your OpenAI or Anthropic API key — GPT-4o, o1, Claude 3.5 Sonnet, Claude 3 Opus, and more. We support streaming and extended thinking.'
+		},
+		{
+			q: 'Can I use it for free?',
+			a: 'Yes. The Free tier includes 5 saved conversations with the full canvas experience — no credit card required. Upgrade to Pro for unlimited cloud-synced conversations.'
+		}
+	];
 </script>
 
 <svelte:head>
@@ -547,6 +587,99 @@
 					<p class="waitlist-error">{waitlistError}</p>
 				{/if}
 			{/if}
+		</div>
+	</section>
+
+	<!-- The problem section -->
+	<section class="problem-section">
+		<div class="problem-inner">
+			<div class="problem-copy">
+				<div class="section-eyebrow">The problem</div>
+				<h2 class="section-title">Linear chat loses your thinking.</h2>
+				<p class="section-sub">
+					Every time you explore a different angle, you scroll back up, lose the thread, or start
+					over. The model forgets. You forget. Great ideas get buried.
+				</p>
+				<p class="section-sub" style:margin-top="1rem">
+					Traek gives every answer its own space on a canvas. Branch, compare, and revisit — without
+					ever losing context.
+				</p>
+			</div>
+			<div class="problem-visual" aria-hidden="true">
+				<!-- Linear vs spatial comparison -->
+				<div class="compare-block">
+					<div class="compare-col compare-linear">
+						<div class="compare-label compare-label-bad">Linear chat</div>
+						<div class="compare-messages">
+							<div class="msg msg-user">What's the best way to…</div>
+							<div class="msg msg-ai">Here's one approach…</div>
+							<div class="msg msg-user">What about a different angle?</div>
+							<div class="msg msg-ai msg-buried">Context: 4 messages ago…</div>
+							<div class="msg msg-user">Can we go back to…</div>
+							<div class="msg msg-ai msg-lost">I don't have context for…</div>
+						</div>
+					</div>
+					<div class="compare-divider" aria-hidden="true">vs</div>
+					<div class="compare-col compare-spatial">
+						<div class="compare-label compare-label-good">Traek canvas</div>
+						<div class="canvas-mini" aria-hidden="true">
+							<div class="mini-node mini-root">Your prompt</div>
+							<div class="mini-branches">
+								<div class="mini-branch">
+									<div class="mini-node mini-branch-a">Path A</div>
+									<div class="mini-node mini-leaf-a">Deeper…</div>
+								</div>
+								<div class="mini-branch">
+									<div class="mini-node mini-branch-b">Path B</div>
+									<div class="mini-node mini-leaf-b">Alternative</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- FAQ -->
+	<section class="faq-section">
+		<div class="faq-inner">
+			<div class="section-eyebrow">FAQ</div>
+			<h2 class="section-title">Common questions.</h2>
+
+			<div class="faq-list">
+				{#each faqs as faq, i}
+					<div class="faq-item" class:faq-open={openFaq === i}>
+						<button
+							type="button"
+							class="faq-question"
+							aria-expanded={openFaq === i}
+							onclick={() => toggleFaq(i)}
+						>
+							<span>{faq.q}</span>
+							<svg
+								class="faq-chevron"
+								width="16"
+								height="16"
+								viewBox="0 0 16 16"
+								fill="none"
+								aria-hidden="true"
+							>
+								<path
+									d="M4 6l4 4 4-4"
+									stroke="currentColor"
+									stroke-width="1.5"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								/>
+							</svg>
+						</button>
+						{#if openFaq === i}
+							<div class="faq-answer">{faq.a}</div>
+						{/if}
+					</div>
+				{/each}
+			</div>
 		</div>
 	</section>
 
@@ -1344,6 +1477,248 @@
 
 		h1 {
 			font-size: 2.4rem;
+		}
+	}
+
+	/* ------------------------------------------------------------------ */
+	/* Problem section                                                      */
+	/* ------------------------------------------------------------------ */
+	.problem-section {
+		border-top: 1px solid var(--pg-border);
+		padding: 5rem max(5vw, 1.5rem);
+	}
+
+	.problem-inner {
+		max-width: 1200px;
+		margin: 0 auto;
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 4rem;
+		align-items: center;
+	}
+
+	.compare-block {
+		display: flex;
+		gap: 1.5rem;
+		align-items: flex-start;
+	}
+
+	.compare-col {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		gap: 0.6rem;
+	}
+
+	.compare-label {
+		font-size: 0.72rem;
+		font-weight: 600;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		margin-bottom: 0.25rem;
+	}
+
+	.compare-label-bad {
+		color: #ff6b6b;
+	}
+
+	.compare-label-good {
+		color: var(--pg-cyan);
+	}
+
+	.compare-messages {
+		display: flex;
+		flex-direction: column;
+		gap: 0.4rem;
+	}
+
+	.msg {
+		padding: 0.5rem 0.75rem;
+		border-radius: 8px;
+		font-size: 0.72rem;
+		line-height: 1.4;
+	}
+
+	.msg-user {
+		background: rgba(255, 255, 255, 0.06);
+		color: var(--pg-text-secondary);
+		align-self: flex-end;
+	}
+
+	.msg-ai {
+		background: var(--pg-bg-card);
+		border: 1px solid var(--pg-border);
+		color: var(--pg-text-secondary);
+	}
+
+	.msg-buried {
+		opacity: 0.4;
+		font-style: italic;
+	}
+
+	.msg-lost {
+		border-color: rgba(255, 107, 107, 0.3);
+		color: #ff6b6b;
+		opacity: 0.7;
+	}
+
+	.compare-divider {
+		font-size: 0.75rem;
+		font-weight: 700;
+		color: var(--pg-text-muted);
+		padding-top: 1.5rem;
+		flex-shrink: 0;
+	}
+
+	.canvas-mini {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.mini-node {
+		padding: 0.45rem 0.9rem;
+		border-radius: 8px;
+		font-size: 0.7rem;
+		font-weight: 500;
+		text-align: center;
+		white-space: nowrap;
+	}
+
+	.mini-root {
+		background: rgba(0, 216, 255, 0.1);
+		border: 1px solid rgba(0, 216, 255, 0.35);
+		color: var(--pg-cyan);
+	}
+
+	.mini-branches {
+		display: flex;
+		gap: 0.75rem;
+	}
+
+	.mini-branch {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.4rem;
+	}
+
+	.mini-branch-a,
+	.mini-leaf-a {
+		background: rgba(255, 255, 255, 0.05);
+		border: 1px solid rgba(255, 255, 255, 0.12);
+		color: var(--pg-text-secondary);
+	}
+
+	.mini-branch-b,
+	.mini-leaf-b {
+		background: rgba(0, 255, 163, 0.06);
+		border: 1px solid rgba(0, 255, 163, 0.2);
+		color: var(--pg-lime);
+	}
+
+	@media (max-width: 900px) {
+		.problem-inner {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	@media (max-width: 640px) {
+		.problem-section {
+			padding-inline: 1.25rem;
+		}
+
+		.compare-block {
+			flex-direction: column;
+		}
+
+		.compare-divider {
+			align-self: center;
+			padding-top: 0;
+		}
+	}
+
+	/* ------------------------------------------------------------------ */
+	/* FAQ                                                                  */
+	/* ------------------------------------------------------------------ */
+	.faq-section {
+		border-top: 1px solid var(--pg-border);
+		padding: 5rem max(5vw, 1.5rem);
+	}
+
+	.faq-inner {
+		max-width: 760px;
+		margin: 0 auto;
+	}
+
+	.faq-list {
+		margin-top: 2.5rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0;
+		border: 1px solid var(--pg-border);
+		border-radius: 16px;
+		overflow: hidden;
+	}
+
+	.faq-item {
+		border-bottom: 1px solid var(--pg-border);
+	}
+
+	.faq-item:last-child {
+		border-bottom: none;
+	}
+
+	.faq-question {
+		width: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		padding: 1.1rem 1.5rem;
+		background: transparent;
+		border: none;
+		cursor: pointer;
+		font-family: inherit;
+		font-size: 0.9375rem;
+		font-weight: 500;
+		color: var(--pg-text);
+		text-align: left;
+		transition: background 0.15s;
+	}
+
+	.faq-question:hover {
+		background: var(--pg-bg-card);
+	}
+
+	.faq-open .faq-question {
+		background: var(--pg-bg-card);
+		color: var(--pg-cyan);
+	}
+
+	.faq-chevron {
+		flex-shrink: 0;
+		color: var(--pg-text-muted);
+		transition: transform 0.2s;
+	}
+
+	.faq-open .faq-chevron {
+		transform: rotate(180deg);
+		color: var(--pg-cyan);
+	}
+
+	.faq-answer {
+		padding: 0 1.5rem 1.25rem;
+		font-size: 0.875rem;
+		color: var(--pg-text-secondary);
+		line-height: 1.65;
+		background: var(--pg-bg-card);
+	}
+
+	@media (max-width: 640px) {
+		.faq-section {
+			padding-inline: 1.25rem;
 		}
 	}
 </style>
