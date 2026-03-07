@@ -15,6 +15,27 @@
  *   get_snippet         — Runnable code snippet for a scenario
  *   scaffold_page       — Generate a complete SvelteKit page + API route
  *
+ * Conversation tools (traek_*):
+ *   traek_list_conversations  — List open conversations
+ *   traek_create_conversation — Create a new conversation
+ *   traek_delete_conversation — Delete a conversation
+ *   traek_load_conversation   — Load from JSON snapshot
+ *   traek_get_conversation_summary — Node count, depth, branches
+ *   traek_add_node            — Add a message node
+ *   traek_update_node         — Edit content or status
+ *   traek_delete_node         — Delete a single node
+ *   traek_delete_branch       — Delete a node and all descendants
+ *   traek_get_node            — Node details
+ *   traek_list_nodes          — List all nodes with previews
+ *   traek_branch_from         — Set active node for branching
+ *   traek_get_branch_context  — Full path from root to node
+ *   traek_search              — Full-text search across nodes
+ *   traek_get_children        — Direct children of a node
+ *   traek_get_siblings        — Siblings of a node
+ *   traek_get_leaves          — All leaf nodes (branch ends)
+ *   traek_export_json         — Export as JSON snapshot
+ *   traek_export_markdown     — Export as Markdown
+ *
  * Resources (URI-addressable):
  *   traek://component/{name}  — Component API reference
  *   traek://guide/{name}      — Integration guide
@@ -30,6 +51,7 @@ import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/
 import { createServer } from 'node:http';
 import { docTools } from './tools/docs';
 import { scaffoldTools } from './tools/scaffold';
+import { conversationTools } from './tools/conversations';
 import { resourceHandlers } from './resources/docs';
 
 function buildServer(): McpServer {
@@ -41,6 +63,11 @@ function buildServer(): McpServer {
 	}
 
 	for (const tool of scaffoldTools) {
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		server.tool(tool.name, tool.description, tool.inputSchema as any, tool.handler as any);
+	}
+
+	for (const tool of conversationTools) {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		server.tool(tool.name, tool.description, tool.inputSchema as any, tool.handler as any);
 	}
