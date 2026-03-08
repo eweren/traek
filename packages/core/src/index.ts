@@ -42,3 +42,6 @@ export type { Unsubscribe, Subscriber } from './store.js';
 // Layout algorithms and types (framework-agnostic)
 export { computeLayout, buildLayoutInput, LAYOUT_MODE_LABELS } from './layout.js';
 export type { LayoutMode, NodePosition, LayoutConfig, LayoutInput } from './layout.js';
+
+// Plugin system
+export type { TraekPlugin } from './plugins.js';

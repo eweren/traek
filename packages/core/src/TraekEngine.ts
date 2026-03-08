@@ -8,7 +8,8 @@ import type {
 	TraekEngineConfig
 } from './types.js';
 import { DEFAULT_TRACK_ENGINE_CONFIG } from './types.js';
-import { computeLayout, buildLayoutInput, type LayoutConfig } from './layout.js';
+import { computeLayout, buildLayoutInput, type LayoutConfig, type LayoutMode } from './layout.js';
+import { PluginRunner, type TraekPlugin } from './plugins.js';
 
 export type { ConversationSnapshot };
 
@@ -110,9 +111,35 @@ export class TraekEngine {
 	>;
 
 	private readonly _subscribers = new Set<StateListener>();
+	private readonly _plugins = new PluginRunner();
 
 	constructor(config?: Partial<TraekEngineConfig>) {
 		this.config = { ...DEFAULT_TRACK_ENGINE_CONFIG, ...config };
+	}
+
+	/**
+	 * Register a plugin with the engine.
+	 * Plugins are called in registration order. Each plugin's `onInit` hook fires immediately.
+	 *
+	 * @example
+	 * ```ts
+	 * engine.use({
+	 *   name: 'my-plugin',
+	 *   onNodeAdd(node) {
+	 *     console.log('Node added:', node.id);
+	 *   },
+	 * });
+	 * ```
+	 */
+	use(plugin: TraekPlugin): this {
+		this._plugins.register(plugin);
+		this._plugins.runInit(plugin, this);
+		return this;
+	}
+
+	/** Read-only list of registered plugins. */
+	get plugins(): readonly TraekPlugin[] {
+		return this._plugins.plugins;
 	}
 
 	// ─── Subscription (framework-agnostic reactive interface) ─────────────────
@@ -269,10 +296,12 @@ export class TraekEngine {
 			data: options.data
 		};
 
-		this.nodes.push(newNode);
-		this.syncMapsAfterPush(newNode);
+		const pluginNode = this._plugins.runNodeAdd(newNode, this);
+		const storedNode = pluginNode !== newNode ? Object.assign(newNode, pluginNode) : newNode;
+		this.nodes.push(storedNode);
+		this.syncMapsAfterPush(storedNode);
 		if (options.type !== 'thought') {
-			this.activeNodeId = newNode.id;
+			this.activeNodeId = storedNode.id;
 		}
 
 		const primaryParentId = parentIds[0];
@@ -280,17 +309,17 @@ export class TraekEngine {
 			this.layoutChildren(primaryParentId);
 		}
 
-		this.onNodeCreated?.(newNode);
+		this.onNodeCreated?.(storedNode);
 
 		if (options.autofocus) {
 			queueMicrotask(() => {
-				this.pendingFocusNodeId = newNode.id;
+				this.pendingFocusNodeId = storedNode.id;
 				this._notify();
 			});
 		}
 
 		this._notify();
-		return newNode;
+		return storedNode;
 	}
 
 	addNode(
@@ -325,10 +354,12 @@ export class TraekEngine {
 			data: options.data
 		};
 
-		this.nodes.push(newNode);
-		this.syncMapsAfterPush(newNode);
+		const pluginNode = this._plugins.runNodeAdd(newNode, this);
+		const storedNode = pluginNode !== newNode ? Object.assign(newNode, pluginNode) : newNode;
+		this.nodes.push(storedNode);
+		this.syncMapsAfterPush(storedNode);
 		if (options.type !== 'thought') {
-			this.activeNodeId = newNode.id;
+			this.activeNodeId = storedNode.id;
 		}
 
 		const primaryParentId = parentIds[0];
@@ -336,17 +367,17 @@ export class TraekEngine {
 			this.layoutChildren(primaryParentId);
 		}
 
-		this.onNodeCreated?.(newNode);
+		this.onNodeCreated?.(storedNode);
 
 		if (options.autofocus) {
 			queueMicrotask(() => {
-				this.pendingFocusNodeId = newNode.id;
+				this.pendingFocusNodeId = storedNode.id;
 				this._notify();
 			});
 		}
 
 		this._notify();
-		return newNode;
+		return storedNode;
 	}
 
 	/**
@@ -457,6 +488,7 @@ export class TraekEngine {
 			const node = this.nodes[index];
 			if (node) {
 				this.onNodeDeleting?.(node);
+				this._plugins.runNodeDelete(node, this);
 				this.storeDeletedBuffer([node]);
 			}
 			const primaryParentId = node?.parentIds[0] ?? null;
@@ -771,8 +803,10 @@ export class TraekEngine {
 
 	/** Run layout from every root (no parents). Use after adding nodes with deferLayout. */
 	flushLayoutFromRoot(): void {
+		const mode: LayoutMode = 'tree-vertical';
 		const input = buildLayoutInput(this.nodes, this.childrenIdMap, this.getLayoutConfig());
-		const positions = computeLayout('tree-vertical', input);
+		const rawPositions = computeLayout(mode, input);
+		const positions = this._plugins.runLayout(rawPositions, mode, this);
 		for (const { nodeId, x, y } of positions) {
 			const node = this.getNode(nodeId);
 			if (!node || node.metadata?.manualPosition) continue;
@@ -1082,7 +1116,7 @@ export class TraekEngine {
 	// ─── Serialization ────────────────────────────────────────────────────────
 
 	serialize(title?: string): ConversationSnapshot {
-		return {
+		const snapshot: ConversationSnapshot = {
 			version: 1,
 			createdAt: Date.now(),
 			title,
@@ -1108,6 +1142,7 @@ export class TraekEngine {
 				data: n.data
 			}))
 		};
+		return this._plugins.runSerialize(snapshot, this);
 	}
 
 	static fromSnapshot(
