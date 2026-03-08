@@ -3,9 +3,11 @@
 	import ThemePicker from '../theme/ThemePicker.svelte';
 
 	let {
-		engine
+		engine,
+		onOpenTemplates
 	}: {
 		engine: TraekEngine;
+		onOpenTemplates?: () => void;
 	} = $props();
 </script>
 
@@ -67,6 +69,22 @@
 				</svg>
 			</button>
 		</div>
+	{/if}
+
+	{#if onOpenTemplates}
+		<button
+			class="toolbar-btn templates-btn"
+			onclick={onOpenTemplates}
+			title="Vorlagen (T)"
+			aria-label="Vorlagen"
+		>
+			<svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+				<rect x="1" y="1" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.4" />
+				<rect x="8" y="1" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.4" />
+				<rect x="1" y="8" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.4" />
+				<rect x="8" y="8" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.4" />
+			</svg>
+		</button>
 	{/if}
 
 	<ThemePicker compact={true} />

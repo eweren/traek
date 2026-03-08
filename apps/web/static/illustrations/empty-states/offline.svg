@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240" width="320" height="240" role="img" aria-labelledby="of-title of-desc">
+  <title id="of-title">Offline mode</title>
+  <desc id="of-desc">A Traek canvas showing faded nodes connected by interrupted dashed lines, with a signal-off indicator representing offline mode</desc>
+  <defs>
+    <pattern id="of-grid" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="1" class="dot"/>
+    </pattern>
+    <radialGradient id="of-vignette" cx="50%" cy="50%" r="65%">
+      <stop offset="0%" stop-color="transparent"/>
+      <stop offset="100%" stop-color="#000" stop-opacity="0.5"/>
+    </radialGradient>
+    <style>
+      .bg        { fill: #0b0b0b; }
+      .dot       { fill: #2a2a2a; }
+      .node-bg   { fill: #141414; stroke: #222; stroke-width: 1; }
+      .line-a    { fill: #2a2a2a; }
+      .line-b    { fill: #222; }
+      .conn      { stroke: #252525; stroke-width: 1.5; fill: none; stroke-linecap: round; stroke-dasharray: 5 5; }
+      /* Signal-off icon */
+      .sig-arc   { fill: none; stroke: #444; stroke-width: 2; stroke-linecap: round; }
+      .sig-cross { stroke: #555; stroke-width: 2; stroke-linecap: round; }
+      .sig-dot   { fill: #444; }
+      .badge-bg  { fill: #161616; stroke: #2a2a2a; stroke-width: 1; }
+      .vignette  { fill: url(#of-vignette); }
+
+      @media (prefers-color-scheme: light) {
+        .bg        { fill: #f0f0f0; }
+        .dot       { fill: #c8c8c8; }
+        .node-bg   { fill: #f8f8f8; stroke: #e0e0e0; }
+        .line-a    { fill: #ddd; }
+        .line-b    { fill: #e4e4e4; }
+        .conn      { stroke: #ccc; }
+        .sig-arc   { stroke: #bbb; }
+        .sig-cross { stroke: #bbb; }
+        .sig-dot   { fill: #c0c0c0; }
+        .badge-bg  { fill: #fff; stroke: #ddd; }
+        .vignette  { fill: none; }
+      }
+    </style>
+  </defs>
+
+  <!-- Canvas background -->
+  <rect width="320" height="240" class="bg"/>
+  <rect width="320" height="240" fill="url(#of-grid)" opacity="0.4"/>
+
+  <!-- Root node: 110×52, centered at x=160, y=72 → (105, 46) -->
+  <rect x="105" y="46" width="110" height="52" rx="5" class="node-bg" opacity="0.65"/>
+  <rect x="118" y="62" width="42" height="3" rx="1.5" class="line-a" opacity="0.5"/>
+  <rect x="118" y="70" width="68" height="3" rx="1.5" class="line-b" opacity="0.35"/>
+  <rect x="118" y="78" width="32" height="3" rx="1.5" class="line-b" opacity="0.25"/>
+
+  <!-- Dashed connection left-down -->
+  <path d="M130,98 C130,130 85,140 85,158" class="conn"/>
+  <!-- Dashed connection right-down -->
+  <path d="M190,98 C190,130 235,140 235,158" class="conn"/>
+
+  <!-- Left child node: 100×48, at (35, 158) -->
+  <rect x="35" y="158" width="100" height="48" rx="5" class="node-bg" opacity="0.55"/>
+  <rect x="48" y="172" width="36" height="3" rx="1.5" class="line-a" opacity="0.4"/>
+  <rect x="48" y="180" width="60" height="3" rx="1.5" class="line-b" opacity="0.28"/>
+
+  <!-- Right child node: 100×48, at (185, 158) -->
+  <rect x="185" y="158" width="100" height="48" rx="5" class="node-bg" opacity="0.55"/>
+  <rect x="198" y="172" width="36" height="3" rx="1.5" class="line-a" opacity="0.4"/>
+  <rect x="198" y="180" width="55" height="3" rx="1.5" class="line-b" opacity="0.28"/>
+
+  <!-- Signal-off badge (top-right area) -->
+  <rect x="248" y="30" width="46" height="44" rx="7" class="badge-bg"/>
+
+  <!-- Wifi arcs (no-signal style) — all muted, centered at (271, 68) -->
+  <!-- Outer arc -->
+  <path d="M258,62 A18,18 0 0,1 284,62" class="sig-arc" opacity="0.4"/>
+  <!-- Mid arc -->
+  <path d="M263,68 A10,10 0 0,1 279,68" class="sig-arc" opacity="0.55"/>
+  <!-- Inner arc -->
+  <path d="M268,74 A4,4 0 0,1 274,74" class="sig-arc" opacity="0.7"/>
+  <!-- Dot at base -->
+  <circle cx="271" cy="76" r="1.5" class="sig-dot"/>
+
+  <!-- Diagonal slash through the wifi icon -->
+  <line x1="257" y1="36" x2="285" y2="70" class="sig-cross" opacity="0.65"/>
+
+  <!-- Subtle vignette -->
+  <rect width="320" height="240" class="vignette"/>
+</svg>

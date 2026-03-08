@@ -48,6 +48,12 @@
 	import AnnotationToolbar from './annotations/AnnotationToolbar.svelte';
 	import type { AnnotationTool, AnnotationColor } from './annotations/types';
 	import CanvasToolbar from './canvas/CanvasToolbar.svelte';
+	import TemplateGallery from './templates/TemplateGallery.svelte';
+	import TemplateEmptyState from './templates/TemplateEmptyState.svelte';
+	import {
+		templateRegistry as defaultTemplateRegistry,
+		type TemplateRegistry
+	} from './templates/TemplateRegistry';
 
 	type InputActionsContext = {
 		engine: TraekEngine;
@@ -93,7 +99,8 @@
 		minimapMinNodes = 0,
 		breadcrumbMinNodes = 0,
 		translations: translationsProp,
-		vimMode = false
+		vimMode = false,
+		templateRegistry: templateRegistryProp
 	}: {
 		engine?: TraekEngine | null;
 		config?: Partial<TraekEngineConfig>;
@@ -130,6 +137,8 @@
 		translations?: PartialTraekTranslations;
 		/** Enable vim-style navigation keys (j/k/h/l). Default: false. */
 		vimMode?: boolean;
+		/** Template registry for the gallery. Defaults to the built-in singleton with 5 templates. */
+		templateRegistry?: TemplateRegistry;
 	} = $props();
 
 	const config = $derived({
@@ -372,6 +381,14 @@
 	let sidebarOpen = $state(false);
 	let showBookmarkJump = $state(false);
 
+	// Template gallery state
+	const activeRegistry = $derived(templateRegistryProp ?? defaultTemplateRegistry);
+	let showTemplateGallery = $state(false);
+	let templateEmptyStateDismissed = $state(false);
+	const showTemplateEmptyState = $derived(
+		engine?.nodes.length === 0 && !templateEmptyStateDismissed
+	);
+
 	// Annotation mode state
 	let annotateMode = $state(false);
 	let annotationTool = $state<AnnotationTool>('sticky');
@@ -478,10 +495,15 @@
 				e.preventDefault();
 				showBookmarkJump = !showBookmarkJump;
 			}
-			// A → toggle annotation mode (when not in an input/textarea)
+			// T → open template gallery (when not in an input/textarea)
 			const target = e.target as HTMLElement;
 			const inInput =
 				target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
+			if (!inInput && !e.ctrlKey && !e.metaKey && e.key === 't') {
+				e.preventDefault();
+				showTemplateGallery = true;
+			}
+			// A → toggle annotation mode (when not in an input/textarea)
 			if (!inInput && !e.ctrlKey && !e.metaKey && e.key === 'a') {
 				e.preventDefault();
 				annotateMode = !annotateMode;
@@ -875,7 +897,20 @@
 				<ContextBreadcrumb {engine} currentNodeId={engine.activeNodeId} />
 			{/if}
 
-			{#if engine.nodes.length === 0}
+			{#if showTemplateEmptyState}
+				<TemplateEmptyState
+					{engine}
+					registry={activeRegistry}
+					onOpenGallery={() => {
+						showTemplateGallery = true;
+					}}
+					onDismiss={() => {
+						templateEmptyStateDismissed = true;
+					}}
+				/>
+			{/if}
+
+			{#if engine.nodes.length === 0 && templateEmptyStateDismissed}
 				<div class="empty-state">
 					<div class="empty-state-content">
 						<div class="empty-state-title">{t.canvas.emptyStateTitle}</div>
@@ -961,7 +996,7 @@
 				</div>
 			{/if}
 
-			<CanvasToolbar {engine} />
+			<CanvasToolbar {engine} onOpenTemplates={() => (showTemplateGallery = true)} />
 
 			<!-- Long-press context menu for touch devices -->
 			{#if interaction && interaction.longPressNodeId && interaction.longPressViewportPos}
@@ -1012,6 +1047,18 @@
 			{/if}
 
 			<ToastContainer />
+
+			<!-- Template Gallery -->
+			{#if showTemplateGallery}
+				<TemplateGallery
+					{engine}
+					registry={activeRegistry}
+					onClose={() => (showTemplateGallery = false)}
+					onApplied={() => {
+						templateEmptyStateDismissed = true;
+					}}
+				/>
+			{/if}
 
 			<!-- Keyboard Help Overlay -->
 			{#if keyboardNavigator?.showHelp}

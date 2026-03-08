@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240" width="320" height="240" role="img" aria-labelledby="se-title se-desc">
+  <title id="se-title">No search results</title>
+  <desc id="se-desc">A magnifying glass over an empty canvas with faint nodes in the background indicating no matches were found</desc>
+  <defs>
+    <pattern id="se-grid" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="1" class="dot"/>
+    </pattern>
+    <clipPath id="se-lens-clip">
+      <circle cx="145" cy="112" r="58"/>
+    </clipPath>
+    <radialGradient id="se-vignette" cx="50%" cy="50%" r="65%">
+      <stop offset="0%" stop-color="transparent"/>
+      <stop offset="100%" stop-color="#000" stop-opacity="0.5"/>
+    </radialGradient>
+    <style>
+      .bg       { fill: #0b0b0b; }
+      .dot      { fill: #333; }
+      .lens-bg  { fill: #111; }
+      .lens-dot { fill: #3a3a3a; }
+      .lens-rim { fill: none; stroke: #444; stroke-width: 2; }
+      .handle   { stroke: #444; stroke-width: 8; stroke-linecap: round; fill: none; }
+      .ghost    { fill: none; stroke: #2a2a2a; stroke-width: 1; stroke-dasharray: 4 3; }
+      .x-stroke { stroke: #555; stroke-width: 2; stroke-linecap: round; }
+      .vignette { fill: url(#se-vignette); }
+
+      @media (prefers-color-scheme: light) {
+        .bg       { fill: #f0f0f0; }
+        .dot      { fill: #c8c8c8; }
+        .lens-bg  { fill: #e8e8e8; }
+        .lens-dot { fill: #c0c0c0; }
+        .lens-rim { stroke: #bbb; }
+        .handle   { stroke: #bbb; }
+        .ghost    { stroke: #ccc; }
+        .x-stroke { stroke: #b0b0b0; }
+        .vignette { fill: none; }
+      }
+    </style>
+  </defs>
+
+  <!-- Canvas background -->
+  <rect width="320" height="240" class="bg"/>
+  <rect width="320" height="240" fill="url(#se-grid)" opacity="0.5"/>
+
+  <!-- Ghost nodes behind the lens (barely visible) -->
+  <rect x="36" y="48" width="80" height="44" rx="5" class="ghost" opacity="0.5"/>
+  <rect x="36" y="60" width="44" height="3" rx="1.5" fill="#2a2a2a" opacity="0.3"/>
+  <rect x="36" y="68" width="60" height="3" rx="1.5" fill="#2a2a2a" opacity="0.25"/>
+
+  <rect x="230" y="140" width="70" height="40" rx="5" class="ghost" opacity="0.5"/>
+  <rect x="242" y="152" width="38" height="3" rx="1.5" fill="#2a2a2a" opacity="0.3"/>
+  <rect x="242" y="160" width="50" height="3" rx="1.5" fill="#2a2a2a" opacity="0.2"/>
+
+  <!-- Magnifying glass lens interior (clip) -->
+  <g clip-path="url(#se-lens-clip)">
+    <circle cx="145" cy="112" r="58" class="lens-bg"/>
+    <!-- Tighter grid inside lens -->
+    <g opacity="0.8">
+      <pattern id="se-grid-inner" x="87" y="54" width="16" height="16" patternUnits="userSpaceOnUse">
+        <circle cx="1" cy="1" r="0.8" class="lens-dot"/>
+      </pattern>
+      <rect x="87" y="54" width="116" height="116" fill="url(#se-grid-inner)"/>
+    </g>
+  </g>
+
+  <!-- "×" mark inside lens center -->
+  <line x1="135" y1="102" x2="155" y2="122" class="x-stroke" opacity="0.6"/>
+  <line x1="155" y1="102" x2="135" y2="122" class="x-stroke" opacity="0.6"/>
+
+  <!-- Lens rim -->
+  <circle cx="145" cy="112" r="58" class="lens-rim"/>
+
+  <!-- Handle -->
+  <line x1="191" y1="158" x2="218" y2="186" class="handle"/>
+
+  <!-- Subtle vignette -->
+  <rect width="320" height="240" class="vignette"/>
+</svg>

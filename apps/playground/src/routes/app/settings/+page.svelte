@@ -1,9 +1,29 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
+
 	let openaiKey = $state('');
 	let anthropicKey = $state('');
 	let saving = $state<Record<string, boolean>>({});
 	let saved = $state<Record<string, boolean>>({});
 	let errors = $state<Record<string, string>>({});
+	/** Which providers have a key stored (from GET /api/keys). */
+	let hasKey = $state<Record<string, boolean>>({ openai: false, anthropic: false });
+
+	async function loadKeys() {
+		try {
+			const res = await fetch('/api/keys');
+			if (res.ok) {
+				const data = (await res.json()) as { openai?: boolean; anthropic?: boolean };
+				hasKey = { openai: !!data.openai, anthropic: !!data.anthropic };
+			}
+		} catch {
+			// ignore
+		}
+	}
+
+	onMount(() => {
+		loadKeys();
+	});
 
 	async function saveKey(provider: 'openai' | 'anthropic') {
 		const key = provider === 'openai' ? openaiKey : anthropicKey;
@@ -21,6 +41,7 @@
 				errors[provider] = body.error ?? 'Failed to save';
 			} else {
 				saved[provider] = true;
+				hasKey = { ...hasKey, [provider]: true };
 				if (provider === 'openai') openaiKey = '';
 				else anthropicKey = '';
 				setTimeout(() => (saved[provider] = false), 2000);
@@ -38,7 +59,9 @@
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ provider })
 		});
-		if (res.ok) saved[provider] = false;
+		if (res.ok) {
+			hasKey = { ...hasKey, [provider]: false };
+		}
 	}
 
 	async function manageSubscription() {
@@ -75,7 +98,10 @@
 		</p>
 
 		<div class="key-row">
-			<label for="openai-key">OpenAI API Key</label>
+			<label for="openai-key">
+				OpenAI API Key
+				{#if hasKey.openai}<span class="key-badge">Saved</span>{/if}
+			</label>
 			<div class="key-input-row">
 				<input
 					type="password"
@@ -102,7 +128,10 @@
 		</div>
 
 		<div class="key-row">
-			<label for="anthropic-key">Anthropic API Key</label>
+			<label for="anthropic-key">
+				Anthropic API Key
+				{#if hasKey.anthropic}<span class="key-badge">Saved</span>{/if}
+			</label>
 			<div class="key-input-row">
 				<input
 					type="password"
@@ -267,6 +296,13 @@
 
 	.btn-danger:hover {
 		border-color: var(--pg-danger);
+	}
+
+	.key-badge {
+		font-size: 0.75rem;
+		font-weight: 600;
+		color: var(--pg-accent);
+		margin-left: 8px;
 	}
 
 	.error {

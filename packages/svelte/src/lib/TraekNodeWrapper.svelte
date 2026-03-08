@@ -627,7 +627,6 @@
 			display: flex;
 			flex-direction: column;
 			min-width: 0;
-			max-height: 500px;
 			background: var(--traek-thought-panel-bg, rgba(22, 22, 22, 0.9));
 			border: 1px solid var(--traek-thought-panel-border, #333333);
 			border-radius: 14px;
@@ -1075,12 +1074,11 @@
 		}
 
 		.message-node-content {
-			display: flex;
-			flex-direction: column;
-			flex: 1;
+			display: block;
 			min-width: 0;
-			min-height: 0;
-			overflow: hidden;
+			min-height: min-content;
+			overflow-y: auto;
+			overflow-x: hidden;
 			user-select: text;
 			cursor: text;
 			border-radius: 0 0 14px 14px;

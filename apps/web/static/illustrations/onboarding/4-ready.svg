@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240" width="320" height="240" role="img" aria-labelledby="ob4-title ob4-desc">
+  <title id="ob4-title">You're ready to Træk</title>
+  <desc id="ob4-desc">A rich, populated Traek conversation tree with multiple branching paths and active nodes, showing a fully explored conversation</desc>
+  <defs>
+    <pattern id="ob4-grid" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="1" class="dot"/>
+    </pattern>
+    <radialGradient id="ob4-center-glow" cx="50%" cy="50%" r="55%">
+      <stop offset="0%" stop-color="#00d8ff" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+    <radialGradient id="ob4-vignette" cx="50%" cy="50%" r="65%">
+      <stop offset="0%" stop-color="transparent"/>
+      <stop offset="100%" stop-color="#000" stop-opacity="0.55"/>
+    </radialGradient>
+    <style>
+      .bg          { fill: #0b0b0b; }
+      .dot         { fill: #2c2c2c; }
+      .glow        { fill: url(#ob4-center-glow); }
+      .node        { fill: #161616; stroke: #2a2a2a; stroke-width: 1; }
+      .node-active { fill: #161616; stroke: #00d8ff; stroke-width: 1.5; }
+      .bar-cyan    { fill: #00d8ff; }
+      .bar-ora     { fill: #ff3e00; }
+      .bar-lime    { fill: #00ffa3; }
+      .bar-muted   { fill: #3a3a3a; }
+      .line-a      { fill: #333; }
+      .line-b      { fill: #2a2a2a; }
+      .conn        { stroke: #2a2a2a; stroke-width: 1.5; fill: none; stroke-linecap: round; }
+      .conn-cyan   { stroke: #00d8ff; stroke-width: 1.5; fill: none; stroke-linecap: round; opacity: 0.4; }
+      .glow-dot    { fill: #00d8ff; }
+      .vignette    { fill: url(#ob4-vignette); }
+
+      @media (prefers-color-scheme: light) {
+        .bg          { fill: #f0f0f0; }
+        .dot         { fill: #c8c8c8; }
+        .glow        { fill: none; }
+        .node        { fill: #fff; stroke: #d4d4d4; }
+        .node-active { fill: #fff; stroke: #0099cc; }
+        .bar-cyan    { fill: #0099cc; }
+        .bar-ora     { fill: #e03a00; }
+        .bar-lime    { fill: #00c97a; }
+        .bar-muted   { fill: #ddd; }
+        .line-a      { fill: #e0e0e0; }
+        .line-b      { fill: #e8e8e8; }
+        .conn        { stroke: #d0d0d0; }
+        .conn-cyan   { stroke: #0099cc; }
+        .glow-dot    { fill: #0099cc; }
+        .vignette    { fill: none; }
+      }
+    </style>
+  </defs>
+
+  <!-- Canvas background -->
+  <rect width="320" height="240" class="bg"/>
+  <rect width="320" height="240" fill="url(#ob4-grid)" opacity="0.55"/>
+  <rect width="320" height="240" class="glow"/>
+
+  <!-- ===== Conversation tree ===== -->
+  <!-- Root: 104×40, centered at (160,30) → (108,10) -->
+  <rect x="108" y="10" width="104" height="40" rx="4" class="node-active"/>
+  <rect x="108" y="10" width="104" height="2.5" rx="1.25" class="bar-cyan"/>
+  <rect x="120" y="22" width="44" height="3" rx="1.5" class="line-a" opacity="0.65"/>
+  <rect x="120" y="30" width="68" height="3" rx="1.5" class="line-b" opacity="0.45"/>
+  <rect x="120" y="38" width="32" height="3" rx="1.5" class="line-b" opacity="0.3"/>
+  <circle cx="160" cy="14" r="2" class="glow-dot" opacity="0.8"/>
+
+  <!-- conn root → resp1 -->
+  <line x1="160" y1="50" x2="160" y2="62" class="conn-cyan"/>
+
+  <!-- Response 1: 104×40, at (108,62) -->
+  <rect x="108" y="62" width="104" height="40" rx="4" class="node"/>
+  <rect x="108" y="62" width="104" height="2.5" rx="1.25" class="bar-ora"/>
+  <rect x="120" y="74" width="50" height="3" rx="1.5" class="line-a" opacity="0.6"/>
+  <rect x="120" y="83" width="72" height="3" rx="1.5" class="line-b" opacity="0.4"/>
+  <rect x="120" y="92" width="38" height="3" rx="1.5" class="line-b" opacity="0.28"/>
+
+  <!-- Branch from resp1 → two paths -->
+  <path d="M160,102 C160,112 90,116 90,130" class="conn"/>
+  <path d="M160,102 C160,112 230,116 230,130" class="conn"/>
+
+  <!-- Left branch user: 84×36 at (48,130) -->
+  <rect x="48" y="130" width="84" height="36" rx="4" class="node"/>
+  <rect x="48" y="130" width="84" height="2.5" rx="1.25" class="bar-cyan"/>
+  <rect x="58" y="141" width="36" height="3" rx="1.5" class="line-a" opacity="0.55"/>
+  <rect x="58" y="150" width="56" height="3" rx="1.5" class="line-b" opacity="0.38"/>
+
+  <!-- Left branch response: 84×36 at (48,180) -->
+  <line x1="90" y1="166" x2="90" y2="180" class="conn"/>
+  <rect x="48" y="180" width="84" height="36" rx="4" class="node"/>
+  <rect x="48" y="180" width="84" height="2.5" rx="1.25" class="bar-ora"/>
+  <rect x="58" y="191" width="44" height="3" rx="1.5" class="line-a" opacity="0.5"/>
+  <rect x="58" y="200" width="34" height="3" rx="1.5" class="line-b" opacity="0.35"/>
+
+  <!-- Right branch user: 84×36 at (188,130) -->
+  <rect x="188" y="130" width="84" height="36" rx="4" class="node"/>
+  <rect x="188" y="130" width="84" height="2.5" rx="1.25" class="bar-lime"/>
+  <rect x="198" y="141" width="38" height="3" rx="1.5" class="line-a" opacity="0.55"/>
+  <rect x="198" y="150" width="54" height="3" rx="1.5" class="line-b" opacity="0.38"/>
+
+  <!-- Right branch response: 84×36 at (188,180) + further branch hint -->
+  <line x1="230" y1="166" x2="230" y2="180" class="conn"/>
+  <rect x="188" y="180" width="84" height="36" rx="4" class="node-active"/>
+  <rect x="188" y="180" width="84" height="2.5" rx="1.25" class="bar-ora"/>
+  <rect x="198" y="191" width="42" height="3" rx="1.5" class="line-a" opacity="0.6"/>
+  <rect x="198" y="200" width="58" height="3" rx="1.5" class="line-b" opacity="0.42"/>
+
+  <!-- Hint of further depth (right path continues) -->
+  <line x1="230" y1="216" x2="230" y2="228" class="conn" opacity="0.35"/>
+  <circle cx="230" cy="230" r="2" class="glow-dot" opacity="0.4"/>
+
+  <!-- Subtle vignette -->
+  <rect width="320" height="240" class="vignette"/>
+</svg>

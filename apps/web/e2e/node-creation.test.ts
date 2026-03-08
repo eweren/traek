@@ -20,6 +20,13 @@ test.describe('Node creation & streaming', () => {
 		await textarea.fill('hello');
 		await textarea.press('Enter');
 
+		// Wait for textarea to clear — confirms submission was accepted
+		await expect(textarea).toHaveValue('', { timeout: 5_000 });
+		// Fit all nodes into view so the response node is rendered (not a placeholder)
+		await page
+			.getByRole('button', { name: 'Fit all nodes' })
+			.evaluate((el) => (el as HTMLButtonElement).click());
+
 		// The explore engine produces scripted responses — wait for assistant content
 		// "Welcome to the træk interactive demo" is the scripted hello response
 		await expect(page.getByText(/Welcome to the/i).first()).toBeVisible({ timeout: 15_000 });
@@ -41,14 +48,23 @@ test.describe('Node creation & streaming', () => {
 
 		const textarea = page.locator('textarea[aria-label]').first();
 
+		const fitAll = () =>
+			page
+				.getByRole('button', { name: 'Fit all nodes' })
+				.evaluate((el) => (el as HTMLButtonElement).click());
+
 		// First message
 		await textarea.fill('hello');
 		await textarea.press('Enter');
+		await expect(textarea).toHaveValue('', { timeout: 5_000 });
+		await fitAll();
 		await expect(page.getByText(/Welcome to the/i).first()).toBeVisible({ timeout: 15_000 });
 
-		// Second message
-		await textarea.fill('branching');
+		// Second message — "branch" (word boundary) triggers the scripted branching response
+		await textarea.fill('branch');
 		await textarea.press('Enter');
+		await expect(textarea).toHaveValue('', { timeout: 5_000 });
+		await fitAll();
 		await expect(page.getByText(/Branching is the core idea/i).first()).toBeVisible({
 			timeout: 15_000
 		});
@@ -60,7 +76,16 @@ test.describe('Node creation & streaming', () => {
 		const textarea = page.locator('textarea[aria-label]').first();
 		await textarea.fill('spatial');
 
-		await page.getByRole('button', { name: 'Send message' }).click({ force: true });
+		// Use evaluate to bypass annotation toolbar overlay that intercepts clicks
+		await page
+			.getByRole('button', { name: 'Send message' })
+			.evaluate((el) => (el as HTMLButtonElement).click());
+
+		// Wait for textarea to clear — confirms submission was accepted
+		await expect(textarea).toHaveValue('', { timeout: 5_000 });
+		await page
+			.getByRole('button', { name: 'Fit all nodes' })
+			.evaluate((el) => (el as HTMLButtonElement).click());
 
 		await expect(page.getByText(/Why spatial layout/i).first()).toBeVisible({ timeout: 15_000 });
 	});

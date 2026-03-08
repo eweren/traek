@@ -4,7 +4,12 @@
 		TraekCanvas,
 		TraekEngine,
 		type MessageNode,
-		type ConversationSnapshot
+		type ConversationSnapshot,
+		ThemeProvider,
+		type NodeComponentMap,
+		TextNode,
+		ImageNode,
+		CodeNode
 	} from '@traek/svelte';
 	import { getConversation, saveConversation } from '$lib/client/local-storage.js';
 	import { page } from '$app/state';
@@ -13,6 +18,12 @@
 	let shareUrl = $state<string | null>(null);
 	let sharing = $state(false);
 	let shareError = $state<string | null>(null);
+
+	const componentMap: NodeComponentMap = {
+		text: TextNode,
+		image: ImageNode,
+		code: CodeNode
+	};
 
 	async function shareConversation() {
 		if (!engine) return;
@@ -79,12 +90,15 @@
 	async function persist(id: string) {
 		if (!engine) return;
 		const stored = await getConversation(id);
+		// JSON round-trip so IDB gets a plain object (no Proxies / non-cloneable refs)
+		const raw = engine.serialize();
+		const snapshot = JSON.parse(JSON.stringify(raw)) as ConversationSnapshot;
 		await saveConversation({
 			id,
 			title: stored?.title ?? 'Conversation',
 			createdAt: stored?.createdAt ?? new Date().toISOString(),
 			updatedAt: new Date().toISOString(),
-			snapshot: engine.serialize()
+			snapshot
 		});
 	}
 
@@ -171,7 +185,11 @@
 		<a href="/app/settings">Add your OpenAI or Anthropic key in Settings</a>
 	</div>
 {:else if engine}
-	<TraekCanvas {engine} onSendMessage={handleSend} />
+	<div class="canvas-page">
+		<ThemeProvider>
+			<TraekCanvas {componentMap} {engine} onSendMessage={handleSend} />
+		</ThemeProvider>
+	</div>
 	<div class="conv-toolbar">
 		<a href="/app" class="toolbar-btn" aria-label="All conversations">←</a>
 		<button class="toolbar-btn" onclick={shareConversation} disabled={sharing}>
@@ -202,6 +220,20 @@
 <style>
 	:global(body) {
 		overflow: hidden;
+	}
+
+	.canvas-page {
+		position: fixed;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+	}
+
+	.canvas-page :global(> *) {
+		width: 100%;
+		height: 100%;
+		min-height: 0;
+		display: block;
 	}
 
 	.loading,

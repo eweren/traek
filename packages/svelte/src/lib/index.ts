@@ -258,6 +258,13 @@ export { default as CollabConflictBanner } from './collab/CollabConflictBanner.s
 export { useCollab, useFollowMode } from './collab/useCollab.svelte.js';
 export type { CollabHandle, FollowModeHandle, FollowTarget } from './collab/useCollab.svelte.js';
 
+// Conversation Templates (TRK-116)
+export { TemplateRegistry, templateRegistry } from './templates/TemplateRegistry';
+export { default as TemplateGallery } from './templates/TemplateGallery.svelte';
+export { default as TemplateEmptyState } from './templates/TemplateEmptyState.svelte';
+export { builtinTemplates } from './templates/builtins/index';
+export type { ConversationTemplate, TemplateCategory } from './templates/types';
+
 // Resilience & offline support
 export { default as ConnectionStatus } from './resilience/ConnectionStatus.svelte';
 export { offlineQueue, type QueuedMessage } from './resilience/offlineQueue.svelte';

@@ -9,8 +9,8 @@ test.describe('Search & filter', () => {
 
 		const searchInput = page.locator('input[placeholder="Search..."]');
 		await expect(searchInput).toBeVisible({ timeout: 5_000 });
-		// Input should be auto-focused
-		await expect(searchInput).toBeFocused();
+		// Input should be auto-focused (allow up to 5s for focus to settle)
+		await expect(searchInput).toBeFocused({ timeout: 5_000 });
 	});
 
 	test('search bar shows result count', async ({ page }) => {

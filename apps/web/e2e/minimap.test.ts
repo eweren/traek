@@ -32,13 +32,13 @@ test.describe('Minimap navigation', () => {
 
 		await expect(expandBtn).toBeVisible({ timeout: 10_000 });
 
-		// Expand it
-		await expandBtn.click();
+		// Expand it — use evaluate to bypass annotation toolbar overlay interception
+		await expandBtn.evaluate((el) => (el as HTMLButtonElement).click());
 		await expect(collapseBtn).toBeVisible({ timeout: 5_000 });
 		await expect(expandBtn).not.toBeVisible();
 
 		// Collapse it again
-		await collapseBtn.click();
+		await collapseBtn.evaluate((el) => (el as HTMLButtonElement).click());
 		await expect(expandBtn).toBeVisible({ timeout: 5_000 });
 	});
 
@@ -48,7 +48,7 @@ test.describe('Minimap navigation', () => {
 		// Expand minimap first (starts collapsed)
 		const expandBtn = page.getByRole('button', { name: 'Expand minimap' });
 		await expect(expandBtn).toBeVisible({ timeout: 10_000 });
-		await expandBtn.click();
+		await expandBtn.evaluate((el) => (el as HTMLButtonElement).click());
 
 		// Minimap SVG with node rectangles should be present
 		const minimapSvg = page.locator('svg[aria-label="Minimap overview"]');

@@ -6,6 +6,7 @@
 	"scripts": {
 		"dev": "turbo dev --filter=@traek/web --continue && pnpm run turbo watch",
 		"dev:docs": "turbo dev --filter=@traek/docs --continue",
+		"dev:playground": "turbo dev --filter=@traek/playground --continue",
 		"watch": "turbo watch",
 		"clean": "turbo clean && rm -rf node_modules .svelte-kit build coverage .turbo .pnpm-store dist test-results",
 		"build": "turbo build",

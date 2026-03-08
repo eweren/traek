@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240" width="320" height="240" role="img" aria-labelledby="ob3-title ob3-desc">
+  <title id="ob3-title">Branch your conversations</title>
+  <desc id="ob3-desc">A conversation tree showing one root node branching into three different paths, illustrating the branching concept</desc>
+  <defs>
+    <pattern id="ob3-grid" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="1" class="dot"/>
+    </pattern>
+    <radialGradient id="ob3-vignette" cx="50%" cy="50%" r="65%">
+      <stop offset="0%" stop-color="transparent"/>
+      <stop offset="100%" stop-color="#000" stop-opacity="0.5"/>
+    </radialGradient>
+    <style>
+      .bg         { fill: #0b0b0b; }
+      .dot        { fill: #2c2c2c; }
+      .node       { fill: #161616; stroke: #2a2a2a; stroke-width: 1; }
+      .node-root  { fill: #161616; stroke: #00d8ff; stroke-width: 1.5; }
+      .bar-cyan   { fill: #00d8ff; }
+      .bar-ora    { fill: #ff3e00; }
+      .bar-lime   { fill: #00ffa3; }
+      .bar-muted  { fill: #444; }
+      .line-a     { fill: #333; }
+      .line-b     { fill: #2a2a2a; }
+      .conn       { stroke: #2a2a2a; stroke-width: 1.5; fill: none; stroke-linecap: round; }
+      .conn-l     { stroke: #ff3e00; stroke-width: 1.5; fill: none; stroke-linecap: round; opacity: 0.5; }
+      .conn-c     { stroke: #2a2a2a; stroke-width: 1.5; fill: none; stroke-linecap: round; }
+      .conn-r     { stroke: #00ffa3; stroke-width: 1.5; fill: none; stroke-linecap: round; opacity: 0.5; }
+      .branch-dot { fill: #333; }
+      .branch-dot-l { fill: #ff3e00; opacity: 0.6; }
+      .branch-dot-r { fill: #00ffa3; opacity: 0.6; }
+      .vignette   { fill: url(#ob3-vignette); }
+
+      @media (prefers-color-scheme: light) {
+        .bg         { fill: #f0f0f0; }
+        .dot        { fill: #c8c8c8; }
+        .node       { fill: #fff; stroke: #d4d4d4; }
+        .node-root  { fill: #fff; stroke: #0099cc; }
+        .bar-cyan   { fill: #0099cc; }
+        .bar-ora    { fill: #e03a00; }
+        .bar-lime   { fill: #00c97a; }
+        .bar-muted  { fill: #ccc; }
+        .line-a     { fill: #e0e0e0; }
+        .line-b     { fill: #e8e8e8; }
+        .conn       { stroke: #d0d0d0; }
+        .conn-l     { stroke: #e03a00; }
+        .conn-c     { stroke: #d0d0d0; }
+        .conn-r     { stroke: #00c97a; }
+        .branch-dot   { fill: #ccc; }
+        .branch-dot-l { fill: #e03a00; }
+        .branch-dot-r { fill: #00c97a; }
+        .vignette   { fill: none; }
+      }
+    </style>
+  </defs>
+
+  <!-- Canvas background -->
+  <rect width="320" height="240" class="bg"/>
+  <rect width="320" height="240" fill="url(#ob3-grid)" opacity="0.55"/>
+
+  <!-- Root user message node: 120×48, centered at (160, 44) → (100, 20) -->
+  <rect x="100" y="20" width="120" height="48" rx="5" class="node-root"/>
+  <rect x="100" y="20" width="120" height="2.5" rx="1.25" class="bar-cyan"/>
+  <rect x="114" y="33" width="52" height="3" rx="1.5" class="line-a" opacity="0.65"/>
+  <rect x="114" y="42" width="78" height="3" rx="1.5" class="line-b" opacity="0.45"/>
+  <rect x="114" y="51" width="40" height="3" rx="1.5" class="line-b" opacity="0.3"/>
+
+  <!-- Root assistant response: 120×48, centered at (160, 104) → (100, 80) -->
+  <rect x="100" y="80" width="120" height="48" rx="5" class="node"/>
+  <rect x="100" y="80" width="120" height="2.5" rx="1.25" class="bar-ora"/>
+  <rect x="114" y="93" width="46" height="3" rx="1.5" class="line-a" opacity="0.6"/>
+  <rect x="114" y="102" width="72" height="3" rx="1.5" class="line-b" opacity="0.4"/>
+  <rect x="114" y="111" width="36" height="3" rx="1.5" class="line-b" opacity="0.28"/>
+  <!-- Connection root→response -->
+  <line x1="160" y1="68" x2="160" y2="80" class="conn"/>
+
+  <!-- Branch point dot -->
+  <circle cx="160" cy="140" r="3" class="branch-dot"/>
+  <!-- Vertical from response to branch point -->
+  <line x1="160" y1="128" x2="160" y2="137" class="conn"/>
+
+  <!-- Branch connections from point -->
+  <!-- Left branch -->
+  <path d="M160,140 C160,148 80,150 80,162" class="conn-l"/>
+  <!-- Center branch -->
+  <line x1="160" y1="140" x2="160" y2="162" class="conn-c"/>
+  <!-- Right branch -->
+  <path d="M160,140 C160,148 240,150 240,162" class="conn-r"/>
+
+  <!-- Left branch node: 86×40, at (37,162) -->
+  <rect x="37" y="162" width="86" height="40" rx="4" class="node"/>
+  <rect x="37" y="162" width="86" height="2.5" rx="1.25" class="bar-ora"/>
+  <rect x="48" y="174" width="32" height="3" rx="1.5" class="line-a" opacity="0.55"/>
+  <rect x="48" y="183" width="56" height="3" rx="1.5" class="line-b" opacity="0.38"/>
+  <circle cx="40" cy="164" r="2" class="branch-dot-l"/>
+
+  <!-- Center branch node: 86×40, at (117,162) -->
+  <rect x="117" y="162" width="86" height="40" rx="4" class="node"/>
+  <rect x="117" y="162" width="86" height="2.5" rx="1.25" class="bar-muted"/>
+  <rect x="128" y="174" width="38" height="3" rx="1.5" class="line-a" opacity="0.55"/>
+  <rect x="128" y="183" width="52" height="3" rx="1.5" class="line-b" opacity="0.38"/>
+
+  <!-- Right branch node: 86×40, at (197,162) -->
+  <rect x="197" y="162" width="86" height="40" rx="4" class="node"/>
+  <rect x="197" y="162" width="86" height="2.5" rx="1.25" class="bar-lime"/>
+  <rect x="208" y="174" width="36" height="3" rx="1.5" class="line-a" opacity="0.55"/>
+  <rect x="208" y="183" width="48" height="3" rx="1.5" class="line-b" opacity="0.38"/>
+  <circle cx="281" cy="164" r="2" class="branch-dot-r"/>
+
+  <!-- Subtle vignette -->
+  <rect width="320" height="240" class="vignette"/>
+</svg>

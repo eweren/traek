@@ -9,6 +9,23 @@ const schema = z.object({
 	key: z.string().min(10)
 });
 
+/** Returns which providers have keys configured (no key values). */
+export const GET: RequestHandler = async ({ locals }) => {
+	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
+
+	const { data: profile } = await db()
+		.from('user_profiles')
+		.select('encrypted_api_keys')
+		.eq('user_id', locals.user.id)
+		.maybeSingle();
+
+	const keys = (profile?.encrypted_api_keys ?? {}) as Record<string, unknown>;
+	return json({
+		openai: 'openai' in keys && keys.openai != null,
+		anthropic: 'anthropic' in keys && keys.anthropic != null
+	});
+};
+
 export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 

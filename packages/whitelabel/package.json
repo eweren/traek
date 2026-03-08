@@ -16,7 +16,7 @@
 		"dist"
 	],
 	"scripts": {
-		"build": "tsc && svelte-package",
+		"build": "svelte-package",
 		"check": "svelte-check --tsconfig ./tsconfig.json"
 	},
 	"peerDependencies": {

@@ -89,7 +89,7 @@ test.describe('Keyboard shortcuts', () => {
 		// Keyboard help dialog should appear
 		const helpDialog = page.locator('[role="dialog"]');
 		await expect(helpDialog).toBeVisible({ timeout: 5_000 });
-		await expect(page.getByText('Keyboard Shortcuts')).toBeVisible();
+		await expect(page.getByRole('heading', { name: 'Keyboard Shortcuts' })).toBeVisible();
 	});
 
 	test('Escape closes keyboard help overlay', async ({ page }) => {

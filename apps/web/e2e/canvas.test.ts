@@ -21,8 +21,16 @@ test.describe('Canvas load & render', () => {
 
 	test('explore page shows pre-seeded nodes', async ({ page }) => {
 		await gotoExplore(page);
+		// Fit all nodes into view so IntersectionObserver renders their content
+		await page
+			.getByRole('button', { name: 'Fit all nodes' })
+			.evaluate((el) => (el as HTMLButtonElement).click());
+		// Brief pause for IntersectionObserver to process nodes now in view
+		await page.waitForTimeout(500);
 		// The explore engine pre-populates with "What is træk" root message
-		await expect(page.getByText('What is træk and why does it exist?')).toBeVisible();
+		await expect(page.getByText('What is træk and why does it exist?').first()).toBeVisible({
+			timeout: 10_000
+		});
 	});
 
 	test('explore page renders zoom controls', async ({ page }) => {

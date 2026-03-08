@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240" width="320" height="240" role="img" aria-labelledby="er-title er-desc">
+  <title id="er-title">Error state</title>
+  <desc id="er-desc">A Traek canvas node with broken connection lines and an orange error indicator, representing an error state</desc>
+  <defs>
+    <pattern id="er-grid" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="1" class="dot"/>
+    </pattern>
+    <radialGradient id="er-vignette" cx="50%" cy="50%" r="65%">
+      <stop offset="0%" stop-color="transparent"/>
+      <stop offset="100%" stop-color="#000" stop-opacity="0.5"/>
+    </radialGradient>
+    <style>
+      .bg        { fill: #0b0b0b; }
+      .dot       { fill: #2a2a2a; }
+      .node-bg   { fill: #161616; stroke: #2a2a2a; stroke-width: 1; }
+      .top-bar   { fill: #ff3e00; }
+      .node-rim  { fill: none; stroke: #ff3e00; stroke-width: 1.5; opacity: 0.6; }
+      .line-a    { fill: #333; }
+      .line-b    { fill: #2a2a2a; }
+      .broken    { stroke: #2a2a2a; stroke-width: 1.5; fill: none; stroke-linecap: round; }
+      .break-gap { /* gap in line, achieved by two segments */ }
+      .x-end     { stroke: #ff3e00; stroke-width: 1.5; stroke-linecap: round; opacity: 0.7; }
+      .warn-ring { fill: none; stroke: #ff3e00; stroke-width: 1; }
+      .warn-body { fill: #ff3e00; }
+      .warn-text { fill: #0b0b0b; font-family: 'Space Mono', monospace; font-weight: 700; font-size: 11px; text-anchor: middle; dominant-baseline: central; }
+      .vignette  { fill: url(#er-vignette); }
+
+      @media (prefers-color-scheme: light) {
+        .bg        { fill: #f0f0f0; }
+        .dot       { fill: #c8c8c8; }
+        .node-bg   { fill: #fff; stroke: #d4d4d4; }
+        .top-bar   { fill: #e03a00; }
+        .node-rim  { stroke: #e03a00; }
+        .line-a    { fill: #e0e0e0; }
+        .line-b    { fill: #e8e8e8; }
+        .broken    { stroke: #ccc; }
+        .x-end     { stroke: #e03a00; }
+        .warn-ring { stroke: #e03a00; }
+        .warn-body { fill: #e03a00; }
+        .warn-text { fill: #fff; }
+        .vignette  { fill: none; }
+      }
+    </style>
+  </defs>
+
+  <!-- Canvas background -->
+  <rect width="320" height="240" class="bg"/>
+  <rect width="320" height="240" fill="url(#er-grid)" opacity="0.5"/>
+
+  <!-- Broken connection — left: two segments with gap, x mark at end -->
+  <line x1="95" y1="120" x2="68" y2="120" class="broken"/>
+  <line x1="56" y1="120" x2="36" y2="120" class="broken" opacity="0.5"/>
+  <!-- X at left end -->
+  <line x1="31" y1="115" x2="41" y2="125" class="x-end"/>
+  <line x1="41" y1="115" x2="31" y2="125" class="x-end"/>
+
+  <!-- Broken connection — right -->
+  <line x1="225" y1="120" x2="252" y2="120" class="broken"/>
+  <line x1="264" y1="120" x2="284" y2="120" class="broken" opacity="0.5"/>
+  <!-- X at right end -->
+  <line x1="279" y1="115" x2="289" y2="125" class="x-end"/>
+  <line x1="289" y1="115" x2="279" y2="125" class="x-end"/>
+
+  <!-- Broken connection — up -->
+  <line x1="160" y1="88" x2="160" y2="64" class="broken"/>
+  <line x1="160" y1="52" x2="160" y2="36" class="broken" opacity="0.5"/>
+  <!-- X at top -->
+  <line x1="155" y1="31" x2="165" y2="41" class="x-end"/>
+  <line x1="165" y1="31" x2="155" y2="41" class="x-end"/>
+
+  <!-- Error node: 130×64 centered at (160,120) -->
+  <rect x="95" y="88" width="130" height="64" rx="6" class="node-bg"/>
+  <rect x="95" y="88" width="130" height="3" rx="2" class="top-bar"/>
+  <rect x="95" y="88" width="130" height="64" rx="6" class="node-rim"/>
+
+  <!-- Content lines (distressed) -->
+  <rect x="112" y="104" width="52" height="3.5" rx="1.75" class="line-a" opacity="0.5"/>
+  <rect x="112" y="113" width="38" height="3.5" rx="1.75" class="line-b" opacity="0.35"/>
+
+  <!-- Orange warning badge (circle with !) — overlaid top-right of node -->
+  <circle cx="207" cy="84" r="12" class="warn-body"/>
+  <text x="207" y="84.5" class="warn-text">!</text>
+  <circle cx="207" cy="84" r="12" class="warn-ring" opacity="0.4"/>
+
+  <!-- Subtle vignette -->
+  <rect width="320" height="240" class="vignette"/>
+</svg>

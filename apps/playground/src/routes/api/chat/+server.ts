@@ -38,11 +38,13 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		.eq('user_id', locals.user.id)
 		.maybeSingle();
 
-	const keys = profile?.encrypted_api_keys as Record<
+	const keys = (profile?.encrypted_api_keys ?? {}) as Record<
 		string,
 		{ ciphertext: string; iv: string }
-	> | null;
-	const encryptedKey = keys?.[provider];
+	>;
+	// Use requested provider if it has a key, otherwise try the other (so Anthropic-only users can chat)
+	const preferred = keys[provider] ? provider : provider === 'openai' ? 'anthropic' : 'openai';
+	const encryptedKey = keys[preferred];
 
 	if (!encryptedKey) {
 		return json({ error: 'no_api_key' }, { status: 400 });
@@ -55,7 +57,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		return json({ error: 'Failed to decrypt API key' }, { status: 500 });
 	}
 
-	if (provider === 'openai') {
+	if (preferred === 'openai') {
 		return proxyOpenAI(apiKey, messages, model ?? 'gpt-4o-mini');
 	} else {
 		return proxyAnthropic(apiKey, messages, model ?? 'claude-haiku-4-5-20251001');
