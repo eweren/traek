@@ -8,6 +8,7 @@
 	import { detailLevelTransition } from './transitions';
 	import NodeSkeleton from './canvas/NodeSkeleton.svelte';
 	import Icon from './icons/Icon.svelte';
+	import BookmarkBadge from './canvas/BookmarkBadge.svelte';
 
 	const DEFAULT_PLACEHOLDER_HEIGHT = 100;
 
@@ -164,6 +165,8 @@
 	);
 	const isOutdated = $derived(node.metadata?.outdated === true);
 	const nodeColor = $derived((node.metadata?.color as string | null) ?? null);
+	const isBookmarked = $derived(node.metadata?.bookmarked === true);
+	const bookmarkLabel = $derived(node.metadata?.bookmarkLabel as string | undefined);
 
 	$effect(() => {
 		// Track viewportResizeVersion to trigger effect on change
@@ -553,6 +556,10 @@
 		data-port-node-id={node.id}
 		data-port-type="output"
 	></div>
+
+	{#if isBookmarked}
+		<BookmarkBadge label={bookmarkLabel} />
+	{/if}
 </div>
 
 <style>
