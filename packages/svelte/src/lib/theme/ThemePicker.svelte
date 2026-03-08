@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { useTheme } from './ThemeProvider.svelte';
+	import { useTheme, applyThemeToRootAnimated } from './ThemeProvider.svelte';
 	import { themes, type ThemeName, createCustomTheme } from './themes';
 
 	const STORAGE_KEY_THEME = 'traek-selected-theme';
 	const STORAGE_KEY_ACCENT = 'traek-custom-accent';
+	const STORAGE_KEY_AUTO = 'traek-auto-theme';
 	const DEFAULT_ACCENT = '#00d8ff';
 
 	let { compact = false }: { compact?: boolean } = $props();
@@ -13,50 +14,88 @@
 	let selectedThemeName = $state<ThemeName>('dark');
 	let customAccent = $state<string>(DEFAULT_ACCENT);
 	let isOpen = $state(false);
+	/** Whether to follow the OS prefers-color-scheme preference */
+	let autoTheme = $state(false);
 
-	// Load saved preferences
+	/** Resolve the OS preference to a theme name */
+	function getSystemTheme(): ThemeName {
+		if (
+			typeof window !== 'undefined' &&
+			window.matchMedia('(prefers-color-scheme: light)').matches
+		) {
+			return 'light';
+		}
+		return 'dark';
+	}
+
+	// Load saved preferences and wire system preference listener
 	onMount(() => {
 		if (typeof localStorage !== 'undefined') {
+			const savedAuto = localStorage.getItem(STORAGE_KEY_AUTO);
 			const savedTheme = localStorage.getItem(STORAGE_KEY_THEME) as ThemeName | null;
 			const savedAccent = localStorage.getItem(STORAGE_KEY_ACCENT);
 
-			if (savedTheme && themes[savedTheme]) {
+			if (savedAccent) customAccent = savedAccent;
+
+			if (savedAuto === 'true') {
+				autoTheme = true;
+				applyThemeWithAccent(getSystemTheme(), customAccent);
+			} else if (savedTheme && themes[savedTheme]) {
 				selectedThemeName = savedTheme;
+				applyThemeWithAccent(selectedThemeName, customAccent);
+			} else {
+				// First visit — auto-detect
+				autoTheme = true;
+				applyThemeWithAccent(getSystemTheme(), customAccent);
 			}
+		}
 
-			if (savedAccent) {
-				customAccent = savedAccent;
-			}
-
-			// Apply saved theme
-			applyThemeWithAccent(selectedThemeName, customAccent);
+		// Listen for OS preference changes
+		if (typeof window !== 'undefined') {
+			const mq = window.matchMedia('(prefers-color-scheme: light)');
+			const handleChange = () => {
+				if (autoTheme) applyThemeWithAccent(getSystemTheme(), customAccent);
+			};
+			mq.addEventListener('change', handleChange);
+			return () => mq.removeEventListener('change', handleChange);
 		}
 	});
 
 	function applyThemeWithAccent(themeName: ThemeName, accent: string) {
 		const baseTheme = themes[themeName];
-		const customTheme =
-			accent !== DEFAULT_ACCENT ? createCustomTheme(baseTheme, accent) : baseTheme;
+		const finalTheme = accent !== DEFAULT_ACCENT ? createCustomTheme(baseTheme, accent) : baseTheme;
+		// Use animated apply for smooth transitions
+		applyThemeToRootAnimated(finalTheme, themeName);
 		themeContext.setTheme(themeName);
-		// Apply accent customization after setting the base theme
 		if (accent !== DEFAULT_ACCENT) {
-			themeContext.applyTheme(customTheme);
+			themeContext.applyTheme(finalTheme);
 		}
 		selectedThemeName = themeName;
 	}
 
 	function selectTheme(themeName: ThemeName) {
+		autoTheme = false;
 		applyThemeWithAccent(themeName, customAccent);
 
 		if (typeof localStorage !== 'undefined') {
 			localStorage.setItem(STORAGE_KEY_THEME, themeName);
+			localStorage.setItem(STORAGE_KEY_AUTO, 'false');
+		}
+	}
+
+	function selectAutoTheme() {
+		autoTheme = true;
+		applyThemeWithAccent(getSystemTheme(), customAccent);
+
+		if (typeof localStorage !== 'undefined') {
+			localStorage.setItem(STORAGE_KEY_AUTO, 'true');
 		}
 	}
 
 	function updateAccent(event: Event) {
 		const input = event.target as HTMLInputElement;
 		customAccent = input.value;
-		applyThemeWithAccent(selectedThemeName, customAccent);
+		applyThemeWithAccent(autoTheme ? getSystemTheme() : selectedThemeName, customAccent);
 
 		if (typeof localStorage !== 'undefined') {
 			localStorage.setItem(STORAGE_KEY_ACCENT, customAccent);
@@ -70,8 +109,8 @@
 	};
 
 	const themePreviewColors: Record<ThemeName, { bg: string; border: string; accent: string }> = {
-		dark: { bg: '#161616', border: '#2a2a2a', accent: '#00d8ff' },
-		light: { bg: '#ffffff', border: '#d4d4d4', accent: '#0099cc' },
+		dark: { bg: '#0e0e10', border: '#1f1f24', accent: '#00d8ff' },
+		light: { bg: '#ffffff', border: '#e4e4e7', accent: '#007aad' },
 		highContrast: { bg: '#000000', border: '#ffffff', accent: '#00ffff' }
 	};
 </script>
@@ -101,15 +140,32 @@
 	{#if isOpen}
 		<div class="theme-picker-panel">
 			<div class="theme-preview-grid">
+				<!-- System / Auto option -->
+				<button
+					type="button"
+					class="theme-preview-card"
+					class:selected={autoTheme}
+					onclick={selectAutoTheme}
+					aria-label="Use system theme preference"
+					aria-pressed={autoTheme}
+				>
+					<div class="theme-preview-sample theme-preview-system">
+						<div class="theme-preview-system-half theme-preview-system-dark"></div>
+						<div class="theme-preview-system-half theme-preview-system-light"></div>
+					</div>
+					<span class="theme-preview-label">System</span>
+				</button>
+
 				{#each Object.entries(themes) as [name] (name)}
 					{@const themeName = name as ThemeName}
 					{@const colors = themePreviewColors[themeName]}
 					<button
 						type="button"
 						class="theme-preview-card"
-						class:selected={selectedThemeName === themeName}
+						class:selected={!autoTheme && selectedThemeName === themeName}
 						onclick={() => selectTheme(themeName)}
 						aria-label="Select {themeLabels[themeName]} theme"
+						aria-pressed={!autoTheme && selectedThemeName === themeName}
 					>
 						<div
 							class="theme-preview-sample"
@@ -256,6 +312,25 @@
 			align-items: flex-end;
 			justify-content: center;
 			padding: 4px;
+			overflow: hidden;
+		}
+
+		.theme-preview-system {
+			border-color: var(--traek-thought-toggle-border, #3f3f46);
+			padding: 0;
+			align-items: stretch;
+		}
+
+		.theme-preview-system-half {
+			flex: 1;
+		}
+
+		.theme-preview-system-dark {
+			background: #0e0e10;
+		}
+
+		.theme-preview-system-light {
+			background: #f4f4f5;
 		}
 
 		.theme-preview-accent {

@@ -113,6 +113,65 @@
 		root.style.setProperty('--traek-overlay-text', theme.colors.overlayText);
 		root.style.setProperty('--traek-overlay-pill-bg', theme.colors.overlayPillBg);
 		root.style.setProperty('--traek-overlay-pill-shadow', theme.colors.overlayPillShadow);
+		root.style.setProperty('--traek-color-red', theme.colors.nodeColorRed ?? '#ef4444');
+		root.style.setProperty('--traek-color-orange', theme.colors.nodeColorOrange ?? '#f97316');
+		root.style.setProperty('--traek-color-yellow', theme.colors.nodeColorYellow ?? '#eab308');
+		root.style.setProperty('--traek-color-green', theme.colors.nodeColorGreen ?? '#22c55e');
+		root.style.setProperty('--traek-color-blue', theme.colors.nodeColorBlue ?? '#3b82f6');
+		root.style.setProperty('--traek-color-purple', theme.colors.nodeColorPurple ?? '#a855f7');
+		root.style.setProperty('--traek-color-pink', theme.colors.nodeColorPink ?? '#ec4899');
+		root.style.setProperty('--traek-color-cyan', theme.colors.nodeColorCyan ?? '#06b6d4');
+		root.style.setProperty('--traek-sidebar-bg', theme.colors.sidebarBg ?? '#1a1a2e');
+		root.style.setProperty('--traek-sidebar-border', theme.colors.sidebarBorder ?? 'rgba(255,255,255,0.08)');
+
+		// Spacing
+		root.style.setProperty('--traek-space-xs', `${theme.spacing.xs}px`);
+		root.style.setProperty('--traek-space-sm', `${theme.spacing.sm}px`);
+		root.style.setProperty('--traek-space-md', `${theme.spacing.md}px`);
+		root.style.setProperty('--traek-space-lg', `${theme.spacing.lg}px`);
+		root.style.setProperty('--traek-space-xl', `${theme.spacing.xl}px`);
+
+		// Border radius
+		root.style.setProperty('--traek-radius-sm', `${theme.radius.sm}px`);
+		root.style.setProperty('--traek-radius-md', `${theme.radius.md}px`);
+		root.style.setProperty('--traek-radius-lg', `${theme.radius.lg}px`);
+
+		// Typography — family & mono
+		root.style.setProperty('--traek-font-family', theme.typography.fontFamily);
+		root.style.setProperty('--traek-font-mono', theme.typography.fontMono);
+
+		// Typography — sizes
+		root.style.setProperty('--traek-text-xs', theme.typography.sizes.xs);
+		root.style.setProperty('--traek-text-sm', theme.typography.sizes.sm);
+		root.style.setProperty('--traek-text-base', theme.typography.sizes.base);
+		root.style.setProperty('--traek-text-lg', theme.typography.sizes.lg);
+		root.style.setProperty('--traek-text-xl', theme.typography.sizes.xl);
+		root.style.setProperty('--traek-text-2xl', theme.typography.sizes['2xl']);
+
+		// Typography — weights
+		root.style.setProperty('--traek-weight-normal', theme.typography.weights.normal.toString());
+		root.style.setProperty('--traek-weight-medium', theme.typography.weights.medium.toString());
+		root.style.setProperty('--traek-weight-semibold', theme.typography.weights.semibold.toString());
+		root.style.setProperty('--traek-weight-bold', theme.typography.weights.bold.toString());
+
+		// Animation durations
+		root.style.setProperty('--traek-duration-fast', `${theme.animation.fast}ms`);
+		root.style.setProperty('--traek-duration-normal', `${theme.animation.normal}ms`);
+		root.style.setProperty('--traek-duration-slow', `${theme.animation.slow}ms`);
+	}
+
+	/**
+	 * Apply theme CSS variables with a brief transition for smooth switching.
+	 * Adds the transition class, applies vars, then removes the class after animation.
+	 */
+	export function applyThemeToRootAnimated(theme: TraekTheme, themeName?: ThemeName): void {
+		if (typeof document === 'undefined') return;
+		const root = document.documentElement;
+		root.classList.add('traek-theme-transitioning');
+		applyThemeToRoot(theme, themeName);
+		// Remove transition class after animation completes
+		const cleanup = () => root.classList.remove('traek-theme-transitioning');
+		setTimeout(cleanup, 320);
 	}
 </script>
 

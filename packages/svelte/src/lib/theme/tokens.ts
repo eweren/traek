@@ -119,7 +119,20 @@ export const TraekThemeColorsSchema = z.object({
 	overlayCardShadow: colorSchema,
 	overlayText: colorSchema,
 	overlayPillBg: colorSchema,
-	overlayPillShadow: colorSchema
+	overlayPillShadow: colorSchema,
+
+	// Node color coding
+	nodeColorRed: colorSchema.optional(),
+	nodeColorOrange: colorSchema.optional(),
+	nodeColorYellow: colorSchema.optional(),
+	nodeColorGreen: colorSchema.optional(),
+	nodeColorBlue: colorSchema.optional(),
+	nodeColorPurple: colorSchema.optional(),
+	nodeColorPink: colorSchema.optional(),
+	nodeColorCyan: colorSchema.optional(),
+	// Sidebar
+	sidebarBg: colorSchema.optional(),
+	sidebarBorder: colorSchema.optional()
 });
 
 /**

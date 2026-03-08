@@ -120,6 +120,82 @@ describe('Theme Application', () => {
 				darkTheme.colors.thoughtPanelBg
 			);
 		});
+
+		it('should apply spacing CSS custom properties', () => {
+			applyThemeToRoot(darkTheme);
+
+			const root = document.documentElement;
+			expect(root.style.getPropertyValue('--traek-space-xs')).toBe(`${darkTheme.spacing.xs}px`);
+			expect(root.style.getPropertyValue('--traek-space-sm')).toBe(`${darkTheme.spacing.sm}px`);
+			expect(root.style.getPropertyValue('--traek-space-md')).toBe(`${darkTheme.spacing.md}px`);
+			expect(root.style.getPropertyValue('--traek-space-lg')).toBe(`${darkTheme.spacing.lg}px`);
+			expect(root.style.getPropertyValue('--traek-space-xl')).toBe(`${darkTheme.spacing.xl}px`);
+		});
+
+		it('should apply border radius CSS custom properties', () => {
+			applyThemeToRoot(darkTheme);
+
+			const root = document.documentElement;
+			expect(root.style.getPropertyValue('--traek-radius-sm')).toBe(`${darkTheme.radius.sm}px`);
+			expect(root.style.getPropertyValue('--traek-radius-md')).toBe(`${darkTheme.radius.md}px`);
+			expect(root.style.getPropertyValue('--traek-radius-lg')).toBe(`${darkTheme.radius.lg}px`);
+		});
+
+		it('should apply typography CSS custom properties', () => {
+			applyThemeToRoot(darkTheme);
+
+			const root = document.documentElement;
+			expect(root.style.getPropertyValue('--traek-font-family')).toBe(
+				darkTheme.typography.fontFamily
+			);
+			expect(root.style.getPropertyValue('--traek-font-mono')).toBe(darkTheme.typography.fontMono);
+			expect(root.style.getPropertyValue('--traek-text-base')).toBe(
+				darkTheme.typography.sizes.base
+			);
+			expect(root.style.getPropertyValue('--traek-text-sm')).toBe(darkTheme.typography.sizes.sm);
+			expect(root.style.getPropertyValue('--traek-text-lg')).toBe(darkTheme.typography.sizes.lg);
+			expect(root.style.getPropertyValue('--traek-weight-normal')).toBe(
+				darkTheme.typography.weights.normal.toString()
+			);
+			expect(root.style.getPropertyValue('--traek-weight-semibold')).toBe(
+				darkTheme.typography.weights.semibold.toString()
+			);
+		});
+
+		it('should apply animation duration CSS custom properties', () => {
+			applyThemeToRoot(darkTheme);
+
+			const root = document.documentElement;
+			expect(root.style.getPropertyValue('--traek-duration-fast')).toBe(
+				`${darkTheme.animation.fast}ms`
+			);
+			expect(root.style.getPropertyValue('--traek-duration-normal')).toBe(
+				`${darkTheme.animation.normal}ms`
+			);
+			expect(root.style.getPropertyValue('--traek-duration-slow')).toBe(
+				`${darkTheme.animation.slow}ms`
+			);
+		});
+
+		it('should apply all token categories when switching themes', () => {
+			applyThemeToRoot(lightTheme);
+
+			const root = document.documentElement;
+			// Colors
+			expect(root.style.getPropertyValue('--traek-canvas-bg')).toBe(lightTheme.colors.canvasBg);
+			// Spacing
+			expect(root.style.getPropertyValue('--traek-space-md')).toBe(`${lightTheme.spacing.md}px`);
+			// Radius
+			expect(root.style.getPropertyValue('--traek-radius-md')).toBe(`${lightTheme.radius.md}px`);
+			// Typography
+			expect(root.style.getPropertyValue('--traek-font-family')).toBe(
+				lightTheme.typography.fontFamily
+			);
+			// Animation
+			expect(root.style.getPropertyValue('--traek-duration-normal')).toBe(
+				`${lightTheme.animation.normal}ms`
+			);
+		});
 	});
 
 	describe('Theme Switching Performance', () => {

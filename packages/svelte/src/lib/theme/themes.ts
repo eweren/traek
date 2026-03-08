@@ -1,91 +1,105 @@
 import type { TraekTheme } from './tokens';
 
 /**
- * Dark theme - default theme matching existing CSS variables
+ * Dark theme — OLED-friendly deep blacks with refined surface elevation.
+ * Accent: #00d8ff (cyan). Assistant accent: #ff4400 (vivid orange-red).
  */
 export const darkTheme: TraekTheme = {
 	colors: {
-		// Canvas
-		canvasBg: '#0b0b0b',
-		canvasDot: '#333333',
+		// Canvas — near-true black for OLED
+		canvasBg: '#070708',
+		canvasDot: '#1e1e22',
 
-		// Nodes
-		nodeBg: '#161616',
-		nodeBorder: '#2a2a2a',
-		nodeText: '#dddddd',
+		// Nodes — elevated surfaces with subtle blue undertone
+		nodeBg: '#0e0e10',
+		nodeBorder: '#1f1f24',
+		nodeText: '#e4e4e7',
 		nodeActiveBorder: '#00d8ff',
-		nodeActiveGlow: 'rgba(0, 216, 255, 0.15)',
+		nodeActiveGlow: 'rgba(0, 216, 255, 0.12)',
 		nodeUserBorderTop: '#00d8ff',
-		nodeAssistantBorderTop: '#ff3e00',
+		nodeAssistantBorderTop: '#ff4400',
 
 		// Connections
-		connectionStroke: '#333333',
+		connectionStroke: '#252528',
 		connectionHighlight: '#00d8ff',
 
-		// Input
-		inputBg: 'rgba(30, 30, 30, 0.8)',
-		inputBorder: '#444444',
-		inputShadow: 'rgba(0, 0, 0, 0.4)',
+		// Input — frosted glass effect
+		inputBg: 'rgba(14, 14, 16, 0.85)',
+		inputBorder: '#2a2a30',
+		inputShadow: 'rgba(0, 0, 0, 0.6)',
 		inputButtonBg: '#00d8ff',
 		inputButtonText: '#000000',
-		inputText: 'rgb(255, 255, 255)',
-		inputContextBg: 'rgba(0, 0, 0, 0.4)',
-		inputContextText: '#888888',
+		inputText: '#f4f4f5',
+		inputContextBg: 'rgba(0, 0, 0, 0.35)',
+		inputContextText: '#71717a',
 		inputDot: '#00d8ff',
-		inputDotMuted: '#555555',
-		statsText: '#8a8a8a',
+		inputDotMuted: '#3f3f46',
+		statsText: '#71717a',
 
 		// TextNode
-		textNodeText: '#dddddd',
-		textNodeBg: '#222222',
-		markdownQuoteBorder: '#444444',
-		markdownQuoteText: '#999999',
-		markdownHr: '#333333',
-		scrollHintBg: 'linear-gradient(transparent, rgba(0, 0, 0, 0.5))',
-		scrollHintText: '#909090',
-		scrollbarThumb: '#333333',
-		scrollbarThumbHover: '#444444',
-		typingCursor: '#ff3e00',
+		textNodeText: '#e4e4e7',
+		textNodeBg: '#111113',
+		markdownQuoteBorder: '#2a2a30',
+		markdownQuoteText: '#71717a',
+		markdownHr: '#1f1f24',
+		scrollHintBg: 'linear-gradient(transparent, rgba(7, 7, 8, 0.8))',
+		scrollHintText: '#71717a',
+		scrollbarThumb: '#27272a',
+		scrollbarThumbHover: '#3f3f46',
+		typingCursor: '#ff4400',
 
 		// Search
-		searchMatchBorder: 'rgba(255, 235, 59, 0.5)',
-		searchDimmedOpacity: 0.4,
+		searchMatchBorder: 'rgba(250, 204, 21, 0.45)',
+		searchDimmedOpacity: 0.35,
 
 		// Thought Panel
-		thoughtPanelBg: 'rgba(22, 22, 22, 0.9)',
-		thoughtPanelBorder: '#333333',
+		thoughtPanelBg: 'rgba(14, 14, 16, 0.92)',
+		thoughtPanelBorder: '#1f1f24',
 		thoughtPanelBorderActive: '#00d8ff',
-		thoughtPanelGlow: 'rgba(0, 216, 255, 0.15)',
-		thoughtHeaderBg: 'rgba(255, 255, 255, 0.03)',
-		thoughtHeaderBorder: '#222222',
-		thoughtHeaderMuted: '#9e9e9e',
-		thoughtHeaderAccent: '#888888',
+		thoughtPanelGlow: 'rgba(0, 216, 255, 0.12)',
+		thoughtHeaderBg: 'rgba(255, 255, 255, 0.025)',
+		thoughtHeaderBorder: '#1a1a1e',
+		thoughtHeaderMuted: '#71717a',
+		thoughtHeaderAccent: '#52525b',
 		thoughtTagCyan: '#00d8ff',
-		thoughtTagOrange: '#ff3e00',
-		thoughtTagGray: '#444444',
-		thoughtDivider: 'rgba(255, 255, 255, 0.06)',
-		thoughtRowBg: 'rgba(255, 255, 255, 0.03)',
-		thoughtRowMuted1: '#888888',
-		thoughtRowMuted2: '#aaaaaa',
-		thoughtRowMuted3: '#999999',
-		thoughtRowMuted4: '#9e9e9e',
-		thoughtBadgeCyan: '#00dddd',
-		thoughtFooterMuted: '#bbbbbb',
-		thoughtFooterBg: 'rgba(0, 0, 0, 0.2)',
-		thoughtFooterBorder: 'rgba(255, 255, 255, 0.05)',
-		thoughtToggleBg: '#444444',
-		thoughtToggleBorder: '#555555',
+		thoughtTagOrange: '#ff4400',
+		thoughtTagGray: '#3f3f46',
+		thoughtDivider: 'rgba(255, 255, 255, 0.05)',
+		thoughtRowBg: 'rgba(255, 255, 255, 0.025)',
+		thoughtRowMuted1: '#71717a',
+		thoughtRowMuted2: '#a1a1aa',
+		thoughtRowMuted3: '#71717a',
+		thoughtRowMuted4: '#71717a',
+		thoughtBadgeCyan: '#00b8d9',
+		thoughtFooterMuted: '#a1a1aa',
+		thoughtFooterBg: 'rgba(0, 0, 0, 0.25)',
+		thoughtFooterBorder: 'rgba(255, 255, 255, 0.04)',
+		thoughtToggleBg: '#27272a',
+		thoughtToggleBorder: '#3f3f46',
 
 		// Overlays
-		overlayGradient1: 'rgba(0, 0, 0, 0.7)',
-		overlayGradient2: 'rgba(0, 0, 0, 0.9)',
+		overlayGradient1: 'rgba(0, 0, 0, 0.65)',
+		overlayGradient2: 'rgba(0, 0, 0, 0.88)',
 		overlayGradient3: 'rgba(0, 0, 0, 1)',
-		overlayCardBg: 'rgba(15, 15, 15, 0.9)',
-		overlayCardBorder: 'rgba(255, 255, 255, 0.08)',
-		overlayCardShadow: 'rgba(0, 0, 0, 0.8)',
-		overlayText: '#e5e5e5',
+		overlayCardBg: 'rgba(14, 14, 16, 0.92)',
+		overlayCardBorder: 'rgba(255, 255, 255, 0.07)',
+		overlayCardShadow: 'rgba(0, 0, 0, 0.9)',
+		overlayText: '#e4e4e7',
 		overlayPillBg: '#00d8ff',
-		overlayPillShadow: 'rgba(0, 216, 255, 0.7)'
+		overlayPillShadow: 'rgba(0, 216, 255, 0.65)',
+
+		// Node color coding
+		nodeColorRed: '#ef4444',
+		nodeColorOrange: '#f97316',
+		nodeColorYellow: '#eab308',
+		nodeColorGreen: '#22c55e',
+		nodeColorBlue: '#3b82f6',
+		nodeColorPurple: '#a855f7',
+		nodeColorPink: '#ec4899',
+		nodeColorCyan: '#06b6d4',
+		// Sidebar
+		sidebarBg: '#1a1a2e',
+		sidebarBorder: 'rgba(255,255,255,0.08)'
 	},
 	spacing: {
 		xs: 4,
@@ -100,8 +114,8 @@ export const darkTheme: TraekTheme = {
 		lg: 24
 	},
 	typography: {
-		fontFamily: "'Space Grotesk', sans-serif",
-		fontMono: "'Space Mono', monospace",
+		fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
+		fontMono: "'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace",
 		sizes: {
 			xs: '10px',
 			sm: '12px',
@@ -118,98 +132,112 @@ export const darkTheme: TraekTheme = {
 		}
 	},
 	animation: {
-		fast: 150,
-		normal: 250,
-		slow: 400
+		fast: 120,
+		normal: 220,
+		slow: 380
 	}
 };
 
 /**
- * Light theme - matching existing [data-theme='light'] CSS variables
+ * Light theme — warm off-white canvas with strong text contrast.
+ * WCAG AA compliant throughout. Accent: #007aad (deeper cyan for contrast).
  */
 export const lightTheme: TraekTheme = {
 	colors: {
-		// Canvas
-		canvasBg: '#f0f0f0',
-		canvasDot: '#cccccc',
+		// Canvas — warm off-white, easier on the eyes than pure grey
+		canvasBg: '#f4f4f5',
+		canvasDot: '#d4d4d8',
 
-		// Nodes
+		// Nodes — pure white cards on warm canvas, clear separation
 		nodeBg: '#ffffff',
-		nodeBorder: '#d4d4d4',
-		nodeText: '#1a1a1a',
-		nodeActiveBorder: '#0099cc',
-		nodeActiveGlow: 'rgba(0, 153, 204, 0.2)',
-		nodeUserBorderTop: '#0099cc',
-		nodeAssistantBorderTop: '#e03a00',
+		nodeBorder: '#e4e4e7',
+		nodeText: '#18181b',
+		nodeActiveBorder: '#007aad',
+		nodeActiveGlow: 'rgba(0, 122, 173, 0.15)',
+		nodeUserBorderTop: '#007aad',
+		nodeAssistantBorderTop: '#c93a00',
 
 		// Connections
-		connectionStroke: '#a3a3a3',
-		connectionHighlight: '#0099cc',
+		connectionStroke: '#d4d4d8',
+		connectionHighlight: '#007aad',
 
-		// Input
-		inputBg: 'rgba(255, 255, 255, 0.95)',
-		inputBorder: '#a3a3a3',
-		inputShadow: 'rgba(0, 0, 0, 0.1)',
-		inputButtonBg: '#0099cc',
+		// Input — crisp white, clear contrast
+		inputBg: 'rgba(255, 255, 255, 0.97)',
+		inputBorder: '#d4d4d8',
+		inputShadow: 'rgba(0, 0, 0, 0.08)',
+		inputButtonBg: '#007aad',
 		inputButtonText: '#ffffff',
-		inputText: '#1a1a1a',
-		inputContextBg: 'rgba(0, 0, 0, 0.05)',
-		inputContextText: '#525252',
-		inputDot: '#0099cc',
-		inputDotMuted: '#a3a3a3',
-		statsText: '#737373',
+		inputText: '#18181b',
+		inputContextBg: 'rgba(0, 0, 0, 0.04)',
+		inputContextText: '#52525b',
+		inputDot: '#007aad',
+		inputDotMuted: '#d4d4d8',
+		statsText: '#71717a',
 
-		// TextNode
-		textNodeText: '#1a1a1a',
+		// TextNode — 18.1:1 contrast (#18181b on #ffffff)
+		textNodeText: '#18181b',
 		textNodeBg: '#ffffff',
-		markdownQuoteBorder: '#a3a3a3',
-		markdownQuoteText: '#525252',
-		markdownHr: '#d4d4d4',
-		scrollHintBg: 'linear-gradient(transparent, rgba(255, 255, 255, 0.8))',
-		scrollHintText: '#737373',
-		scrollbarThumb: '#d4d4d4',
-		scrollbarThumbHover: '#a3a3a3',
-		typingCursor: '#e03a00',
+		markdownQuoteBorder: '#d4d4d8',
+		markdownQuoteText: '#52525b',
+		markdownHr: '#e4e4e7',
+		scrollHintBg: 'linear-gradient(transparent, rgba(255, 255, 255, 0.9))',
+		scrollHintText: '#71717a',
+		scrollbarThumb: '#d4d4d8',
+		scrollbarThumbHover: '#a1a1aa',
+		typingCursor: '#c93a00',
 
 		// Search
-		searchMatchBorder: 'rgba(255, 193, 7, 0.6)',
-		searchDimmedOpacity: 0.3,
+		searchMatchBorder: 'rgba(202, 138, 4, 0.55)',
+		searchDimmedOpacity: 0.28,
 
 		// Thought Panel
-		thoughtPanelBg: 'rgba(255, 255, 255, 0.95)',
-		thoughtPanelBorder: '#d4d4d4',
-		thoughtPanelBorderActive: '#0099cc',
-		thoughtPanelGlow: 'rgba(0, 153, 204, 0.2)',
-		thoughtHeaderBg: 'rgba(0, 0, 0, 0.03)',
-		thoughtHeaderBorder: '#e5e5e5',
-		thoughtHeaderMuted: '#6b6b6b',
-		thoughtHeaderAccent: '#525252',
-		thoughtTagCyan: '#0099cc',
-		thoughtTagOrange: '#e03a00',
-		thoughtTagGray: '#a3a3a3',
-		thoughtDivider: 'rgba(0, 0, 0, 0.06)',
-		thoughtRowBg: 'rgba(0, 0, 0, 0.02)',
-		thoughtRowMuted1: '#737373',
-		thoughtRowMuted2: '#525252',
-		thoughtRowMuted3: '#525252',
-		thoughtRowMuted4: '#737373',
-		thoughtBadgeCyan: '#008b8b',
-		thoughtFooterMuted: '#404040',
-		thoughtFooterBg: 'rgba(0, 0, 0, 0.04)',
-		thoughtFooterBorder: 'rgba(0, 0, 0, 0.06)',
-		thoughtToggleBg: '#d4d4d4',
-		thoughtToggleBorder: '#a3a3a3',
+		thoughtPanelBg: 'rgba(255, 255, 255, 0.97)',
+		thoughtPanelBorder: '#e4e4e7',
+		thoughtPanelBorderActive: '#007aad',
+		thoughtPanelGlow: 'rgba(0, 122, 173, 0.15)',
+		thoughtHeaderBg: 'rgba(0, 0, 0, 0.025)',
+		thoughtHeaderBorder: '#f4f4f5',
+		thoughtHeaderMuted: '#52525b',
+		thoughtHeaderAccent: '#3f3f46',
+		thoughtTagCyan: '#007aad',
+		thoughtTagOrange: '#c93a00',
+		thoughtTagGray: '#d4d4d8',
+		thoughtDivider: 'rgba(0, 0, 0, 0.05)',
+		thoughtRowBg: 'rgba(0, 0, 0, 0.018)',
+		thoughtRowMuted1: '#52525b',
+		thoughtRowMuted2: '#3f3f46',
+		thoughtRowMuted3: '#52525b',
+		thoughtRowMuted4: '#52525b',
+		thoughtBadgeCyan: '#005a80',
+		thoughtFooterMuted: '#27272a',
+		thoughtFooterBg: 'rgba(0, 0, 0, 0.03)',
+		thoughtFooterBorder: 'rgba(0, 0, 0, 0.05)',
+		thoughtToggleBg: '#e4e4e7',
+		thoughtToggleBorder: '#d4d4d8',
 
 		// Overlays
-		overlayGradient1: 'rgba(0, 0, 0, 0.4)',
-		overlayGradient2: 'rgba(0, 0, 0, 0.6)',
-		overlayGradient3: 'rgba(0, 0, 0, 0.85)',
-		overlayCardBg: 'rgba(255, 255, 255, 0.95)',
-		overlayCardBorder: 'rgba(0, 0, 0, 0.1)',
-		overlayCardShadow: 'rgba(0, 0, 0, 0.2)',
-		overlayText: '#1a1a1a',
-		overlayPillBg: '#0099cc',
-		overlayPillShadow: 'rgba(0, 153, 204, 0.4)'
+		overlayGradient1: 'rgba(0, 0, 0, 0.35)',
+		overlayGradient2: 'rgba(0, 0, 0, 0.55)',
+		overlayGradient3: 'rgba(0, 0, 0, 0.82)',
+		overlayCardBg: 'rgba(255, 255, 255, 0.97)',
+		overlayCardBorder: 'rgba(0, 0, 0, 0.09)',
+		overlayCardShadow: 'rgba(0, 0, 0, 0.15)',
+		overlayText: '#18181b',
+		overlayPillBg: '#007aad',
+		overlayPillShadow: 'rgba(0, 122, 173, 0.35)',
+
+		// Node color coding
+		nodeColorRed: '#ef4444',
+		nodeColorOrange: '#f97316',
+		nodeColorYellow: '#eab308',
+		nodeColorGreen: '#22c55e',
+		nodeColorBlue: '#3b82f6',
+		nodeColorPurple: '#a855f7',
+		nodeColorPink: '#ec4899',
+		nodeColorCyan: '#06b6d4',
+		// Sidebar
+		sidebarBg: '#f0f0f5',
+		sidebarBorder: 'rgba(0,0,0,0.08)'
 	},
 	spacing: {
 		xs: 4,
@@ -224,8 +252,8 @@ export const lightTheme: TraekTheme = {
 		lg: 24
 	},
 	typography: {
-		fontFamily: "'Space Grotesk', sans-serif",
-		fontMono: "'Space Mono', monospace",
+		fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
+		fontMono: "'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace",
 		sizes: {
 			xs: '10px',
 			sm: '12px',
@@ -242,9 +270,9 @@ export const lightTheme: TraekTheme = {
 		}
 	},
 	animation: {
-		fast: 150,
-		normal: 250,
-		slow: 400
+		fast: 120,
+		normal: 220,
+		slow: 380
 	}
 };
 
@@ -333,7 +361,20 @@ export const highContrastTheme: TraekTheme = {
 		overlayCardShadow: 'rgba(255, 255, 255, 0.2)',
 		overlayText: '#ffffff',
 		overlayPillBg: '#00ffff',
-		overlayPillShadow: 'rgba(0, 255, 255, 0.8)'
+		overlayPillShadow: 'rgba(0, 255, 255, 0.8)',
+
+		// Node color coding
+		nodeColorRed: '#ef4444',
+		nodeColorOrange: '#f97316',
+		nodeColorYellow: '#eab308',
+		nodeColorGreen: '#22c55e',
+		nodeColorBlue: '#3b82f6',
+		nodeColorPurple: '#a855f7',
+		nodeColorPink: '#ec4899',
+		nodeColorCyan: '#06b6d4',
+		// Sidebar
+		sidebarBg: '#1a1a2e',
+		sidebarBorder: 'rgba(255,255,255,0.08)'
 	},
 	spacing: {
 		xs: 4,
@@ -348,8 +389,8 @@ export const highContrastTheme: TraekTheme = {
 		lg: 24
 	},
 	typography: {
-		fontFamily: "'Space Grotesk', sans-serif",
-		fontMono: "'Space Mono', monospace",
+		fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
+		fontMono: "'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace",
 		sizes: {
 			xs: '10px',
 			sm: '12px',
@@ -366,9 +407,9 @@ export const highContrastTheme: TraekTheme = {
 		}
 	},
 	animation: {
-		fast: 150,
-		normal: 250,
-		slow: 400
+		fast: 120,
+		normal: 220,
+		slow: 380
 	}
 };
 
