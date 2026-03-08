@@ -131,6 +131,7 @@ export default defineConfig({
 				{
 					label: 'Guides',
 					items: [
+						{ label: 'Component Showcase', slug: 'guides/components' },
 						{ label: 'Interactive Examples', slug: 'guides/examples' },
 						{ label: 'Cookbook', slug: 'guides/cookbook' },
 						{ label: 'Starter Templates', slug: 'guides/starter-templates' },

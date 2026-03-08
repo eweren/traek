@@ -122,30 +122,36 @@ describe('markdownToHtml', () => {
 	});
 
 	describe('XSS safety', () => {
-		// markdownToHtml does NOT sanitize — it is designed for trusted content only.
-		// These tests document the actual behavior: raw HTML passes through marked.
-		// Consumers must sanitize separately (e.g. with DOMPurify) for untrusted input.
+		// Security model:
+		// - In the BROWSER, markdownToHtml sanitizes output with DOMPurify, blocking all XSS
+		//   vectors (script tags, on* handlers, javascript: URIs, iframes, etc.).
+		// - On the SERVER (Node.js / SSR), DOMPurify is unavailable (no window), so marked
+		//   output is returned as-is. These tests run in Node.js and therefore observe the
+		//   unsanitized server-side path. The browser path is secured by DOMPurify at runtime.
+		//
+		// Consumers rendering HTML outside of the Traek library (e.g. in email templates,
+		// PDFs, or custom SSR pipelines) must sanitize separately before use.
 
-		it('should pass through script tags (not sanitized — trusted content only)', () => {
+		it('passes through script tags in Node.js (sanitized in browser by DOMPurify)', () => {
 			expect.assertions(1);
+			// Server-side path: raw marked output, no DOMPurify
 			const result = markdownToHtml('<script>alert("xss")</script>');
-			// Documenting that script tags are preserved — callers must sanitize
 			expect(result).toContain('<script>');
 		});
 
-		it('should pass through img onerror handlers (not sanitized — trusted content only)', () => {
+		it('passes through img onerror handlers in Node.js (sanitized in browser by DOMPurify)', () => {
 			expect.assertions(1);
 			const result = markdownToHtml('<img onerror="alert(\'xss\')">');
 			expect(result).toContain('onerror');
 		});
 
-		it('should pass through javascript: URLs (not sanitized — trusted content only)', () => {
+		it('passes through javascript: URLs in Node.js (sanitized in browser by DOMPurify)', () => {
 			expect.assertions(1);
 			const result = markdownToHtml('<a href="javascript:alert(\'xss\')">click</a>');
 			expect(result).toContain('javascript:');
 		});
 
-		it('should pass through iframe tags (not sanitized — trusted content only)', () => {
+		it('passes through iframe tags in Node.js (sanitized in browser by DOMPurify)', () => {
 			expect.assertions(1);
 			const result = markdownToHtml('<iframe src="evil.com"></iframe>');
 			expect(result).toContain('<iframe');
@@ -153,7 +159,7 @@ describe('markdownToHtml', () => {
 
 		it('should escape angle brackets inside markdown code spans', () => {
 			expect.assertions(2);
-			// Inline code in markdown escapes HTML entities
+			// Inline code in markdown escapes HTML entities — safe on both server and browser
 			const result = markdownToHtml('`<script>alert("xss")</script>`');
 			expect(result).not.toContain('<script>alert');
 			expect(result).toContain('&lt;script&gt;');

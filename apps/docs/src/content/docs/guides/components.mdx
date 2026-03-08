@@ -1,0 +1,208 @@
+---
+title: Component Showcase
+description: Visual gallery of every Træk component — live demos, code snippets, and theming variations in one place.
+head:
+  - tag: link
+    attrs:
+      rel: canonical
+      href: https://gettraek.com/guides/components/
+---
+
+import ThemeShowcaseDemo from '../../../../components/demos/ThemeShowcaseDemo.svelte';
+import BranchShowcaseDemo from '../../../../components/demos/BranchShowcaseDemo.svelte';
+import LoadingOverlayDemo from '../../../../components/demos/LoadingOverlayDemo.svelte';
+
+# Component Showcase
+
+A visual reference for every exported Træk component — interactive demos, code snippets, and theming variations side by side.
+
+---
+
+## TraekCanvas
+
+The main spatial canvas. Renders nodes on a pannable/zoomable surface with streaming input, connection lines, and keyboard navigation built in.
+
+<ThemeShowcaseDemo client:load />
+
+Switch between **Dark**, **Light**, and **High Contrast** using the tabs above the canvas. Each theme is a full token set — colors, spacing, radius, and typography — applied via CSS custom properties on `:root`.
+
+**Usage:**
+
+```svelte
+<script lang="ts">
+	import {
+		TraekCanvas,
+		TraekEngine,
+		createDefaultRegistry,
+		DEFAULT_TRACK_ENGINE_CONFIG
+	} from '@traek/svelte';
+	import type { MessageNode } from '@traek/svelte';
+
+	const engine = new TraekEngine(DEFAULT_TRACK_ENGINE_CONFIG);
+	const registry = createDefaultRegistry();
+	engine.addNode('Hello! How can I help?', 'assistant', { type: 'text' });
+
+	async function handleSend(content: string, userNode: MessageNode) {
+		const node = engine.addNode('', 'assistant', {
+			type: 'text',
+			parentIds: [userNode.id],
+			status: 'streaming'
+		});
+		// stream your AI response into node.id …
+		engine.updateNode(node.id, { status: 'done' });
+	}
+</script>
+
+<TraekCanvas {engine} {registry} onSendMessage={handleSend} />
+```
+
+### Key Props
+
+| Prop            | Type                                   | Description                                                     |
+| --------------- | -------------------------------------- | --------------------------------------------------------------- |
+| `engine`        | `TraekEngine`                          | **Required.** The conversation state manager.                   |
+| `onSendMessage` | `(content, userNode, action?) => void` | **Required.** Called when the user submits a message.           |
+| `registry`      | `NodeTypeRegistry`                     | Node type registry. Use `createDefaultRegistry()` for defaults. |
+| `initialScale`  | `number`                               | Starting zoom level (default `1`).                              |
+| `showStats`     | `boolean`                              | Show engine debug stats.                                        |
+
+---
+
+## Branching
+
+Træk's core differentiator: any node can have multiple children. Click a node to set the context, then send a message to branch from it.
+
+<BranchShowcaseDemo client:load />
+
+When a node has two or more children, a **Branch Compare** button appears in the node toolbar — click it to view parallel paths side by side with word-level diff highlighting.
+
+**Creating branches programmatically:**
+
+```ts
+const parentId = 'some-user-node-id';
+
+// Branch A
+engine.addNode('Response A: more concise.', 'assistant', {
+	type: 'text',
+	parentIds: [parentId]
+});
+
+// Branch B — a different take
+engine.addNode('Response B: more detailed explanation.', 'assistant', {
+	type: 'text',
+	parentIds: [parentId]
+});
+```
+
+---
+
+## DefaultLoadingOverlay
+
+A frosted-glass pill that renders while the canvas initialises. Pass it as the `loadingOverlay` slot or display it before hydration.
+
+<LoadingOverlayDemo client:load />
+
+**Usage:**
+
+```svelte
+<script lang="ts">
+	import { DefaultLoadingOverlay, ThemeProvider } from '@traek/svelte';
+</script>
+
+<ThemeProvider initialTheme="dark">
+	<DefaultLoadingOverlay />
+</ThemeProvider>
+```
+
+---
+
+## Theme System
+
+Træk ships three built-in themes. All themes are full token objects — swap them at runtime with zero reflows.
+
+### Built-in Themes
+
+| Token                  | Dark      | Light     | High Contrast |
+| ---------------------- | --------- | --------- | ------------- |
+| **Canvas bg**          | `#070708` | `#f4f4f5` | `#000000`     |
+| **Node bg**            | `#0e0e10` | `#ffffff` | `#0a0a0a`     |
+| **Accent (user)**      | `#00d8ff` | `#007aad` | `#00ffff`     |
+| **Accent (assistant)** | `#ff4400` | `#c93a00` | `#ff6600`     |
+| **Node text**          | `#e4e4e7` | `#18181b` | `#ffffff`     |
+
+### Switching Themes
+
+```ts
+import { applyThemeToRoot, themes } from '@traek/svelte';
+
+// Apply a named theme globally
+applyThemeToRoot(themes['light'], 'light');
+applyThemeToRoot(themes['highContrast'], 'highContrast');
+```
+
+### Custom Themes
+
+```ts
+import { createCustomTheme, darkTheme } from '@traek/svelte';
+
+const brandTheme = createCustomTheme(darkTheme, {
+	colors: {
+		nodeUserBorderTop: '#6366f1', // indigo accent
+		nodeAssistantBorderTop: '#f59e0b', // amber accent
+		inputButtonBg: '#6366f1',
+		inputButtonText: '#ffffff',
+		connectionHighlight: '#6366f1'
+	}
+});
+```
+
+See the [Advanced Theming guide](/guides/advanced-theming/) for a full walkthrough.
+
+---
+
+## TextNode
+
+The default node renderer. Handles markdown (via `marked` + `DOMPurify`), syntax-highlighted code blocks (via `highlight.js`), image rendering, and collapsible thought/reasoning panels.
+
+TextNode is used automatically when you call `engine.addNode(…, { type: 'text' })`. You can override it per node type via the `registry`:
+
+```svelte
+<script lang="ts">
+	import { TraekCanvas, NodeTypeRegistry, TextNode } from '@traek/svelte';
+	import MyCustomNode from './MyCustomNode.svelte';
+
+	const registry = new NodeTypeRegistry();
+	registry.register({ type: 'text', component: TextNode });
+	registry.register({ type: 'custom', component: MyCustomNode });
+</script>
+
+<TraekCanvas {engine} {registry} onSendMessage={handleSend} />
+```
+
+**Markdown example** — send this as a node's `content`:
+
+````md
+## Results
+
+| Model  | Score |
+| ------ | ----- |
+| GPT-4  | 92.3% |
+| Claude | 94.1% |
+
+```python
+result = model.predict(inputs)
+print(f"Score: {result:.1f}%")
+```
+````
+
+---
+
+## Next Steps
+
+| Guide                                                    | What you'll learn                                     |
+| -------------------------------------------------------- | ----------------------------------------------------- |
+| [Advanced Theming](/guides/advanced-theming/)            | Full CSS variable reference and custom theme creation |
+| [Custom Node Types](/guides/custom-nodes/)               | Build your own node renderers and register them       |
+| [Interactive Examples](/guides/examples/)                | Live demos for Svelte, React, and Vue                 |
+| [API Reference — TraekCanvas](/api/traek-canvas-svelte/) | Complete prop reference                               |
+| [API Reference — TraekEngine](/api/traek-engine/)        | Engine methods and event lifecycle                    |

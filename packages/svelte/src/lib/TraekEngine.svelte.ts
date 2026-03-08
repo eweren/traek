@@ -6,6 +6,9 @@ import {
 } from '$lib/persistence/schemas';
 import { searchNodes as searchNodesUtil, type SearchFilters } from '$lib/search/searchUtils';
 import { HistoryManager, type EngineSnapshot } from '$lib/history/HistoryManager';
+import { computeLayout } from './layout/algorithms';
+import type { LayoutMode } from './layout/types';
+export type { LayoutMode } from './layout/types';
 
 // Shared types and utilities from the framework-agnostic core package.
 // Re-exported here so that consumers of @traek/svelte don't need to
@@ -80,6 +83,10 @@ export class TraekEngine {
 	canRedo = $state<boolean>(false);
 	/** Registry of user-defined custom tags. */
 	customTags = $state(new SvelteMap<string, CustomTag>());
+	/** Current auto-layout mode. 'tree-vertical' matches existing default behavior. */
+	layoutMode = $state<LayoutMode>('tree-vertical');
+	/** Duration for animated layout transitions (ms). Set to 0 to disable. */
+	layoutTransitionMs = $state(300);
 	private config: TraekEngineConfig;
 
 	private historyManager = new HistoryManager();
@@ -386,6 +393,99 @@ export class TraekEngine {
 		if (this.nodeIndexMap.has(nodeId)) {
 			this.pendingFocusNodeId = nodeId;
 		}
+	}
+
+	/**
+	 * Apply a named auto-layout algorithm to reposition all nodes.
+	 * Nodes with `metadata.manualPosition === true` are preserved.
+	 * @param mode Layout algorithm to use (defaults to current layoutMode)
+	 * @param force If true, override manualPosition (useful for "reset layout")
+	 * @param animate If true, tween node positions over layoutTransitionMs
+	 */
+	applyLayout(mode: LayoutMode = this.layoutMode, force = false, animate = true): void {
+		this.layoutMode = mode;
+
+		const step = this.config.gridStep;
+
+		// Build childrenMap from nodes (exclude thought nodes)
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity
+		const childrenMap = new Map<string | null, string[]>();
+		for (const node of this.nodes) {
+			if (node.type === 'thought') continue;
+			const parentId = node.parentIds[0] ?? null;
+			const arr = childrenMap.get(parentId) ?? [];
+			arr.push(node.id);
+			childrenMap.set(parentId, arr);
+		}
+
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity
+		const nodeMap = new Map<string, Node>();
+		for (const node of this.nodes) nodeMap.set(node.id, node);
+
+		const layoutInput = {
+			nodes: this.nodes,
+			childrenMap,
+			nodeMap,
+			config: {
+				nodeWidthGrid: Math.round(this.config.nodeWidth / step),
+				nodeHGrid: Math.round(this.config.nodeHeightDefault / step),
+				gapXGrid: Math.round(this.config.layoutGapX / step),
+				gapYGrid: Math.round(this.config.layoutGapY / step)
+			}
+		};
+
+		const positions = computeLayout(mode, layoutInput);
+
+		if (!animate || this.layoutTransitionMs <= 0 || typeof requestAnimationFrame === 'undefined') {
+			// Immediate apply
+			for (const { nodeId, x, y } of positions) {
+				const node = this.getNode(nodeId);
+				if (!node) continue;
+				if (!force && node.metadata?.manualPosition) continue;
+				node.metadata = { ...(node.metadata ?? { x: 0, y: 0 }), x, y };
+			}
+			return;
+		}
+
+		// Animated apply: tween from current to target over layoutTransitionMs
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity
+		const startPositions = new Map(
+			positions.map(({ nodeId }) => {
+				const node = this.getNode(nodeId);
+				return [nodeId, { x: node?.metadata?.x ?? 0, y: node?.metadata?.y ?? 0 }];
+			})
+		);
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity
+		const targetPositions = new Map(positions.map(({ nodeId, x, y }) => [nodeId, { x, y }]));
+
+		const startTime = performance.now();
+		const duration = this.layoutTransitionMs;
+
+		const tick = (now: number) => {
+			const elapsed = now - startTime;
+			const t = Math.min(1, elapsed / duration);
+			// Ease-in-out cubic
+			const eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+			for (const { nodeId } of positions) {
+				const node = this.getNode(nodeId);
+				if (!node) continue;
+				if (!force && node.metadata?.manualPosition) continue;
+				const start = startPositions.get(nodeId)!;
+				const target = targetPositions.get(nodeId)!;
+				node.metadata = {
+					...(node.metadata ?? { x: 0, y: 0 }),
+					x: Math.round(start.x + (target.x - start.x) * eased),
+					y: Math.round(start.y + (target.y - start.y) * eased)
+				};
+			}
+
+			if (t < 1) {
+				requestAnimationFrame(tick);
+			}
+		};
+
+		requestAnimationFrame(tick);
 	}
 
 	/** Run layout from every root (no parents). Use after adding nodes with deferLayout. */
