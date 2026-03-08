@@ -142,6 +142,26 @@
 			</div>
 		{/if}
 
+		<div class="shortcuts-section">
+			<h3>{t.keyboard.annotationsSection}</h3>
+			<div class="shortcuts-grid">
+				<div class="shortcut">
+					<kbd>A</kbd>
+					<span>{t.keyboard.toggleAnnotateMode}</span>
+				</div>
+				<div class="shortcut">
+					<kbd>1</kbd> / <kbd>2</kbd> / <kbd>3</kbd>
+					<span
+						>{t.keyboard.stickyToolKey} / {t.keyboard.markerToolKey} / {t.keyboard.pinToolKey}</span
+					>
+				</div>
+				<div class="shortcut">
+					<kbd>E</kbd>
+					<span>{t.keyboard.eraserToolKey}</span>
+				</div>
+			</div>
+		</div>
+
 		<button class="close-button" onclick={onClose}>{t.keyboard.close}</button>
 	</div>
 </div>

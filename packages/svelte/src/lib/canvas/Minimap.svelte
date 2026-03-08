@@ -2,15 +2,19 @@
 	import type { ViewportManager } from './ViewportManager.svelte';
 	import type { Node } from '../TraekEngine.svelte';
 	import type { TraekEngineConfig } from '../TraekEngine.svelte';
+	import type { Annotation } from '../annotations/types';
+	import { ANNOTATION_COLOR_VALUES } from '../annotations/types';
 
 	let {
 		viewport,
 		nodes,
-		config
+		config,
+		annotations = []
 	}: {
 		viewport: ViewportManager;
 		nodes: Node[];
 		config: TraekEngineConfig;
+		annotations?: Annotation[];
 	} = $props();
 
 	let isExpanded = $state(false);
@@ -129,6 +133,43 @@
 						class:assistant={node.role === 'assistant'}
 						class:system={node.role === 'system'}
 					/>
+				{/each}
+
+				{#each annotations as ann (ann.id)}
+					{#if ann.type === 'sticky'}
+						{@const xPx = ann.x}
+						{@const yPx = ann.y}
+						{@const x = (xPx - bounds.minX) * bounds.scale}
+						{@const y = (yPx - bounds.minY) * bounds.scale}
+						<rect
+							{x}
+							{y}
+							width={Math.max(2, ann.width * bounds.scale)}
+							height={Math.max(2, ann.height * bounds.scale)}
+							rx="1"
+							fill={ANNOTATION_COLOR_VALUES[ann.color]}
+							opacity="0.7"
+						/>
+					{:else if ann.type === 'pin'}
+						{@const x = (ann.x - bounds.minX) * bounds.scale}
+						{@const y = (ann.y - bounds.minY) * bounds.scale}
+						<circle cx={x} cy={y} r="3" fill={ANNOTATION_COLOR_VALUES[ann.color]} opacity="0.8" />
+					{:else if ann.type === 'marker' && ann.points.length > 1}
+						{@const pathD = ann.points
+							.map(
+								(p, i) =>
+									`${i === 0 ? 'M' : 'L'} ${(p.x - bounds.minX) * bounds.scale} ${(p.y - bounds.minY) * bounds.scale}`
+							)
+							.join(' ')}
+						<path
+							d={pathD}
+							fill="none"
+							stroke={ANNOTATION_COLOR_VALUES[ann.color]}
+							stroke-width="1.5"
+							stroke-linecap="round"
+							opacity="0.5"
+						/>
+					{/if}
 				{/each}
 
 				{#if viewport.viewportEl}

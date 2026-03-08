@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { annotationSchema } from '../annotations/types';
 
 const nodeStatusSchema = z.enum(['streaming', 'done', 'error']);
 
@@ -75,7 +76,8 @@ export const conversationSnapshotSchema = z.object({
 		.optional(),
 	activeNodeId: z.string().nullable(),
 	nodes: z.array(serializedNodeFlexSchema),
-	customTags: z.array(customTagSchema).optional()
+	customTags: z.array(customTagSchema).optional(),
+	annotations: z.array(annotationSchema).optional()
 });
 
 export type SerializedNode = z.infer<typeof serializedNodeSchema>;

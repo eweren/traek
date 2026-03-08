@@ -62,6 +62,12 @@ export const ja: TraekTranslations = {
 		vimNavigateDown: '子ノードへ移動',
 		vimNavigateLeft: '前の兄弟',
 		vimNavigateRight: '次の兄弟',
+		annotationsSection: 'アノテーション',
+		toggleAnnotateMode: 'アノテーションモード切替',
+		stickyToolKey: '付箋ツール',
+		markerToolKey: 'マーカーツール',
+		pinToolKey: 'ピンツール',
+		eraserToolKey: '消しゴムツール',
 		close: '閉じる'
 	},
 	fuzzySearch: {
@@ -166,5 +172,19 @@ export const ja: TraekTranslations = {
 		pause: '一時停止',
 		play: '再生',
 		stepForward: '一歩進む'
+	},
+	annotations: {
+		toggleMode: 'アノテーション',
+		toggleModeAriaLabel: 'アノテーションモード切替',
+		modeActive: 'アノテーションモード有効',
+		stickyTool: '付箋',
+		markerTool: 'マーカー',
+		pinTool: 'ピン',
+		eraserTool: '消去',
+		stickyPlaceholder: 'ここにメモを入力\u2026',
+		deleteAnnotation: 'アノテーションを削除',
+		pinLabelPlaceholder: 'ラベル\u2026',
+		pinCommentPlaceholder: 'コメント（任意）\u2026',
+		annotationNote: (text: string) => `アノテーション: ${text}`
 	}
 };

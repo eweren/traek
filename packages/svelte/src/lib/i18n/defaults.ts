@@ -62,6 +62,12 @@ export const DEFAULT_TRANSLATIONS: TraekTranslations = {
 		vimNavigateDown: 'Navigate to child',
 		vimNavigateLeft: 'Previous sibling',
 		vimNavigateRight: 'Next sibling',
+		annotationsSection: 'Annotations',
+		toggleAnnotateMode: 'Toggle annotation mode',
+		stickyToolKey: 'Sticky note tool',
+		markerToolKey: 'Marker tool',
+		pinToolKey: 'Pin tool',
+		eraserToolKey: 'Eraser tool',
 		close: 'Close'
 	},
 	fuzzySearch: {
@@ -167,5 +173,19 @@ export const DEFAULT_TRANSLATIONS: TraekTranslations = {
 		pause: 'Pause',
 		play: 'Play',
 		stepForward: 'Step forward'
+	},
+	annotations: {
+		toggleMode: 'Annotate',
+		toggleModeAriaLabel: 'Toggle annotation mode',
+		modeActive: 'Annotation mode active',
+		stickyTool: 'Sticky note',
+		markerTool: 'Marker',
+		pinTool: 'Pin',
+		eraserTool: 'Erase',
+		stickyPlaceholder: 'Type your note here\u2026',
+		deleteAnnotation: 'Delete annotation',
+		pinLabelPlaceholder: 'Label\u2026',
+		pinCommentPlaceholder: 'Comment (optional)\u2026',
+		annotationNote: (text: string) => `Annotation: ${text}`
 	}
 };

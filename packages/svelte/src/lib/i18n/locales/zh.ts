@@ -62,6 +62,12 @@ export const zh: TraekTranslations = {
 		vimNavigateDown: '移至子节点',
 		vimNavigateLeft: '上一个兄弟节点',
 		vimNavigateRight: '下一个兄弟节点',
+		annotationsSection: '注释',
+		toggleAnnotateMode: '切换注释模式',
+		stickyToolKey: '便签工具',
+		markerToolKey: '标记工具',
+		pinToolKey: '图钉工具',
+		eraserToolKey: '橡皮擦工具',
 		close: '关闭'
 	},
 	fuzzySearch: {
@@ -162,5 +168,19 @@ export const zh: TraekTranslations = {
 		pause: '暂停',
 		play: '播放',
 		stepForward: '前进一步'
+	},
+	annotations: {
+		toggleMode: '注释',
+		toggleModeAriaLabel: '切换注释模式',
+		modeActive: '注释模式已激活',
+		stickyTool: '便签',
+		markerTool: '标记',
+		pinTool: '图钉',
+		eraserTool: '橡皮擦',
+		stickyPlaceholder: '在此输入备注\u2026',
+		deleteAnnotation: '删除注释',
+		pinLabelPlaceholder: '标签\u2026',
+		pinCommentPlaceholder: '评论（可选）\u2026',
+		annotationNote: (text: string) => `注释：${text}`
 	}
 };

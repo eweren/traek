@@ -45,6 +45,9 @@
 	import TagBookmarkSidebar from './sidebar/TagBookmarkSidebar.svelte';
 	import BookmarkJumpOverlay from './keyboard/BookmarkJumpOverlay.svelte';
 	import BulkActionToolbar from './canvas/BulkActionToolbar.svelte';
+	import AnnotationLayer from './annotations/AnnotationLayer.svelte';
+	import AnnotationToolbar from './annotations/AnnotationToolbar.svelte';
+	import type { AnnotationTool, AnnotationColor } from './annotations/types';
 
 	type InputActionsContext = {
 		engine: TraekEngine;
@@ -369,6 +372,11 @@
 	let sidebarOpen = $state(false);
 	let showBookmarkJump = $state(false);
 
+	// Annotation mode state
+	let annotateMode = $state(false);
+	let annotationTool = $state<AnnotationTool>('sticky');
+	let annotationColor = $state<AnnotationColor>('yellow');
+
 	// Desktop tour state (tourDelay < 0 disables the tour entirely)
 	let showDesktopTour = $state(false);
 	let showKeyboardHint = $state(false);
@@ -469,6 +477,22 @@
 			if ((e.metaKey || e.ctrlKey) && !e.shiftKey && e.key === 'b') {
 				e.preventDefault();
 				showBookmarkJump = !showBookmarkJump;
+			}
+			// A → toggle annotation mode (when not in an input/textarea)
+			const target = e.target as HTMLElement;
+			const inInput =
+				target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
+			if (!inInput && !e.ctrlKey && !e.metaKey && e.key === 'a') {
+				e.preventDefault();
+				annotateMode = !annotateMode;
+			}
+			// Tool shortcuts when in annotation mode
+			if (annotateMode && !inInput && !e.ctrlKey && !e.metaKey) {
+				if (e.key === '1') annotationTool = 'sticky';
+				else if (e.key === '2') annotationTool = 'marker';
+				else if (e.key === '3') annotationTool = 'pin';
+				else if (e.key === 'e' || e.key === '4') annotationTool = 'eraser';
+				else if (e.key === 'Escape') annotateMode = false;
 			}
 		};
 
@@ -762,6 +786,19 @@
 					</g>
 				</svg>
 
+				<!-- Annotation layer: above connections, below nodes -->
+				{#if engine}
+					<AnnotationLayer
+						{engine}
+						{annotateMode}
+						activeTool={annotationTool}
+						activeColor={annotationColor}
+						scale={viewport.scale}
+						offsetX={viewport.offset.x}
+						offsetY={viewport.offset.y}
+					/>
+				{/if}
+
 				<NodeRenderer
 					{engine}
 					{config}
@@ -1006,8 +1043,16 @@
 
 			<ZoomControls {viewport} nodes={engine.nodes} {config} {interaction} />
 			{#if engine.nodes.filter((n) => n.type !== 'thought').length >= minimapMinNodes}
-				<Minimap {viewport} nodes={engine.nodes} {config} />
+				<Minimap {viewport} nodes={engine.nodes} {config} annotations={engine.annotations} />
 			{/if}
+
+			<div class="annotation-toolbar-wrapper">
+				<AnnotationToolbar
+					bind:annotateMode
+					bind:activeTool={annotationTool}
+					bind:activeColor={annotationColor}
+				/>
+			</div>
 
 			{#if showSearchBar}
 				<SearchBar
@@ -1336,6 +1381,17 @@
 		.undo-redo-controls {
 			display: flex;
 			gap: 4px;
+		}
+
+		.annotation-toolbar-wrapper {
+			position: absolute;
+			bottom: 20px;
+			left: 20px;
+			z-index: 50;
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 8px;
 		}
 
 		.icon-button {

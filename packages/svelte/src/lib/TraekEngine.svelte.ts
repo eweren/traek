@@ -38,6 +38,7 @@ import {
 	type NodeColor
 } from '@traek/core';
 import { listBuiltinTags } from '$lib/tags/tagUtils';
+import type { Annotation } from './annotations/types';
 
 /** Props every custom node component receives from the canvas. Use this to type your component's $props(). */
 export type TraekNodeComponentProps = {
@@ -89,6 +90,8 @@ export class TraekEngine {
 	layoutTransitionMs = $state(300);
 	/** Current theme mode: 'dark', 'light', or 'system' (follows OS preference). */
 	themeMode = $state<'dark' | 'light' | 'system'>('system');
+	/** All canvas annotations (sticky notes, markers, pins). */
+	annotations = $state<Annotation[]>([]);
 	private config: TraekEngineConfig;
 
 	private historyManager = new HistoryManager();
@@ -1139,7 +1142,8 @@ export class TraekEngine {
 	captureForUndo(): void {
 		const snapshot: EngineSnapshot = {
 			nodes: this.nodes.map((n) => structuredClone(n)),
-			activeNodeId: this.activeNodeId
+			activeNodeId: this.activeNodeId,
+			annotations: structuredClone(this.annotations)
 		};
 		this.historyManager.push(snapshot);
 		this.canUndo = this.historyManager.canUndo;
@@ -1153,13 +1157,15 @@ export class TraekEngine {
 	undo(): boolean {
 		const current: EngineSnapshot = {
 			nodes: this.nodes.map((n) => structuredClone(n)),
-			activeNodeId: this.activeNodeId
+			activeNodeId: this.activeNodeId,
+			annotations: structuredClone(this.annotations)
 		};
 		const prev = this.historyManager.undo(current);
 		if (!prev) return false;
 		this.nodes = prev.nodes;
 		this.rebuildMaps();
 		this.activeNodeId = prev.activeNodeId;
+		if (prev.annotations !== undefined) this.annotations = prev.annotations;
 		this.flushLayoutFromRoot();
 		this.canUndo = this.historyManager.canUndo;
 		this.canRedo = this.historyManager.canRedo;
@@ -1172,13 +1178,15 @@ export class TraekEngine {
 	redo(): boolean {
 		const current: EngineSnapshot = {
 			nodes: this.nodes.map((n) => structuredClone(n)),
-			activeNodeId: this.activeNodeId
+			activeNodeId: this.activeNodeId,
+			annotations: structuredClone(this.annotations)
 		};
 		const next = this.historyManager.redo(current);
 		if (!next) return false;
 		this.nodes = next.nodes;
 		this.rebuildMaps();
 		this.activeNodeId = next.activeNodeId;
+		if (next.annotations !== undefined) this.annotations = next.annotations;
 		this.flushLayoutFromRoot();
 		this.canUndo = this.historyManager.canUndo;
 		this.canRedo = this.historyManager.canRedo;
@@ -1411,7 +1419,8 @@ export class TraekEngine {
 				},
 				data: n.data
 			})),
-			customTags: Array.from(this.customTags.values())
+			customTags: Array.from(this.customTags.values()),
+			annotations: this.annotations.length > 0 ? structuredClone(this.annotations) : undefined
 		};
 	}
 
@@ -1458,6 +1467,8 @@ export class TraekEngine {
 				this.customTags.set(tag.slug, tag);
 			}
 		}
+		// Restore annotations (optional field, backward-compatible)
+		this.annotations = validated.annotations ? [...validated.annotations] : [];
 	}
 
 	/** Create an engine from a serialized snapshot. Validates input with Zod. */
@@ -1498,6 +1509,40 @@ export class TraekEngine {
 				engine.pendingFocusNodeId = validated.activeNodeId;
 			}
 		}
+		if (validated.annotations) {
+			engine.annotations = [...validated.annotations];
+		}
 		return engine;
+	}
+
+	/** Add a new annotation to the canvas. Supports undo. */
+	addAnnotation(annotation: Annotation): void {
+		this.captureForUndo();
+		this.annotations = [...this.annotations, annotation];
+	}
+
+	/** Update an existing annotation by ID. Supports undo. */
+	updateAnnotation(id: string, update: Partial<Annotation>): void {
+		const idx = this.annotations.findIndex((a) => a.id === id);
+		if (idx === -1) return;
+		this.captureForUndo();
+		const next = [...this.annotations];
+		next[idx] = { ...next[idx], ...update } as Annotation;
+		this.annotations = next;
+	}
+
+	/** Delete an annotation by ID. Supports undo. */
+	deleteAnnotation(id: string): void {
+		const idx = this.annotations.findIndex((a) => a.id === id);
+		if (idx === -1) return;
+		this.captureForUndo();
+		this.annotations = this.annotations.filter((a) => a.id !== id);
+	}
+
+	/** Remove all annotations. Supports undo. */
+	clearAnnotations(): void {
+		if (this.annotations.length === 0) return;
+		this.captureForUndo();
+		this.annotations = [];
 	}
 }

@@ -1,8 +1,10 @@
 import type { Node } from '../TraekEngine.svelte';
+import type { Annotation } from '../annotations/types';
 
 export type EngineSnapshot = {
 	nodes: Node[];
 	activeNodeId: string | null;
+	annotations?: Annotation[];
 };
 
 /**

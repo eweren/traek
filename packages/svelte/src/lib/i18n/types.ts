@@ -64,6 +64,12 @@ export interface TraekTranslations {
 		vimNavigateDown: string;
 		vimNavigateLeft: string;
 		vimNavigateRight: string;
+		annotationsSection: string;
+		toggleAnnotateMode: string;
+		stickyToolKey: string;
+		markerToolKey: string;
+		pinToolKey: string;
+		eraserToolKey: string;
 		close: string;
 	};
 	fuzzySearch: {
@@ -162,6 +168,20 @@ export interface TraekTranslations {
 		pause: string;
 		play: string;
 		stepForward: string;
+	};
+	annotations: {
+		toggleMode: string;
+		toggleModeAriaLabel: string;
+		modeActive: string;
+		stickyTool: string;
+		markerTool: string;
+		pinTool: string;
+		eraserTool: string;
+		stickyPlaceholder: string;
+		deleteAnnotation: string;
+		pinLabelPlaceholder: string;
+		pinCommentPlaceholder: string;
+		annotationNote: (text: string) => string;
 	};
 }
 
