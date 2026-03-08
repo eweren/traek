@@ -122,7 +122,10 @@
 		root.style.setProperty('--traek-color-pink', theme.colors.nodeColorPink ?? '#ec4899');
 		root.style.setProperty('--traek-color-cyan', theme.colors.nodeColorCyan ?? '#06b6d4');
 		root.style.setProperty('--traek-sidebar-bg', theme.colors.sidebarBg ?? '#1a1a2e');
-		root.style.setProperty('--traek-sidebar-border', theme.colors.sidebarBorder ?? 'rgba(255,255,255,0.08)');
+		root.style.setProperty(
+			'--traek-sidebar-border',
+			theme.colors.sidebarBorder ?? 'rgba(255,255,255,0.08)'
+		);
 
 		// Spacing
 		root.style.setProperty('--traek-space-xs', `${theme.spacing.xs}px`);

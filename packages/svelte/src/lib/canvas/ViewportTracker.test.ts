@@ -245,5 +245,141 @@ describe('ViewportTracker', () => {
 			// Should complete in reasonable time (< 200ms for 1000 nodes)
 			expect(duration).toBeLessThan(200);
 		});
+
+		it('should correctly hide all descendants of a collapsed node (path-memoization)', () => {
+			const el = { clientWidth: 10000, clientHeight: 10000 } as HTMLElement;
+			// Linear chain: root → A → B → C → D
+			const nodes: Node[] = [
+				{
+					id: 'root',
+					parentIds: [],
+					role: 'user',
+					type: 'text',
+					metadata: { x: 0, y: 0, height: 100 }
+				},
+				{
+					id: 'A',
+					parentIds: ['root'],
+					role: 'assistant',
+					type: 'text',
+					metadata: { x: 0, y: 10, height: 100 }
+				},
+				{
+					id: 'B',
+					parentIds: ['A'],
+					role: 'user',
+					type: 'text',
+					metadata: { x: 0, y: 20, height: 100 }
+				},
+				{
+					id: 'C',
+					parentIds: ['B'],
+					role: 'assistant',
+					type: 'text',
+					metadata: { x: 0, y: 30, height: 100 }
+				},
+				{
+					id: 'D',
+					parentIds: ['C'],
+					role: 'user',
+					type: 'text',
+					metadata: { x: 0, y: 40, height: 100 }
+				}
+			];
+			// Collapse A — its children B, C, D should all be hidden
+			const collapsedNodes = new Set(['A']);
+			const visible = tracker.getVisibleNodeIds(nodes, collapsedNodes, el, 1, { x: 0, y: 0 });
+			expect(visible.has('root')).toBe(true);
+			expect(visible.has('A')).toBe(true); // A itself is visible (only its children are hidden)
+			expect(visible.has('B')).toBe(false);
+			expect(visible.has('C')).toBe(false);
+			expect(visible.has('D')).toBe(false);
+		});
+
+		it('should share ancestor walk results across sibling branches (memoization efficiency)', () => {
+			const el = { clientWidth: 10000, clientHeight: 10000 } as HTMLElement;
+			// Tree: root → parent → [sibling1, sibling2, sibling3]
+			const nodes: Node[] = [
+				{
+					id: 'root',
+					parentIds: [],
+					role: 'user',
+					type: 'text',
+					metadata: { x: 0, y: 0, height: 100 }
+				},
+				{
+					id: 'parent',
+					parentIds: ['root'],
+					role: 'assistant',
+					type: 'text',
+					metadata: { x: 0, y: 10, height: 100 }
+				},
+				{
+					id: 's1',
+					parentIds: ['parent'],
+					role: 'user',
+					type: 'text',
+					metadata: { x: 0, y: 20, height: 100 }
+				},
+				{
+					id: 's2',
+					parentIds: ['parent'],
+					role: 'user',
+					type: 'text',
+					metadata: { x: 20, y: 20, height: 100 }
+				},
+				{
+					id: 's3',
+					parentIds: ['parent'],
+					role: 'user',
+					type: 'text',
+					metadata: { x: 40, y: 20, height: 100 }
+				}
+			];
+			// Collapse root — all descendants hidden
+			const collapsedNodes = new Set(['root']);
+			const visible = tracker.getVisibleNodeIds(nodes, collapsedNodes, el, 1, { x: 0, y: 0 });
+			expect(visible.has('root')).toBe(true);
+			expect(visible.has('parent')).toBe(false);
+			expect(visible.has('s1')).toBe(false);
+			expect(visible.has('s2')).toBe(false);
+			expect(visible.has('s3')).toBe(false);
+		});
+
+		it('should handle 500+ nodes with deep collapse chains within 20ms', () => {
+			const el = { clientWidth: 1000, clientHeight: 800 } as HTMLElement;
+			const nodes: Node[] = [];
+			// Build a wide tree: root with 50 branches, each 10 nodes deep = 501 total
+			nodes.push({
+				id: 'root',
+				parentIds: [],
+				role: 'user',
+				type: 'text',
+				metadata: { x: 0, y: 0, height: 100 }
+			});
+			for (let branch = 0; branch < 50; branch++) {
+				let prevId = 'root';
+				for (let depth = 0; depth < 10; depth++) {
+					const id = `b${branch}-d${depth}`;
+					nodes.push({
+						id,
+						parentIds: [prevId],
+						role: depth % 2 === 0 ? 'user' : 'assistant',
+						type: 'text',
+						metadata: { x: branch * 5, y: (depth + 1) * 5, height: 100 }
+					});
+					prevId = id;
+				}
+			}
+			// Collapse root — all 500 descendants should be hidden
+			const collapsedNodes = new Set(['root']);
+			const start = performance.now();
+			const visible = tracker.getVisibleNodeIds(nodes, collapsedNodes, el, 1, { x: 0, y: 0 });
+			const duration = performance.now() - start;
+			expect(visible.has('root')).toBe(true);
+			expect(visible.has('b0-d0')).toBe(false);
+			expect(visible.has('b49-d9')).toBe(false);
+			expect(duration).toBeLessThan(20);
+		});
 	});
 });

@@ -8,6 +8,44 @@
 	} from '@traek/svelte';
 	import { getConversation, saveConversation } from '$lib/client/local-storage.js';
 	import { page } from '$app/state';
+	import { track } from '$lib/client/analytics.js';
+
+	let shareUrl = $state<string | null>(null);
+	let sharing = $state(false);
+	let shareError = $state<string | null>(null);
+
+	async function shareConversation() {
+		if (!engine) return;
+		sharing = true;
+		shareError = null;
+		try {
+			const res = await fetch('/api/share', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ conversationId: convId, snapshot: engine.serialize() })
+			});
+			if (!res.ok) {
+				shareError = 'Failed to create share link.';
+				return;
+			}
+			const { token } = await res.json();
+			shareUrl = `${window.location.origin}/share/${token}`;
+			track('conversation_shared');
+		} catch {
+			shareError = 'Network error.';
+		} finally {
+			sharing = false;
+		}
+	}
+
+	function copyShareUrl() {
+		if (shareUrl) navigator.clipboard.writeText(shareUrl);
+	}
+
+	function closeShareModal() {
+		shareUrl = null;
+		shareError = null;
+	}
 
 	const convId = $derived(page.params.id ?? '');
 
@@ -15,6 +53,7 @@
 	let loading = $state(true);
 	let apiKeyMissing = $state(false);
 	let cleanup: (() => void) | null = null;
+	let messageSentTracked = false;
 
 	onMount(async () => {
 		const id = convId;
@@ -65,6 +104,11 @@
 	async function handleSend(input: string, userNode: MessageNode) {
 		const eng = engine;
 		if (!eng) return;
+
+		if (!messageSentTracked) {
+			messageSentTracked = true;
+			track('first_message_sent');
+		}
 
 		const path = pathToUserNode(eng, userNode);
 		const messages = path.map((n) => ({ role: n.role, content: (n.content ?? '').trim() }));
@@ -128,6 +172,31 @@
 	</div>
 {:else if engine}
 	<TraekCanvas {engine} onSendMessage={handleSend} />
+	<div class="conv-toolbar">
+		<a href="/app" class="toolbar-btn" aria-label="All conversations">←</a>
+		<button class="toolbar-btn" onclick={shareConversation} disabled={sharing}>
+			{sharing ? '...' : 'Share'}
+		</button>
+	</div>
+{/if}
+
+{#if shareUrl || shareError}
+	<div class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="share-title">
+		<div class="modal">
+			{#if shareUrl}
+				<h2 id="share-title">Shareable link</h2>
+				<p>Anyone with this link can view a read-only snapshot of this conversation.</p>
+				<div class="share-url-row">
+					<input type="text" readonly value={shareUrl} />
+					<button class="btn-copy" onclick={copyShareUrl}>Copy</button>
+				</div>
+			{:else}
+				<h2 id="share-title">Share failed</h2>
+				<p>{shareError}</p>
+			{/if}
+			<button class="btn-close" onclick={closeShareModal}>Close</button>
+		</div>
+	</div>
 {/if}
 
 <style>
@@ -144,5 +213,115 @@
 		justify-content: center;
 		gap: 12px;
 		color: var(--pg-text-muted);
+	}
+
+	.conv-toolbar {
+		position: fixed;
+		top: 12px;
+		right: 12px;
+		z-index: 50;
+		display: flex;
+		gap: 6px;
+	}
+
+	.toolbar-btn {
+		background: var(--pg-surface);
+		border: 1px solid var(--pg-border);
+		border-radius: var(--pg-radius);
+		color: var(--pg-text);
+		font-size: 0.8rem;
+		font-weight: 600;
+		padding: 6px 12px;
+		cursor: pointer;
+		text-decoration: none;
+		display: inline-flex;
+		align-items: center;
+		transition: border-color 0.15s;
+	}
+
+	.toolbar-btn:hover:not(:disabled) {
+		border-color: var(--pg-accent);
+		color: var(--pg-accent);
+	}
+
+	.toolbar-btn:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+
+	.modal-backdrop {
+		position: fixed;
+		inset: 0;
+		background: rgba(0, 0, 0, 0.6);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		z-index: 200;
+		backdrop-filter: blur(4px);
+	}
+
+	.modal {
+		background: var(--pg-surface);
+		border: 1px solid var(--pg-border);
+		border-radius: calc(var(--pg-radius) * 1.5);
+		padding: 28px;
+		max-width: 480px;
+		width: 90%;
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+	}
+
+	.modal h2 {
+		font-size: 1.1rem;
+		font-weight: 700;
+	}
+
+	.modal p {
+		font-size: 0.875rem;
+		color: var(--pg-text-muted);
+		line-height: 1.5;
+	}
+
+	.share-url-row {
+		display: flex;
+		gap: 8px;
+	}
+
+	.share-url-row input {
+		flex: 1;
+		padding: 8px 12px;
+		background: var(--pg-bg);
+		border: 1px solid var(--pg-border);
+		border-radius: var(--pg-radius);
+		color: var(--pg-text);
+		font-size: 0.8rem;
+		font-family: monospace;
+		outline: none;
+	}
+
+	.btn-copy,
+	.btn-close {
+		padding: 8px 16px;
+		border-radius: var(--pg-radius);
+		font-size: 0.875rem;
+		font-weight: 600;
+		border: none;
+		cursor: pointer;
+	}
+
+	.btn-copy {
+		background: var(--pg-accent);
+		color: white;
+	}
+
+	.btn-close {
+		background: transparent;
+		border: 1px solid var(--pg-border);
+		color: var(--pg-text);
+	}
+
+	.btn-close:hover {
+		border-color: var(--pg-text-muted);
 	}
 </style>

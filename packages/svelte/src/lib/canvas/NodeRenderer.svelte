@@ -23,7 +23,10 @@
 		onEditNode,
 		onRetry,
 		onNodeActivated,
-		focusedNodeId = null
+		focusedNodeId = null,
+		dropTargetNodeId = null,
+		isDropTargetValid = false,
+		selectedNodeIds = new Set<string>()
 	}: {
 		engine: TraekEngine;
 		config: TraekEngineConfig;
@@ -40,7 +43,16 @@
 		onRetry?: (nodeId: string) => void;
 		onNodeActivated?: (nodeId: string) => void;
 		focusedNodeId?: string | null;
+		dropTargetNodeId?: string | null;
+		isDropTargetValid?: boolean;
+		selectedNodeIds?: Set<string>;
 	} = $props();
+
+	const isSearchActive = $derived(engine.searchQuery.length > 0);
+	const searchMatchSet = $derived(new Set(engine.searchMatches));
+	const currentMatchId = $derived(
+		engine.searchMatches.length > 0 ? engine.searchMatches[engine.currentSearchIndex] : null
+	);
 </script>
 
 {#each engine.nodes as node (node.id)}
@@ -48,6 +60,16 @@
 	{@const isFocused = focusedNodeId === node.id}
 	{@const isNodeHidden = engine.isInCollapsedSubtree(node.id)}
 	{@const isVisible = visibleNodeIds.has(node.id)}
+	{@const isSearchMatch = isSearchActive && searchMatchSet.has(node.id)}
+	{@const isCurrentMatch = node.id === currentMatchId}
+	{@const isSearchDimmed = isSearchActive && !searchMatchSet.has(node.id)}
+	{@const isSelected = selectedNodeIds.has(node.id)}
+	{@const isDropTarget = dropTargetNodeId === node.id}
+	{@const dropTargetClass = isDropTarget
+		? isDropTargetValid
+			? 'drop-target-valid'
+			: 'drop-target-invalid'
+		: null}
 	{#if !isNodeHidden}
 		{#if isVisible || isActive || isFocused}
 			{@const typeDef = registry?.get(node.type)}
@@ -86,6 +108,11 @@
 						{scale}
 						{onRetry}
 						{onNodeActivated}
+						{isSearchMatch}
+						{isCurrentMatch}
+						{isSearchDimmed}
+						{isSelected}
+						{dropTargetClass}
 					>
 						<ResolvedComponent {node} {engine} {isActive} {...uiData?.props ?? {}} />
 					</TraekNodeWrapper>
@@ -104,6 +131,11 @@
 					{scale}
 					{onRetry}
 					{onNodeActivated}
+					{isSearchMatch}
+					{isCurrentMatch}
+					{isSearchDimmed}
+					{isSelected}
+					{dropTargetClass}
 				>
 					<div class="node-card error">
 						<div class="role-tag">{node.type}</div>

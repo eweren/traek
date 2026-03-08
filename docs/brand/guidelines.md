@@ -304,4 +304,14 @@ træk is **infrastructure for non-linear AI interaction** — positioned at the 
 
 ---
 
-*Last updated: 2026-03-07*
+---
+
+## Full Design System Reference
+
+For the complete specification — including logo clear space, minimum sizes, logo don'ts, detailed accessibility contrast ratios, component patterns catalog, full spacing grid, and CSS custom property reference — see:
+
+**[docs/brand/design-system.md](./design-system.md)**
+
+---
+
+*Last updated: 2026-03-08*

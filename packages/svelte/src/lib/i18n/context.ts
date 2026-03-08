@@ -2,7 +2,7 @@ import { setContext, getContext } from 'svelte';
 import type { TraekTranslations, PartialTraekTranslations } from './types';
 import { DEFAULT_TRANSLATIONS } from './defaults';
 
-const I18N_KEY = Symbol('traek-i18n');
+export const I18N_KEY = Symbol('traek-i18n');
 
 /** Deep-merge user overrides onto defaults. Functions and primitives are replaced; objects are recursed. */
 function deepMerge<T extends Record<string, unknown>>(
@@ -60,10 +60,17 @@ export function setTraekI18n(overrides?: PartialTraekTranslations): TraekTransla
 /**
  * Retrieve translations from the nearest Svelte context.
  * Falls back to defaults if no context was set (e.g. in tests or standalone usage).
+ * Handles both the direct value format (from setTraekI18n) and the getter-wrapper
+ * format (from TraekI18nProvider, which enables reactive locale switching).
  */
 export function getTraekI18n(): TraekTranslations {
 	try {
-		return getContext<TraekTranslations>(I18N_KEY) ?? DEFAULT_TRANSLATIONS;
+		const ctx = getContext<TraekTranslations | { get: () => TraekTranslations }>(I18N_KEY);
+		if (!ctx) return DEFAULT_TRANSLATIONS;
+		if (typeof (ctx as { get?: unknown }).get === 'function') {
+			return (ctx as { get: () => TraekTranslations }).get();
+		}
+		return ctx as TraekTranslations;
 	} catch {
 		return DEFAULT_TRANSLATIONS;
 	}

@@ -1,0 +1,246 @@
+/**
+ * Traek Print Stylesheet
+ *
+ * Flattens the spatial canvas into a linear, paginated conversation
+ * suitable for printing or saving as PDF.
+ *
+ * Usage: import this CSS in your app, or call printConversation() from exportExtended.ts.
+ */
+
+@media print {
+	/* Hide all interactive canvas chrome */
+	.traek-canvas-controls,
+	.traek-zoom-controls,
+	.traek-input-form,
+	.traek-minimap,
+	.traek-search-bar,
+	.traek-toolbar,
+	.traek-connection-layer,
+	.traek-ghost-preview,
+	.traek-node-toolbar,
+	.traek-tag-dropdown,
+	.traek-toast-container,
+	.traek-onboarding,
+	.traek-focus-mode-controls {
+		display: none !important;
+	}
+
+	/* Reset canvas transforms */
+	.traek-canvas-viewport {
+		transform: none !important;
+		position: static !important;
+		overflow: visible !important;
+		width: auto !important;
+		height: auto !important;
+	}
+
+	/* Show nodes in linear flow */
+	.traek-canvas-nodes {
+		position: static !important;
+		display: flex !important;
+		flex-direction: column !important;
+		gap: 1rem !important;
+		width: 100% !important;
+	}
+
+	/* Reset individual node positioning */
+	.traek-node-wrapper {
+		position: static !important;
+		transform: none !important;
+		width: 100% !important;
+		max-width: 720px !important;
+		margin: 0 auto !important;
+		page-break-inside: avoid;
+		break-inside: avoid;
+	}
+
+	/* Page break at branch points (data-branch-point="true") */
+	.traek-node-wrapper[data-branch-point='true'] {
+		page-break-before: always;
+		break-before: always;
+	}
+
+	/* Node appearance */
+	.traek-node {
+		border: 1pt solid #ccc !important;
+		border-radius: 4pt !important;
+		padding: 12pt !important;
+		background: #fff !important;
+		color: #000 !important;
+		box-shadow: none !important;
+	}
+
+	/* Role labels */
+	.traek-node[data-role='user']::before {
+		content: 'User';
+		display: block;
+		font-size: 8pt;
+		font-weight: bold;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		color: #0077cc;
+		margin-bottom: 6pt;
+	}
+
+	.traek-node[data-role='assistant']::before {
+		content: 'Assistant';
+		display: block;
+		font-size: 8pt;
+		font-weight: bold;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		color: #c04000;
+		margin-bottom: 6pt;
+	}
+
+	/* Text content */
+	.traek-text-node {
+		font-size: 10pt;
+		line-height: 1.6;
+		color: #111 !important;
+		background: transparent !important;
+	}
+
+	/* Code blocks */
+	.traek-text-node pre,
+	.traek-text-node code {
+		font-size: 8pt;
+		background: #f5f5f5 !important;
+		color: #111 !important;
+		border: 1pt solid #ddd;
+		page-break-inside: avoid;
+		break-inside: avoid;
+	}
+
+	/* Thread header */
+	.traek-print-thread-header {
+		font-size: 9pt;
+		color: #666;
+		border-bottom: 1pt solid #eee;
+		padding-bottom: 4pt;
+		margin-bottom: 8pt;
+	}
+
+	/* Footer with page numbers */
+	@page {
+		margin: 20mm;
+		@bottom-center {
+			content: 'Traek — Page ' counter(page) ' of ' counter(pages);
+			font-size: 8pt;
+			color: #999;
+		}
+	}
+
+	/* First page: no top margin for header */
+	@page :first {
+		@top-center {
+			content: none;
+		}
+	}
+
+	/* Ensure links show URLs */
+	a[href]::after {
+		content: ' (' attr(href) ')';
+		font-size: 7pt;
+		color: #666;
+	}
+
+	/* Hide decorative images that don't add meaning */
+	img[aria-hidden='true'] {
+		display: none !important;
+	}
+}
+
+/* Print preview page: render as a readable linear document */
+.traek-print-preview {
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+	font-size: 14px;
+	line-height: 1.7;
+	color: #111;
+	background: #fff;
+	max-width: 720px;
+	margin: 0 auto;
+	padding: 40px 24px;
+}
+
+.traek-print-preview .traek-print-header {
+	border-bottom: 2px solid #eee;
+	margin-bottom: 32px;
+	padding-bottom: 16px;
+}
+
+.traek-print-preview .traek-print-header h1 {
+	font-size: 24px;
+	font-weight: 700;
+	margin: 0 0 8px;
+}
+
+.traek-print-preview .traek-print-header .meta {
+	font-size: 12px;
+	color: #666;
+}
+
+.traek-print-preview .traek-print-thread {
+	margin-bottom: 48px;
+}
+
+.traek-print-preview .traek-print-thread-label {
+	font-size: 11px;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.1em;
+	color: #999;
+	margin-bottom: 16px;
+}
+
+.traek-print-preview .traek-print-message {
+	border-left: 3px solid #eee;
+	padding: 12px 16px;
+	margin-bottom: 16px;
+	page-break-inside: avoid;
+	break-inside: avoid;
+}
+
+.traek-print-preview .traek-print-message.role-user {
+	border-left-color: #0077cc;
+}
+
+.traek-print-preview .traek-print-message.role-assistant {
+	border-left-color: #c04000;
+}
+
+.traek-print-preview .traek-print-message .role-label {
+	font-size: 11px;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	margin-bottom: 8px;
+}
+
+.traek-print-preview .traek-print-message.role-user .role-label {
+	color: #0077cc;
+}
+
+.traek-print-preview .traek-print-message.role-assistant .role-label {
+	color: #c04000;
+}
+
+.traek-print-preview .traek-print-message .content {
+	font-size: 14px;
+	line-height: 1.7;
+	white-space: pre-wrap;
+}
+
+.traek-print-preview .traek-print-branch-divider {
+	border: none;
+	border-top: 1px dashed #ddd;
+	margin: 32px 0;
+}
+
+.traek-print-preview .traek-print-footer {
+	border-top: 1px solid #eee;
+	padding-top: 16px;
+	font-size: 11px;
+	color: #999;
+	text-align: center;
+}

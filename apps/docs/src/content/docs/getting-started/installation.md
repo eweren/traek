@@ -1,6 +1,14 @@
 ---
-title: Installation
-description: How to install Træk packages in your project.
+title: Install Træk — AI Chat UI for React, Svelte & Vue
+description: >-
+  Install the Træk AI chat UI library. npm packages for React 18+, Svelte 5,
+  Vue 3, and vanilla TypeScript. Get a branching, spatial conversation canvas
+  running in minutes.
+head:
+  - tag: link
+    attrs:
+      rel: canonical
+      href: https://gettraek.com/getting-started/installation/
 ---
 
 # Installation

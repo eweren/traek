@@ -121,13 +121,18 @@
 	}
 </script>
 
-<!-- SVG defs for gradients (userSpaceOnUse so vertical lines get a valid gradient) -->
+<!-- SVG defs for gradients (userSpaceOnUse so vertical lines get a valid gradient).
+     Only generated for visible connections to keep DOM size proportional to the viewport,
+     not the total node count. This reduces gradient elements from O(all_edges) to O(visible_edges)
+     for large canvases (500+ nodes). -->
 <defs>
 	{#each nodes as node (node.id)}
-		{#if node.parentIds.length > 0 && node.type !== 'thought'}
+		{#if node.parentIds.length > 0 && node.type !== 'thought' && !(collapsedCache.get(node.id) ?? false)}
+			{@const isChildVisible = visibleNodeIds.has(node.id)}
 			{#each node.parentIds as pid (pid)}
 				{@const parent = nodeMap.get(pid)}
-				{#if parent}
+				{@const isParentVisible = visibleNodeIds.has(pid)}
+				{#if parent && (isChildVisible || isParentVisible)}
 					{@const gradientId = `gradient-${pid}-${node.id}`}
 					{@const parentColor = getRoleColor(parent.role)}
 					{@const childColor = getRoleColor(node.role)}

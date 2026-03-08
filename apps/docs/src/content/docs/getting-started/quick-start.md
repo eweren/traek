@@ -1,6 +1,13 @@
 ---
-title: Quick Start
-description: Get Træk running in 5 minutes.
+title: Quick Start — Build a Branching AI Chat UI in 5 Minutes
+description: >-
+  Get Træk's spatial AI chat canvas running in 5 minutes. Code examples for
+  React, Svelte, and Vue. Connect OpenAI or any LLM API with streaming support.
+head:
+  - tag: link
+    attrs:
+      rel: canonical
+      href: https://gettraek.com/getting-started/quick-start/
 ---
 
 # Quick Start

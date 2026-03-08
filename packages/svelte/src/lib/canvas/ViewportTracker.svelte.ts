@@ -108,6 +108,9 @@ export class ViewportTracker {
 	/**
 	 * Build a cache of which nodes are in collapsed subtrees.
 	 * A node is hidden if any ancestor in its primary parent chain is collapsed.
+	 *
+	 * Uses path-memoization so each node ID is visited at most once across all
+	 * ancestor walks, giving O(n + edges) instead of O(n × depth).
 	 */
 	private buildCollapsedCache(nodes: Node[], collapsedNodes: Set<string>): Map<string, boolean> {
 		// eslint-disable-next-line svelte/prefer-svelte-reactivity
@@ -116,35 +119,50 @@ export class ViewportTracker {
 		const nodeMap = new Map(nodes.map((n) => [n.id, n]));
 
 		for (const node of nodes) {
-			cache.set(node.id, this.isInCollapsedSubtree(node.id, nodeMap, collapsedNodes));
+			if (cache.has(node.id)) continue; // already computed via a previous ancestor walk
+
+			// Walk UP the primary-parent chain collecting nodes not yet in cache.
+			// Once we hit a cache entry or a definitive answer, propagate the result
+			// back down to every node we visited in this walk.
+			const path: string[] = [];
+			let currentId: string = node.id;
+
+			while (true) {
+				if (cache.has(currentId)) {
+					// Hit a pre-computed ancestor — propagate its hidden status to all
+					// descendants we walked through in this pass.
+					const inherited = cache.get(currentId)!;
+					for (const id of path) cache.set(id, inherited);
+					break;
+				}
+
+				const current = nodeMap.get(currentId);
+				if (!current) {
+					// Unknown node ID — treat as not hidden.
+					for (const id of path) cache.set(id, false);
+					break;
+				}
+
+				path.push(currentId);
+
+				const primaryParentId = current.parentIds[0];
+				if (!primaryParentId) {
+					// Reached a root — none of these nodes are hidden.
+					for (const id of path) cache.set(id, false);
+					break;
+				}
+
+				if (collapsedNodes.has(primaryParentId)) {
+					// The immediate parent of `currentId` is collapsed → currentId and
+					// all descendants we walked (path) are hidden.
+					for (const id of path) cache.set(id, true);
+					break;
+				}
+
+				currentId = primaryParentId;
+			}
 		}
 
 		return cache;
-	}
-
-	/**
-	 * Check if a node should be hidden because one of its ancestors is collapsed.
-	 */
-	private isInCollapsedSubtree(
-		nodeId: string,
-		nodeMap: Map<string, Node>,
-		collapsedNodes: Set<string>
-	): boolean {
-		// eslint-disable-next-line svelte/prefer-svelte-reactivity
-		const visited = new Set<string>();
-		let current = nodeMap.get(nodeId);
-
-		while (current) {
-			if (visited.has(current.id)) return false;
-			visited.add(current.id);
-
-			const primaryParentId = current.parentIds[0];
-			if (!primaryParentId) return false;
-			if (collapsedNodes.has(primaryParentId)) return true;
-
-			current = nodeMap.get(primaryParentId);
-		}
-
-		return false;
 	}
 }

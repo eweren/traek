@@ -6,6 +6,10 @@ export type { TraekCanvasProps } from './components/TraekCanvas.js';
 export { TextNode } from './components/TextNode.js';
 export type { TextNodeProps } from './components/TextNode.js';
 
+// Viewport-aware node wrapper
+export { TraekNode } from './components/TraekNode.js';
+export type { TraekNodeProps } from './components/TraekNode.js';
+
 // Hooks
 export { useTraekEngine, useCreateTraekEngine } from './hooks/useTraekEngine.js';
 

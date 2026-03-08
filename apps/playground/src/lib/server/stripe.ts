@@ -10,10 +10,14 @@ export function stripe(): Stripe {
 	return _stripe;
 }
 
-export type Tier = 'free' | 'pro' | 'team';
+export type Tier = 'free' | 'pro' | 'team' | 'enterprise';
 
 export function priceIdToTier(priceId: string): Tier {
 	if (priceId === env.STRIPE_PRO_PRICE_ID) return 'pro';
 	if (priceId === env.STRIPE_TEAM_PRICE_ID) return 'team';
+	if (priceId === env.STRIPE_ENTERPRISE_PRICE_ID) return 'enterprise';
 	return 'free';
 }
+
+/** Minimum seats for enterprise plan */
+export const ENTERPRISE_MIN_SEATS = 10;

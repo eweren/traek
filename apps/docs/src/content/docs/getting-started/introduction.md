@@ -1,6 +1,14 @@
 ---
-title: Introduction
-description: What is Træk and why use it?
+title: What is Træk? — AI Chat UI Library Introduction
+description: >-
+  Træk is an open-source AI chat UI library for Svelte, React, and Vue. Build
+  spatial, branching conversation interfaces with tree-structured message nodes
+  on a zoomable canvas — not a linear chatbot.
+head:
+  - tag: link
+    attrs:
+      rel: canonical
+      href: https://gettraek.com/getting-started/introduction/
 ---
 
 # Introduction

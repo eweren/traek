@@ -194,3 +194,18 @@ export { default as BookmarkBadge } from './canvas/BookmarkBadge.svelte';
 export { default as TagCreator } from './tags/TagCreator.svelte';
 export type { NodeColor, CustomTag } from './TraekEngine.svelte';
 export { listBuiltinTags, type Tag } from './tags/tagUtils';
+
+// Export & Sharing (TRK-77)
+export { default as SharePreviewCard } from './export/SharePreviewCard.svelte';
+export { default as TraekEmbed } from './export/TraekEmbed.svelte';
+export { default as QrHandoff } from './export/QrHandoff.svelte';
+export {
+	snapshotToPDFHtml,
+	printConversation,
+	snapshotToSlack,
+	snapshotToSlackJSON,
+	snapshotToDiscord,
+	snapshotToDiscordJSON,
+	countBranchPoints,
+	getConversationPreview
+} from './export/exportExtended';

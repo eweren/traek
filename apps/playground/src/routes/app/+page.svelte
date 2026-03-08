@@ -7,23 +7,30 @@
 		type ConversationMeta
 	} from '$lib/client/local-storage.js';
 	import { goto } from '$app/navigation';
+	import type { PageData } from './$types.js';
+	import { track } from '$lib/client/analytics.js';
 
 	const FREE_LIMIT = 5;
+
+	let { data }: { data: PageData } = $props();
+	let tier = $derived(data.tier ?? 'free');
+	let isPro = $derived(tier === 'pro' || tier === 'team');
 
 	let conversations = $state<ConversationMeta[]>([]);
 	let count = $state(0);
 	let loading = $state(true);
+	let showUpgradeModal = $state(false);
 
 	onMount(async () => {
+		track('playground_visit');
 		conversations = await listConversations();
 		count = conversations.length;
 		loading = false;
 	});
 
 	async function newConversation() {
-		if (count >= FREE_LIMIT) {
-			// TODO: trigger upgrade prompt
-			alert('Free tier limit reached. Upgrade to Pro for unlimited conversations.');
+		if (!isPro && count >= FREE_LIMIT) {
+			showUpgradeModal = true;
 			return;
 		}
 		const id = crypto.randomUUID();
@@ -42,6 +49,14 @@
 		await deleteConversation(id);
 		conversations = conversations.filter((c) => c.id !== id);
 		count = conversations.length;
+	}
+
+	async function upgrade() {
+		const res = await fetch('/api/stripe/checkout', { method: 'POST' });
+		if (res.ok) {
+			const { url } = await res.json();
+			window.location.href = url;
+		}
 	}
 
 	function formatDate(iso: string) {
@@ -89,7 +104,13 @@
 		</div>
 		<div class="sidebar-footer">
 			<a href="/app/settings" class="settings-link">Settings</a>
-			<span class="tier-badge">Free {count}/{FREE_LIMIT}</span>
+			{#if isPro}
+				<span class="tier-badge tier-pro">{tier === 'team' ? 'Team' : 'Pro'}</span>
+			{:else}
+				<button class="tier-badge tier-free" onclick={() => (showUpgradeModal = true)}>
+					Free {count}/{FREE_LIMIT}
+				</button>
+			{/if}
 		</div>
 	</nav>
 
@@ -101,6 +122,22 @@
 		</div>
 	</main>
 </div>
+
+{#if showUpgradeModal}
+	<div class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="upgrade-title">
+		<div class="modal">
+			<h2 id="upgrade-title">You've reached the free limit</h2>
+			<p>
+				The free plan includes {FREE_LIMIT} conversations stored locally. Upgrade to Pro for unlimited
+				conversations, cloud sync, export, and public sharing links.
+			</p>
+			<div class="modal-actions">
+				<button class="btn btn-primary" onclick={upgrade}>Upgrade to Pro — $12/mo</button>
+				<button class="btn btn-outline" onclick={() => (showUpgradeModal = false)}>Not now</button>
+			</div>
+		</div>
+	</div>
+{/if}
 
 <style>
 	.shell {
@@ -245,11 +282,26 @@
 
 	.tier-badge {
 		font-size: 0.75rem;
-		color: var(--pg-text-muted);
-		background: var(--pg-bg);
 		padding: 2px 8px;
 		border-radius: 100px;
 		border: 1px solid var(--pg-border);
+	}
+
+	.tier-free {
+		color: var(--pg-text-muted);
+		background: var(--pg-bg);
+		cursor: pointer;
+	}
+
+	.tier-free:hover {
+		border-color: var(--pg-accent);
+		color: var(--pg-accent);
+	}
+
+	.tier-pro {
+		color: var(--pg-accent);
+		background: color-mix(in srgb, var(--pg-accent) 10%, transparent);
+		border-color: color-mix(in srgb, var(--pg-accent) 30%, transparent);
 	}
 
 	.main-empty {
@@ -294,5 +346,61 @@
 
 	.btn-primary:hover {
 		background: var(--pg-accent-hover);
+	}
+
+	/* ─── Upgrade modal ─────────────────────────────────────── */
+	.modal-backdrop {
+		position: fixed;
+		inset: 0;
+		background: rgba(0, 0, 0, 0.6);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		z-index: 200;
+		backdrop-filter: blur(4px);
+	}
+
+	.modal {
+		background: var(--pg-surface);
+		border: 1px solid var(--pg-border);
+		border-radius: calc(var(--pg-radius) * 1.5);
+		padding: 32px;
+		max-width: 420px;
+		width: 90%;
+		display: flex;
+		flex-direction: column;
+		gap: 20px;
+	}
+
+	.modal h2 {
+		font-size: 1.3rem;
+		font-weight: 700;
+		letter-spacing: -0.02em;
+	}
+
+	.modal p {
+		font-size: 0.9rem;
+		color: var(--pg-text-muted);
+		line-height: 1.5;
+	}
+
+	.modal-actions {
+		display: flex;
+		gap: 10px;
+	}
+
+	.btn-outline {
+		background: transparent;
+		color: var(--pg-text);
+		border: 1px solid var(--pg-border);
+		padding: 10px 20px;
+		border-radius: var(--pg-radius);
+		font-size: 0.9rem;
+		font-weight: 600;
+		cursor: pointer;
+	}
+
+	.btn-outline:hover {
+		border-color: var(--pg-text-muted);
 	}
 </style>

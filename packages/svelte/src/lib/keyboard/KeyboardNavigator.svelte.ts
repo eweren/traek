@@ -1,5 +1,16 @@
 import type { TraekEngine } from '../TraekEngine.svelte';
 
+export type KeyboardNavigatorOptions = {
+	/** Enable vim-style navigation (j/k/h/l as arrow keys). Default: false. */
+	vimMode?: boolean;
+	/** Called when user requests to delete the focused node. */
+	onDelete?: (nodeId: string) => void;
+	/** Called when user requests to fit all nodes in view. */
+	onFitAll?: () => void;
+	/** Called when user requests to focus the input field. */
+	onFocusInput?: () => void;
+};
+
 /**
  * KeyboardNavigator - State machine for desktop keyboard navigation
  * Manages keyboard focus separate from active node selection
@@ -13,6 +24,8 @@ export class KeyboardNavigator {
 	showFuzzySearch = $state(false);
 	/** Last keyboard navigation direction for announcements */
 	lastDirection = $state<'parent' | 'child' | 'sibling' | 'root' | 'leaf' | null>(null);
+	/** Whether vim-style navigation is active */
+	vimMode = $state(false);
 	/** Chord state: stores first key of chord sequence */
 	#chordState: { key: string; timestamp: number } | null = null;
 	/** Chord timeout (500ms) */
@@ -20,10 +33,21 @@ export class KeyboardNavigator {
 
 	#engine: TraekEngine;
 	#onAnnounce?: (message: string) => void;
+	#onDelete?: (nodeId: string) => void;
+	#onFitAll?: () => void;
+	#onFocusInput?: () => void;
 
-	constructor(engine: TraekEngine, onAnnounce?: (message: string) => void) {
+	constructor(
+		engine: TraekEngine,
+		onAnnounce?: (message: string) => void,
+		options: KeyboardNavigatorOptions = {}
+	) {
 		this.#engine = engine;
 		this.#onAnnounce = onAnnounce;
+		this.#onDelete = options.onDelete;
+		this.#onFitAll = options.onFitAll;
+		this.#onFocusInput = options.onFocusInput;
+		this.vimMode = options.vimMode ?? false;
 
 		// Initialize focused node from engine's active node
 		$effect(() => {
@@ -46,6 +70,11 @@ export class KeyboardNavigator {
 			return false;
 		}
 
+		// Skip modifier-key combos — handled by the canvas global handler
+		if (e.ctrlKey || e.metaKey) {
+			return false;
+		}
+
 		// Quick-Jump: Numbers 1-9 to jump to nth child
 		if (/^[1-9]$/.test(e.key)) {
 			e.preventDefault();
@@ -57,6 +86,27 @@ export class KeyboardNavigator {
 		if (e.key === '/') {
 			e.preventDefault();
 			this.openFuzzySearch();
+			return true;
+		}
+
+		// Delete focused node (Delete or Backspace)
+		if ((e.key === 'Delete' || e.key === 'Backspace') && this.focusedNodeId) {
+			e.preventDefault();
+			this.deleteFocusedNode();
+			return true;
+		}
+
+		// Fit all nodes in view (f key)
+		if (e.key === 'f' || e.key === 'F') {
+			e.preventDefault();
+			this.fitAll();
+			return true;
+		}
+
+		// Focus input / new message (n or i key)
+		if (e.key === 'n' || e.key === 'i') {
+			e.preventDefault();
+			this.focusInput();
 			return true;
 		}
 
@@ -89,12 +139,39 @@ export class KeyboardNavigator {
 			}
 		}
 
-		// Check if this is a chord starter
-		if (e.key.toLowerCase() === 'g') {
+		// Check if this is a chord starter (only when not in vim mode to avoid conflict)
+		if (e.key.toLowerCase() === 'g' && !this.vimMode) {
 			e.preventDefault();
 			this.#chordState = { key: 'g', timestamp: Date.now() };
 			this.#announce('Chord started: g');
 			return true;
+		}
+
+		// Vim-style navigation (j/k/h/l) when vim mode is enabled
+		if (this.vimMode) {
+			switch (e.key) {
+				case 'k':
+					e.preventDefault();
+					this.navigateToParent();
+					return true;
+				case 'j':
+					e.preventDefault();
+					this.navigateToChild();
+					return true;
+				case 'h':
+					e.preventDefault();
+					this.navigateToPreviousSibling();
+					return true;
+				case 'l':
+					e.preventDefault();
+					this.navigateToNextSibling();
+					return true;
+				case 'g':
+					e.preventDefault();
+					this.#chordState = { key: 'g', timestamp: Date.now() };
+					this.#announce('Chord started: g');
+					return true;
+			}
 		}
 
 		switch (e.key) {
@@ -322,7 +399,7 @@ export class KeyboardNavigator {
 		}
 	}
 
-	/** Open fuzzy search overlay (/) */
+	/** Open fuzzy search overlay (/ or Cmd+K) */
 	openFuzzySearch(): void {
 		this.showFuzzySearch = true;
 		this.#announce('Fuzzy search opened');
@@ -332,6 +409,51 @@ export class KeyboardNavigator {
 	closeFuzzySearch(): void {
 		this.showFuzzySearch = false;
 		this.#announce('Fuzzy search closed');
+	}
+
+	/** Delete the focused node (Delete/Backspace) */
+	deleteFocusedNode(): void {
+		if (!this.focusedNodeId) return;
+		const nodeId = this.focusedNodeId;
+		const parent = this.#engine.getParent(nodeId);
+
+		// Move focus to parent or sibling before deleting
+		if (parent) {
+			this.focusedNodeId = parent.id;
+		} else {
+			const siblings = this.#engine.getSiblings(nodeId);
+			const other = siblings.find((s) => s.id !== nodeId);
+			if (other) {
+				this.focusedNodeId = other.id;
+			} else {
+				this.focusedNodeId = null;
+			}
+		}
+
+		if (this.#onDelete) {
+			this.#onDelete(nodeId);
+		} else {
+			this.#engine.deleteNodeAndDescendants(nodeId);
+		}
+		this.#announce('Node deleted');
+	}
+
+	/** Fit all nodes in view (f key) */
+	fitAll(): void {
+		this.#onFitAll?.();
+		this.#announce('Fit all nodes');
+	}
+
+	/** Focus the input field (n or i key) */
+	focusInput(): void {
+		this.#onFocusInput?.();
+		this.#announce('Input focused');
+	}
+
+	/** Toggle vim-style navigation mode */
+	toggleVimMode(): void {
+		this.vimMode = !this.vimMode;
+		this.#announce(this.vimMode ? 'Vim mode enabled' : 'Vim mode disabled');
 	}
 
 	/** Navigate to a node from fuzzy search */

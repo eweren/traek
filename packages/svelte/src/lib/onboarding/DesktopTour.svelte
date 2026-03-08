@@ -8,6 +8,9 @@
 
 	let currentStep = $state(0);
 
+	// 5 focused steps — covers the minimum viable understanding without overwhelming new users.
+	// Advanced features (search, compare, keyboard shortcuts) are disclosed progressively
+	// via separate mechanisms (search hint toast, branch celebration, KeyboardDiscoveryHint).
 	const steps = $derived([
 		{
 			title: t.tour.welcomeTitle,
@@ -30,24 +33,6 @@
 		{
 			title: t.tour.createBranchTitle,
 			description: t.tour.createBranchDescription,
-			targetSelector: '.viewport',
-			position: 'center' as const
-		},
-		{
-			title: t.tour.keyboardNavTitle,
-			description: t.tour.keyboardNavDescription,
-			targetSelector: '.viewport',
-			position: 'center' as const
-		},
-		{
-			title: t.tour.searchTitle,
-			description: t.tour.searchDescription,
-			targetSelector: '.viewport',
-			position: 'center' as const
-		},
-		{
-			title: t.tour.compareBranchesTitle,
-			description: t.tour.compareBranchesDescription,
 			targetSelector: '.viewport',
 			position: 'center' as const
 		},

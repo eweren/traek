@@ -7,7 +7,7 @@
 
 	const t = getTraekI18n();
 
-	let { onClose }: { onClose: () => void } = $props();
+	let { onClose, vimMode = false }: { onClose: () => void; vimMode?: boolean } = $props();
 
 	function handleBackdropClick(e: MouseEvent) {
 		if (e.target === e.currentTarget) {
@@ -74,8 +74,16 @@
 					<span>{t.keyboard.toggleCollapseExpand}</span>
 				</div>
 				<div class="shortcut">
-					<kbd>Tab</kbd>
+					<kbd>n</kbd> / <kbd>i</kbd>
 					<span>{t.keyboard.switchFocusToInput}</span>
+				</div>
+				<div class="shortcut">
+					<kbd>Del</kbd>
+					<span>{t.keyboard.deleteFocusedNode}</span>
+				</div>
+				<div class="shortcut">
+					<kbd>f</kbd>
+					<span>{t.keyboard.fitAllNodes}</span>
 				</div>
 				<div class="shortcut">
 					<kbd>?</kbd>
@@ -103,8 +111,36 @@
 					<kbd>/</kbd>
 					<span>{t.keyboard.openFuzzySearch}</span>
 				</div>
+				<div class="shortcut">
+					<kbd>⌘K</kbd>
+					<span>{t.keyboard.openCommandPalette}</span>
+				</div>
 			</div>
 		</div>
+
+		{#if vimMode}
+			<div class="shortcuts-section">
+				<h3>{t.keyboard.vimModeSection}</h3>
+				<div class="shortcuts-grid">
+					<div class="shortcut">
+						<kbd>k</kbd>
+						<span>{t.keyboard.vimNavigateUp}</span>
+					</div>
+					<div class="shortcut">
+						<kbd>j</kbd>
+						<span>{t.keyboard.vimNavigateDown}</span>
+					</div>
+					<div class="shortcut">
+						<kbd>h</kbd>
+						<span>{t.keyboard.vimNavigateLeft}</span>
+					</div>
+					<div class="shortcut">
+						<kbd>l</kbd>
+						<span>{t.keyboard.vimNavigateRight}</span>
+					</div>
+				</div>
+			</div>
+		{/if}
 
 		<button class="close-button" onclick={onClose}>{t.keyboard.close}</button>
 	</div>

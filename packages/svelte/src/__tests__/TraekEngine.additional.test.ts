@@ -438,4 +438,111 @@ describe('TraekEngine — additional coverage', () => {
 			expect(node.parentIds).toEqual([]);
 		});
 	});
+
+	describe('reparentNode', () => {
+		it('should return false when reparenting a node to itself', () => {
+			expect.assertions(1);
+			const engine = new TraekEngine();
+			const node = engine.addNode('Node', 'user', { parentIds: [] });
+			expect(engine.reparentNode(node.id, node.id)).toBe(false);
+		});
+
+		it('should return false for non-existent nodeId', () => {
+			expect.assertions(1);
+			const engine = new TraekEngine();
+			const parent = engine.addNode('Parent', 'user', { parentIds: [] });
+			expect(engine.reparentNode('does-not-exist', parent.id)).toBe(false);
+		});
+
+		it('should return false for non-existent newParentId', () => {
+			expect.assertions(1);
+			const engine = new TraekEngine();
+			const node = engine.addNode('Node', 'user', { parentIds: [] });
+			expect(engine.reparentNode(node.id, 'does-not-exist')).toBe(false);
+		});
+
+		it('should return false when newParentId is already the sole parent', () => {
+			expect.assertions(1);
+			const engine = new TraekEngine();
+			const parent = engine.addNode('Parent', 'user', { parentIds: [] });
+			const child = engine.addNode('Child', 'assistant', { parentIds: [parent.id] });
+			expect(engine.reparentNode(child.id, parent.id)).toBe(false);
+		});
+
+		it('should return false when reparenting would create a cycle', () => {
+			expect.assertions(1);
+			const engine = new TraekEngine();
+			const a = engine.addNode('A', 'user', { parentIds: [] });
+			const b = engine.addNode('B', 'assistant', { parentIds: [a.id] });
+			// Making A a child of B would create A→B→A cycle
+			expect(engine.reparentNode(a.id, b.id)).toBe(false);
+		});
+
+		it('should correctly reparent a node to a new parent', () => {
+			expect.assertions(3);
+			const engine = new TraekEngine();
+			const parentA = engine.addNode('A', 'user', { parentIds: [] });
+			const parentB = engine.addNode('B', 'user', { parentIds: [] });
+			const child = engine.addNode('Child', 'assistant', { parentIds: [parentA.id] });
+
+			const result = engine.reparentNode(child.id, parentB.id);
+			expect(result).toBe(true);
+
+			const updatedChild = engine.getNode(child.id)!;
+			expect(updatedChild.parentIds).toEqual([parentB.id]);
+			expect(engine.getChildren(parentA.id)).toHaveLength(0);
+		});
+
+		it('should update children map of new parent after reparent', () => {
+			expect.assertions(2);
+			const engine = new TraekEngine();
+			const parentA = engine.addNode('A', 'user', { parentIds: [] });
+			const parentB = engine.addNode('B', 'user', { parentIds: [] });
+			const child = engine.addNode('Child', 'assistant', { parentIds: [parentA.id] });
+
+			expect(engine.getChildren(parentB.id)).toHaveLength(0);
+			engine.reparentNode(child.id, parentB.id);
+			expect(engine.getChildren(parentB.id)).toHaveLength(1);
+		});
+
+		it('should replace multi-parent node with single new parent', () => {
+			expect.assertions(2);
+			const engine = new TraekEngine();
+			const a = engine.addNode('A', 'user', { parentIds: [] });
+			const b = engine.addNode('B', 'user', { parentIds: [] });
+			const c = engine.addNode('C', 'user', { parentIds: [] });
+			const child = engine.addNode('Child', 'assistant', { parentIds: [a.id, b.id] });
+
+			engine.reparentNode(child.id, c.id);
+			const updated = engine.getNode(child.id)!;
+			expect(updated.parentIds).toHaveLength(1);
+			expect(updated.parentIds[0]).toBe(c.id);
+		});
+
+		it('should support undo after reparent', () => {
+			expect.assertions(2);
+			const engine = new TraekEngine();
+			const parentA = engine.addNode('A', 'user', { parentIds: [] });
+			const parentB = engine.addNode('B', 'user', { parentIds: [] });
+			const child = engine.addNode('Child', 'assistant', { parentIds: [parentA.id] });
+
+			engine.reparentNode(child.id, parentB.id);
+			expect(engine.getNode(child.id)!.parentIds).toEqual([parentB.id]);
+
+			engine.undo();
+			expect(engine.getNode(child.id)!.parentIds).toEqual([parentA.id]);
+		});
+
+		it('should not modify node count after reparent', () => {
+			expect.assertions(2);
+			const engine = new TraekEngine();
+			const parentA = engine.addNode('A', 'user', { parentIds: [] });
+			const parentB = engine.addNode('B', 'user', { parentIds: [] });
+			engine.addNode('Child', 'assistant', { parentIds: [parentA.id] });
+
+			expect(engine.nodes).toHaveLength(3);
+			engine.reparentNode(engine.nodes[2].id, parentB.id);
+			expect(engine.nodes).toHaveLength(3);
+		});
+	});
 });

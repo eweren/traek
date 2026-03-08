@@ -6,6 +6,7 @@
 	import ActionBadges from '../actions/ActionBadges.svelte';
 	import SlashCommandDropdown from '../actions/SlashCommandDropdown.svelte';
 	import { getTraekI18n } from '../i18n/index';
+	import Icon from '../icons/Icon.svelte';
 
 	const t = getTraekI18n();
 
@@ -107,10 +108,13 @@
 				}
 			}}
 		></textarea>
-		<button type="submit" disabled={!userInput.trim()} aria-label={t.input.sendAriaLabel}>
-			<svg viewBox="0 0 24 24" width="18" height="18"
-				><path fill="currentColor" d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" /></svg
-			>
+		<button
+			type="submit"
+			disabled={!userInput.trim()}
+			aria-label={t.input.sendAriaLabel}
+			class="send-btn"
+		>
+			<Icon name="send" size={18} strokeWidth={2} aria-hidden={true} />
 		</button>
 	</form>
 </div>
@@ -125,6 +129,7 @@
 			left: 0;
 			right: 0;
 			padding: 16px;
+			padding-bottom: max(16px, env(safe-area-inset-bottom));
 			background: linear-gradient(to top, var(--traek-canvas-bg, #0d0d0d) 60%, transparent);
 		}
 
@@ -170,15 +175,32 @@
 			display: flex;
 			align-items: center;
 			justify-content: center;
-			transition: transform 0.1s;
+			transition:
+				transform var(--traek-duration-fast, 120ms) ease,
+				background var(--traek-duration-fast, 120ms) ease,
+				box-shadow var(--traek-duration-fast, 120ms) ease,
+				opacity var(--traek-duration-fast, 120ms) ease;
 		}
 
 		button:hover:not(:disabled) {
-			transform: scale(1.05);
+			transform: scale(1.08);
+			box-shadow: 0 4px 16px rgba(0, 216, 255, 0.35);
 		}
+
+		button:active:not(:disabled) {
+			transform: scale(0.95);
+			box-shadow: none;
+		}
+
 		button:disabled {
 			opacity: 0.3;
 			cursor: not-allowed;
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+			button {
+				transition: opacity var(--traek-duration-fast, 120ms) ease;
+			}
 		}
 
 		@media (max-width: 768px) {

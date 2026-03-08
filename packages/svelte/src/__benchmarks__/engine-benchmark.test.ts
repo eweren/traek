@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { TraekEngine, DEFAULT_TRACK_ENGINE_CONFIG } from '../lib/TraekEngine.svelte';
+import type { Node } from '../lib/TraekEngine.svelte';
 import { ViewportTracker } from '../lib/canvas/ViewportTracker.svelte';
 
 /**
@@ -46,7 +47,7 @@ function populateEngineWithNodes(engine: TraekEngine, count: number): string[] {
 
 	// Create a balanced tree structure for realistic testing
 	// Root node
-	const root = engine.addNode('Root node', 'user', { deferLayout: true });
+	const root = engine.addNode('Root node', 'user', { deferLayout: true, skipHistory: true });
 	nodeIds.push(root.id);
 
 	// Add nodes in batches to create a tree structure
@@ -63,7 +64,8 @@ function populateEngineWithNodes(engine: TraekEngine, count: number): string[] {
 			for (let i = 0; i < childrenToAdd; i++) {
 				const node = engine.addNode(`Node ${nodeIds.length}`, 'assistant', {
 					parentIds: [parentId],
-					deferLayout: true
+					deferLayout: true,
+					skipHistory: true
 				});
 				nodeIds.push(node.id);
 				nextLevel.push(node.id);
@@ -350,6 +352,85 @@ describe('TraekEngine Performance Benchmarks', () => {
 
 			recordBenchmark('deleteNodeAndDescendants', 500, duration, threshold);
 			expect(duration).toBeLessThan(threshold);
+		});
+	});
+
+	describe('ViewportTracker.buildCollapsedCache performance', () => {
+		it('should compute collapsed cache for 500 nodes with deep chains within 10ms', () => {
+			// Build 50 branches × 10 deep (500 descendants + root = 501 total)
+			const nodes: Node[] = [];
+			nodes.push({
+				id: 'root',
+				parentIds: [],
+				role: 'user' as const,
+				type: 'text',
+				metadata: { x: 0, y: 0, height: 100 }
+			});
+			for (let branch = 0; branch < 50; branch++) {
+				let prevId = 'root';
+				for (let depth = 0; depth < 10; depth++) {
+					const id = `b${branch}-d${depth}`;
+					nodes.push({
+						id,
+						parentIds: [prevId],
+						role: (depth % 2 === 0 ? 'user' : 'assistant') as 'user' | 'assistant',
+						type: 'text',
+						metadata: { x: branch * 5, y: (depth + 1) * 5, height: 100 }
+					});
+					prevId = id;
+				}
+			}
+
+			const tracker = new ViewportTracker(DEFAULT_TRACK_ENGINE_CONFIG, 200);
+			const collapsedNodes = new Set(['root']);
+			const threshold = 10; // 10ms
+
+			const { duration, result } = measurePerformance(() => {
+				return tracker.getVisibleNodeIds(
+					nodes,
+					collapsedNodes,
+					{ clientWidth: 1920, clientHeight: 1080 } as HTMLElement,
+					1,
+					{ x: 0, y: 0 }
+				);
+			});
+
+			// root is visible; all 500 descendants should be hidden
+			recordBenchmark(
+				'ViewportTracker.buildCollapsedCache (deep tree)',
+				nodes.length,
+				duration,
+				threshold
+			);
+			expect(duration).toBeLessThan(threshold);
+			expect(result.has('root')).toBe(true);
+			expect(result.has('b0-d0')).toBe(false);
+			expect(result.has('b49-d9')).toBe(false);
+		});
+
+		it('should handle repeated getVisibleNodeIds calls (pan simulation) within 5ms each', () => {
+			const engine = createEngine();
+			populateEngineWithNodes(engine, 500);
+			engine.flushLayoutFromRoot();
+
+			const tracker = new ViewportTracker(DEFAULT_TRACK_ENGINE_CONFIG, 200);
+			const mockViewport = { clientWidth: 1920, clientHeight: 1080 } as HTMLElement;
+			const threshold = 5; // 5ms per call (pan frame budget)
+
+			// Simulate 10 consecutive pan frames
+			for (let frame = 0; frame < 10; frame++) {
+				const offset = { x: frame * -50, y: 0 };
+				const { duration } = measurePerformance(() => {
+					tracker.getVisibleNodeIds(engine.nodes, engine.collapsedNodes, mockViewport, 1, offset);
+				});
+				recordBenchmark(
+					`ViewportTracker.getVisibleNodeIds (pan frame ${frame})`,
+					engine.nodes.length,
+					duration,
+					threshold
+				);
+				expect(duration).toBeLessThan(threshold);
+			}
 		});
 	});
 });
