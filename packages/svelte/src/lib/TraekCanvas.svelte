@@ -41,6 +41,9 @@
 	import ThemePicker from './theme/ThemePicker.svelte';
 	import { setTraekI18n } from './i18n/index';
 	import type { PartialTraekTranslations } from './i18n/index';
+	import TagBookmarkSidebar from './sidebar/TagBookmarkSidebar.svelte';
+	import BookmarkJumpOverlay from './keyboard/BookmarkJumpOverlay.svelte';
+	import BulkActionToolbar from './canvas/BulkActionToolbar.svelte';
 
 	type InputActionsContext = {
 		engine: TraekEngine;
@@ -358,6 +361,10 @@
 	// Search state
 	let showSearchBar = $state(false);
 
+	// Sidebar and bookmark jump state
+	let sidebarOpen = $state(false);
+	let showBookmarkJump = $state(false);
+
 	// Desktop tour state (tourDelay < 0 disables the tour entirely)
 	let showDesktopTour = $state(false);
 	let showKeyboardHint = $state(false);
@@ -448,6 +455,16 @@
 					e.preventDefault();
 					engine.redo();
 				}
+			}
+			// Cmd+Shift+T → toggle sidebar
+			if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key === 'T') {
+				e.preventDefault();
+				sidebarOpen = !sidebarOpen;
+			}
+			// Cmd+B → bookmark jump overlay
+			if ((e.metaKey || e.ctrlKey) && !e.shiftKey && e.key === 'b') {
+				e.preventDefault();
+				showBookmarkJump = !showBookmarkJump;
 			}
 		};
 
@@ -1040,6 +1057,36 @@
 						if (keyboardNavigator) keyboardNavigator.showHelp = true;
 					}}
 					onDismiss={() => (showKeyboardHint = false)}
+				/>
+			{/if}
+
+			<!-- Tag & Bookmark Sidebar (Cmd+Shift+T) -->
+			<TagBookmarkSidebar
+				{engine}
+				bind:open={sidebarOpen}
+				onNavigate={(id) => engine.focusOnNode(id)}
+			/>
+
+			<!-- Bookmark Jump Overlay (Cmd+B) -->
+			{#if showBookmarkJump}
+				<BookmarkJumpOverlay
+					{engine}
+					onClose={() => {
+						showBookmarkJump = false;
+					}}
+					onSelect={(id) => {
+						engine.focusOnNode(id);
+						showBookmarkJump = false;
+					}}
+				/>
+			{/if}
+
+			<!-- Bulk Action Toolbar (shown when 2+ nodes are multi-selected) -->
+			{#if interaction?.selectedNodeIds && interaction.selectedNodeIds.size > 1}
+				<BulkActionToolbar
+					{engine}
+					selectedIds={Array.from(interaction.selectedNodeIds)}
+					onClear={() => interaction?.selectedNodeIds.clear()}
 				/>
 			{/if}
 		</div>

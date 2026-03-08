@@ -9,6 +9,7 @@
 	import NodeSkeleton from './canvas/NodeSkeleton.svelte';
 	import Icon from './icons/Icon.svelte';
 	import BookmarkBadge from './canvas/BookmarkBadge.svelte';
+	import ColorPicker from './canvas/ColorPicker.svelte';
 
 	const DEFAULT_PLACEHOLDER_HEIGHT = 100;
 
@@ -62,6 +63,7 @@
 	let wrapper = $state<HTMLElement | null>(null);
 	let isInView = $state(true);
 	let isThoughtExpanded = $state(false);
+	let showNodeColorPicker = $state(false);
 	let previousStatus = $state<string | undefined>(undefined);
 	let showCompletePulse = $state(false);
 
@@ -556,6 +558,44 @@
 		data-port-node-id={node.id}
 		data-port-type="output"
 	></div>
+
+	{#if isActive && engine}
+		<div class="node-quick-actions">
+			<button
+				class="node-quick-btn"
+				class:bookmarked={isBookmarked}
+				onclick={() => {
+					if (isBookmarked) engine?.unbookmarkNode(node.id);
+					else engine?.bookmarkNode(node.id);
+				}}
+				title={isBookmarked ? 'Remove bookmark' : 'Bookmark this node'}
+				aria-label={isBookmarked ? 'Remove bookmark' : 'Bookmark this node'}
+			>
+				{isBookmarked ? '★' : '☆'}
+			</button>
+			<button
+				class="node-quick-btn"
+				onclick={() => {
+					showNodeColorPicker = !showNodeColorPicker;
+				}}
+				title="Set node color"
+				aria-label="Set node color"
+			>
+				●
+			</button>
+		</div>
+		{#if showNodeColorPicker}
+			<div class="node-color-popover">
+				<ColorPicker
+					value={nodeColor as import('./TraekEngine.svelte').NodeColor | null}
+					onchange={(c) => {
+						engine?.setNodeColor(node.id, c);
+						showNodeColorPicker = false;
+					}}
+				/>
+			</div>
+		{/if}
+	{/if}
 
 	{#if isBookmarked}
 		<BookmarkBadge label={bookmarkLabel} />
@@ -1420,6 +1460,51 @@
 					border-color 0.2s,
 					box-shadow 0.2s;
 			}
+		}
+
+		/* Node quick actions bar (bookmark + color) */
+		.node-quick-actions {
+			position: absolute;
+			top: -32px;
+			right: 8px;
+			display: flex;
+			gap: 4px;
+			z-index: 20;
+		}
+
+		.node-quick-btn {
+			width: 26px;
+			height: 26px;
+			border-radius: 6px;
+			border: 1px solid rgba(255, 255, 255, 0.15);
+			background: var(--traek-node-bg, #1e1e2e);
+			color: rgba(255, 255, 255, 0.7);
+			cursor: pointer;
+			font-size: 13px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			padding: 0;
+		}
+
+		.node-quick-btn:hover {
+			background: rgba(255, 255, 255, 0.1);
+			color: white;
+		}
+
+		.node-quick-btn.bookmarked {
+			color: var(--traek-color-yellow, #eab308);
+		}
+
+		.node-color-popover {
+			position: absolute;
+			top: 0;
+			right: 40px;
+			background: var(--traek-node-bg, #1e1e2e);
+			border: 1px solid rgba(255, 255, 255, 0.15);
+			border-radius: 8px;
+			box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+			z-index: 30;
 		}
 	}
 </style>
