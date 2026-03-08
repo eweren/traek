@@ -252,6 +252,17 @@ export type { CollabHandle, FollowModeHandle, FollowTarget } from './collab/useC
 // Resilience & offline support
 export { default as ConnectionStatus } from './resilience/ConnectionStatus.svelte';
 export { offlineQueue, type QueuedMessage } from './resilience/offlineQueue.svelte';
+export {
+	StreamReconnector,
+	computeBackoffDelay,
+	type StreamReconnectorOptions,
+	type StreamFactory,
+	type StreamChunkHandler,
+	type StreamDoneHandler,
+	type StreamErrorHandler,
+	type StreamReconnectingHandler,
+	type StreamHandlers
+} from './resilience/StreamReconnector.svelte';
 
 // Analytics & Insights Dashboard
 export { default as InsightsDashboard } from './analytics/InsightsDashboard.svelte';

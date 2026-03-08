@@ -41,15 +41,21 @@ class OfflineQueue {
 
 	private flushHandler: FlushHandler | null = null;
 	private pingUrl: string | null = null;
-	private pingIntervalId: ReturnType<typeof setInterval> | null = null;
+
+	// Bound method references kept for symmetric removeEventListener calls.
+	private readonly boundHandleOnline: () => void;
+	private readonly boundHandleOffline: () => void;
 
 	constructor() {
+		this.boundHandleOnline = () => this.handleOnline();
+		this.boundHandleOffline = () => {
+			this.isOnline = false;
+		};
+
 		if (typeof window === 'undefined') return;
 
-		window.addEventListener('online', () => this.handleOnline());
-		window.addEventListener('offline', () => {
-			this.isOnline = false;
-		});
+		window.addEventListener('online', this.boundHandleOnline);
+		window.addEventListener('offline', this.boundHandleOffline);
 	}
 
 	/**
@@ -118,11 +124,8 @@ class OfflineQueue {
 
 	destroy() {
 		if (typeof window === 'undefined') return;
-		window.removeEventListener('online', () => this.handleOnline());
-		window.removeEventListener('offline', () => {
-			this.isOnline = false;
-		});
-		if (this.pingIntervalId != null) clearInterval(this.pingIntervalId);
+		window.removeEventListener('online', this.boundHandleOnline);
+		window.removeEventListener('offline', this.boundHandleOffline);
 	}
 }
 
