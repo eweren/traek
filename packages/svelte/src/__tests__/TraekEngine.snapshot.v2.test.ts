@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { TraekEngine } from '../lib/TraekEngine.svelte';
+import { TraekEngine, type ConversationSnapshot } from '../lib/TraekEngine.svelte';
 
 describe('Snapshot v2 with custom tags', () => {
 	it('serializes custom tags in v2 snapshot', () => {
@@ -23,14 +23,14 @@ describe('Snapshot v2 with custom tags', () => {
 
 	it('v1 snapshot loads without error (migration)', () => {
 		const v1Snapshot = {
-			version: 1,
+			version: 1 as const,
 			title: 'Old',
 			nodes: [],
 			activeNodeId: null,
 			createdAt: Date.now()
-		};
+		} satisfies Partial<ConversationSnapshot>;
 		const engine = new TraekEngine();
-		expect(() => engine.fromSnapshot(v1Snapshot as any)).not.toThrow();
+		expect(() => engine.fromSnapshot(v1Snapshot as ConversationSnapshot)).not.toThrow();
 		expect(engine.customTags.size).toBe(0);
 	});
 });

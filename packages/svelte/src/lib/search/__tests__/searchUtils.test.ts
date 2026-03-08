@@ -4,13 +4,15 @@ import type { Node, MessageNode } from '../../TraekEngine.svelte';
 import { BasicNodeTypes } from '../../TraekEngine.svelte';
 
 // Helper to create test nodes for extended filter tests
+import type { NodeColor } from '../../TraekEngine.svelte';
+
 const makeNode = (
 	id: string,
 	content: string,
 	tags: string[] = [],
-	color?: string,
+	color?: NodeColor,
 	bookmarked?: boolean
-) => ({
+): MessageNode => ({
 	id,
 	parentIds: [],
 	role: 'user' as const,
@@ -226,7 +228,7 @@ describe('searchNodes with extended filters', () => {
 			makeNode('1', 'hello world', ['important']),
 			makeNode('2', 'hello world', ['todo']),
 			makeNode('3', 'hello world', [])
-		] as any[];
+		];
 		const result = searchNodes(nodes, 'hello', { tags: ['important'] });
 		expect(result).toContain('1');
 		expect(result).not.toContain('2');
@@ -237,7 +239,7 @@ describe('searchNodes with extended filters', () => {
 		const nodes = [
 			makeNode('1', 'hello world', [], undefined, true),
 			makeNode('2', 'hello world', [], undefined, false)
-		] as any[];
+		];
 		const result = searchNodes(nodes, 'hello', { bookmarked: true });
 		expect(result).toContain('1');
 		expect(result).not.toContain('2');
@@ -248,8 +250,8 @@ describe('searchNodes with extended filters', () => {
 			makeNode('1', 'hello world', [], 'red'),
 			makeNode('2', 'hello world', [], 'blue'),
 			makeNode('3', 'hello world')
-		] as any[];
-		const result = searchNodes(nodes, 'hello', { colors: ['red'] as any });
+		];
+		const result = searchNodes(nodes, 'hello', { colors: ['red'] });
 		expect(result).toContain('1');
 		expect(result).not.toContain('2');
 		expect(result).not.toContain('3');
@@ -259,7 +261,7 @@ describe('searchNodes with extended filters', () => {
 		const nodes = [
 			makeNode('1', 'hello world', ['important'], 'red', true),
 			makeNode('2', 'hello world', [], undefined, false)
-		] as any[];
+		];
 		const result = searchNodes(nodes, 'hello', {});
 		expect(result).toContain('1');
 		expect(result).toContain('2');
