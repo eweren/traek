@@ -710,6 +710,7 @@
 						editingNodeId = null;
 					} else {
 						engine.activeNodeId = null;
+						viewport?.viewportEl?.focus({ preventScroll: true });
 					}
 				}
 			}}

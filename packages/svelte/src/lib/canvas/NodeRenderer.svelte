@@ -74,6 +74,12 @@
 			? 'drop-target-valid'
 			: 'drop-target-invalid'
 		: null}
+	{@const _siblings = engine.getSiblings(node.id)}
+	{@const _nodeChildren = engine.getChildren(node.id).filter((c) => c.type !== 'thought')}
+	{@const ariaLevel = engine.getDepth(node.id) + 1}
+	{@const ariaSetsize = _siblings.length}
+	{@const ariaPosinset = _siblings.findIndex((s) => s.id === node.id) + 1}
+	{@const ariaExpanded = _nodeChildren.length > 0 ? !engine.isCollapsed(node.id) : undefined}
 	{#if !isNodeHidden}
 		{#if isVisible || isActive || isFocused}
 			{@const typeDef = registry?.get(node.type)}
@@ -121,6 +127,10 @@
 							{isSearchDimmed}
 							{isSelected}
 							{dropTargetClass}
+							{ariaLevel}
+							{ariaSetsize}
+							{ariaPosinset}
+							{ariaExpanded}
 						>
 							<ResolvedComponent {node} {engine} {isActive} {...uiData?.props ?? {}} />
 						</TraekNodeWrapper>
@@ -146,6 +156,10 @@
 						{isSearchDimmed}
 						{isSelected}
 						{dropTargetClass}
+						{ariaLevel}
+						{ariaSetsize}
+						{ariaPosinset}
+						{ariaExpanded}
 					>
 						<div class="node-card error">
 							<div class="role-tag">{node.type}</div>

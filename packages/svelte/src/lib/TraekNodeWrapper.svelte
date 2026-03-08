@@ -32,6 +32,10 @@
 		isSearchDimmed = false,
 		isSelected = false,
 		dropTargetClass = null,
+		ariaLevel = undefined,
+		ariaSetsize = undefined,
+		ariaPosinset = undefined,
+		ariaExpanded = undefined,
 		children
 	}: {
 		node: Node;
@@ -57,6 +61,11 @@
 		isSelected?: boolean;
 		/** CSS class for drop target state: 'drop-target-valid' | 'drop-target-invalid' | null */
 		dropTargetClass?: string | null;
+		/** ARIA tree semantics (per ARIA Tree Widget pattern) */
+		ariaLevel?: number;
+		ariaSetsize?: number;
+		ariaPosinset?: number;
+		ariaExpanded?: boolean;
 		children: import('svelte').Snippet;
 	} = $props();
 
@@ -220,6 +229,11 @@
 	data-node-id={node.id}
 	role="treeitem"
 	aria-selected={isActive}
+	tabindex={isFocused ? 0 : -1}
+	aria-level={ariaLevel}
+	aria-setsize={ariaSetsize}
+	aria-posinset={ariaPosinset}
+	aria-expanded={ariaExpanded}
 	class="message-node-wrapper {node.role} {isActive ? 'active' : ''} {isFocused
 		? 'keyboard-focused'
 		: ''} {node.status === 'error' ? 'error' : ''} {!isInView
