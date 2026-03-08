@@ -38,6 +38,40 @@ export {
 export type { NodeTypeDefinition, NodeTypeAction } from './node-types/index';
 export type { ActionVariant } from './node-types/types';
 
+// Multimodal node types (TRK-103)
+export {
+	imageNodeDefinition,
+	fileNodeDefinition,
+	codeNodeDefinition,
+	embedNodeDefinition,
+	multimodalNodeDefinitions
+} from './node-types/multimodal/definitions';
+export {
+	imageNodeDataSchema,
+	fileNodeDataSchema,
+	codeNodeDataSchema,
+	embedNodeDataSchema,
+	getFileIcon,
+	formatFileSize,
+	detectEmbedType,
+	COMMON_LANGUAGES
+} from './node-types/multimodal/types';
+export type {
+	ImageEntry,
+	ImageNodeData,
+	FileEntry,
+	FileNodeData,
+	CodeNodeData,
+	EmbedType,
+	EmbedPreview,
+	EmbedNodeData
+} from './node-types/multimodal/types';
+export { default as ImageNode } from './node-types/multimodal/ImageNode.svelte';
+export { default as FileNode } from './node-types/multimodal/FileNode.svelte';
+export { default as CodeNode } from './node-types/multimodal/CodeNode.svelte';
+export { default as EmbedNode } from './node-types/multimodal/EmbedNode.svelte';
+export { default as LightboxModal } from './node-types/multimodal/Lightbox.svelte';
+
 // Default node actions
 export {
 	duplicateAction,
