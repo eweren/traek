@@ -17,7 +17,23 @@
 </script>
 
 <svelte:head>
-	<title>Shared conversation — Traek</title>
+	<title>{data.title} — Træk</title>
+	<meta name="description" content={data.description} />
+	<!-- Open Graph -->
+	<meta property="og:type" content="website" />
+	<meta property="og:url" content={data.shareUrl} />
+	<meta property="og:title" content="{data.title} — Træk" />
+	<meta property="og:description" content={data.description} />
+	<meta property="og:image" content={data.ogImageUrl} />
+	<meta property="og:image:width" content="1200" />
+	<meta property="og:image:height" content="630" />
+	<meta property="og:site_name" content="Træk" />
+	<!-- Twitter / X -->
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:site" content="@gettraek" />
+	<meta name="twitter:title" content="{data.title} — Træk" />
+	<meta name="twitter:description" content={data.description} />
+	<meta name="twitter:image" content={data.ogImageUrl} />
 </svelte:head>
 
 <div class="read-only-banner">

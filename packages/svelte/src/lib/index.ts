@@ -149,6 +149,7 @@ export { ICONS, type IconName, type IconDef } from './icons/icons.js';
 // Theme System
 export { default as ThemeProvider, useTheme, applyThemeToRoot } from './theme/ThemeProvider.svelte';
 export { default as ThemePicker } from './theme/ThemePicker.svelte';
+export { default as ThemeToggle } from './theme/ThemeToggle.svelte';
 export {
 	darkTheme,
 	lightTheme,
@@ -175,6 +176,18 @@ export type {
 	TraekThemeTypography,
 	TraekThemeAnimation
 } from './theme/tokens';
+export {
+	toLinear,
+	relativeLuminance,
+	contrastRatio,
+	parseColor,
+	colorContrastRatio,
+	meetsWCAG_AA,
+	meetsWCAG_AAA,
+	validateThemeContrast,
+	CONTRAST_PAIRS
+} from './theme/wcag';
+export type { ContrastPair, ContrastResult, ThemeAuditResult } from './theme/wcag';
 
 // i18n
 export {

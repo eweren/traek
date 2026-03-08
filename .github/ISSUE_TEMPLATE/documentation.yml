@@ -1,0 +1,29 @@
+name: Documentation Issue
+description: Report missing, incorrect, or unclear documentation
+title: '[docs] '
+labels: ['documentation']
+body:
+  - type: textarea
+    id: location
+    attributes:
+      label: Where is the documentation issue?
+      description: Link to the specific page, section, or file that needs improvement.
+      placeholder: e.g. README.md#theming, gettraek.com/docs/api
+    validations:
+      required: true
+
+  - type: textarea
+    id: issue
+    attributes:
+      label: What is wrong or missing?
+      description: Describe what is unclear, incorrect, or absent.
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested improvement
+      description: What should the documentation say instead? (optional — helpful but not required)
+    validations:
+      required: false

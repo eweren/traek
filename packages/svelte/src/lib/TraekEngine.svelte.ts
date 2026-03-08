@@ -87,6 +87,8 @@ export class TraekEngine {
 	layoutMode = $state<LayoutMode>('tree-vertical');
 	/** Duration for animated layout transitions (ms). Set to 0 to disable. */
 	layoutTransitionMs = $state(300);
+	/** Current theme mode: 'dark', 'light', or 'system' (follows OS preference). */
+	themeMode = $state<'dark' | 'light' | 'system'>('system');
 	private config: TraekEngineConfig;
 
 	private historyManager = new HistoryManager();
@@ -393,6 +395,14 @@ export class TraekEngine {
 		if (this.nodeIndexMap.has(nodeId)) {
 			this.pendingFocusNodeId = nodeId;
 		}
+	}
+
+	/**
+	 * Set the theme mode. Updates engine state; the ThemeToggle component
+	 * reads this to apply the actual CSS variables.
+	 */
+	setThemeMode(mode: 'dark' | 'light' | 'system'): void {
+		this.themeMode = mode;
 	}
 
 	/**

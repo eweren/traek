@@ -189,3 +189,16 @@ export function markdownToHtml(md: string): string {
 
 	return String(DOMPurify.sanitize(html, PURIFY_CONFIG));
 }
+
+/**
+ * Like markdownToHtml but catches parsing/sanitization errors instead of
+ * throwing. Returns the sanitized HTML on success or an empty string plus the
+ * caught error so callers can show a graceful fallback.
+ */
+export function safeMarkdownToHtml(md: string): { html: string; error: Error | null } {
+	try {
+		return { html: markdownToHtml(md), error: null };
+	} catch (e) {
+		return { html: '', error: e instanceof Error ? e : new Error(String(e)) };
+	}
+}

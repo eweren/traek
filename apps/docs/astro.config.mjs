@@ -137,6 +137,8 @@ export default defineConfig({
 						{ label: 'Starter Templates', slug: 'guides/starter-templates' },
 						{ label: 'Migration from Linear Chat', slug: 'guides/migration-from-linear-chat' },
 						{ label: 'Advanced Theming', slug: 'guides/advanced-theming' },
+						{ label: 'Design Tokens & Figma Sync', slug: 'guides/design-tokens' },
+						{ label: 'Token Preview', slug: 'guides/token-preview' },
 						{ label: 'Plugin Development', slug: 'guides/plugin-development' },
 						{ label: 'Publishing to the Marketplace', slug: 'guides/marketplace-submission' },
 						{ label: 'Custom Node Types', slug: 'guides/custom-nodes' },

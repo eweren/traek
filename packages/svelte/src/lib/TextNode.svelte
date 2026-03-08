@@ -3,7 +3,7 @@
 	import { fadedSlide } from './transitions';
 	import type { TraekEngine } from './TraekEngine.svelte';
 	import TraekNodeWrapper from './TraekNodeWrapper.svelte';
-	import { markdownToHtml } from './utils';
+	import { safeMarkdownToHtml } from './utils';
 	import { getDetailLevel } from './canvas/AdaptiveRenderer.svelte';
 	import { getTraekI18n } from './i18n/index';
 
@@ -24,7 +24,8 @@
 		editingNodeId = null,
 		onEditSave,
 		onEditCancel,
-		onStartEdit
+		onStartEdit,
+		onError
 	} = $props<{
 		node: MessageNode;
 		isActive: boolean;
@@ -39,6 +40,8 @@
 		onEditSave?: (nodeId: string, content: string) => void;
 		onEditCancel?: () => void;
 		onStartEdit?: (nodeId: string) => void;
+		/** Called when a rendering error occurs (markdown parse, image load). */
+		onError?: (error: Error, nodeId: string) => void;
 	}>();
 
 	let scrollContainer = $state<HTMLElement | null>(null);
