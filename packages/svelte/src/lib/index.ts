@@ -14,8 +14,13 @@ export {
 	type NodeStatus,
 	type AddNodePayload,
 	type TraekNodeComponentProps,
-	type NodeComponentMap
+	type NodeComponentMap,
+	type LayoutMode
 } from './TraekEngine.svelte';
+
+// Layout system
+export { default as LayoutPicker } from './layout/LayoutPicker.svelte';
+export { LAYOUT_MODE_LABELS } from './layout/types';
 
 // Actions
 export { default as ActionBadges } from './actions/ActionBadges.svelte';
@@ -62,6 +67,22 @@ export type {
 	ConversationListItem,
 	SaveState
 } from './persistence/types';
+
+// Version History (TRK-72)
+export { VersionHistoryManager } from './versions/VersionHistoryManager';
+export { AutoSnapshotTimer } from './versions/AutoSnapshotTimer';
+export { MemoryAdapter as VersionMemoryAdapter } from './versions/adapters/MemoryAdapter';
+export { LocalStorageAdapter as VersionLocalStorageAdapter } from './versions/adapters/LocalStorageAdapter';
+export { IndexedDBVersionAdapter } from './versions/adapters/IndexedDBAdapter';
+export { snapshotDiff } from './versions/snapshotDiff';
+export { versionEntrySchema } from './versions/types';
+export type {
+	VersionEntry,
+	SnapshotDiff,
+	SnapshotNodeChange,
+	StorageAdapter as VersionStorageAdapter,
+	VersionHistoryOptions
+} from './versions/types';
 
 // Conversation UI
 export { default as HeaderBar } from './conversation/HeaderBar.svelte';
