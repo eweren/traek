@@ -1,6 +1,5 @@
 import { useRef, useState, useCallback } from 'react';
 import { DEFAULT_TRACK_ENGINE_CONFIG, TraekEngine } from '@traek/core';
-import type { Node } from '@traek/core';
 import { TextNode, TraekCanvas } from '@traek/react';
 import React from 'react';
 
@@ -24,7 +23,6 @@ export default function ReactDemo() {
 	}
 	const engine = engineRef.current;
 
-	const [nodes, setNodes] = useState<Node[]>(() => [...engine.nodes]);
 	const [input, setInput] = useState('');
 
 	// useEffect(() => {

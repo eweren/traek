@@ -27,36 +27,36 @@ Requires `@traek/svelte >= 0.0.4` and `svelte >= 5`.
 ## Quick start
 
 ```ts
-import { applyWhitelabel } from '@traek/whitelabel'
+import { applyWhitelabel } from '@traek/whitelabel';
 
 // Call once, client-side, before mounting the canvas
 applyWhitelabel({
-  brand: {
-    name: 'Acme AI',
-    logoUrl: '/acme-logo.svg',
-    loadingText: 'Starting your session…',
-  },
-  brandColors: {
-    accent: '#6366f1',
-    assistantAccent: '#f59e0b',
-  },
-  typography: {
-    fontFamily: "'Inter', sans-serif",
-  },
-})
+	brand: {
+		name: 'Acme AI',
+		logoUrl: '/acme-logo.svg',
+		loadingText: 'Starting your session…'
+	},
+	brandColors: {
+		accent: '#6366f1',
+		assistantAccent: '#f59e0b'
+	},
+	typography: {
+		fontFamily: "'Inter', sans-serif"
+	}
+});
 ```
 
 ```svelte
 <!-- Replace the default loading screen -->
 <script>
-  import { TraekCanvas } from '@traek/svelte'
-  import { BrandedLoading } from '@traek/whitelabel'
+	import { TraekCanvas } from '@traek/svelte';
+	import { BrandedLoading } from '@traek/whitelabel';
 </script>
 
 <TraekCanvas {engine} {onSendMessage}>
-  {#snippet loadingOverlay()}
-    <BrandedLoading name="Acme AI" logoUrl="/acme-logo.svg" />
-  {/snippet}
+	{#snippet loadingOverlay()}
+		<BrandedLoading name="Acme AI" logoUrl="/acme-logo.svg" />
+	{/snippet}
 </TraekCanvas>
 ```
 

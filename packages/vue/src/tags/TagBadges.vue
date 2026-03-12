@@ -49,7 +49,6 @@ function removeTag(tag: string) {
 			{{ getTagConfig(tag).label }}
 			<button
 				v-if="editable"
-				@click.stop="removeTag(tag)"
 				:aria-label="`Remove ${getTagConfig(tag).label} tag`"
 				:style="{
 					background: 'transparent',
@@ -61,6 +60,7 @@ function removeTag(tag: string) {
 					fontSize: '12px',
 					opacity: 0.7
 				}"
+				@click.stop="removeTag(tag)"
 			>
 				×
 			</button>

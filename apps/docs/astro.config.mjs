@@ -9,6 +9,11 @@ export default defineConfig({
 	vite: {
 		resolve: {
 			dedupe: ['react', 'react-dom']
+		},
+		build: {
+			rollupOptions: {
+				external: (id) => id.startsWith('lib0/')
+			}
 		}
 	},
 	integrations: [

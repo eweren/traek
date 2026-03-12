@@ -10,6 +10,7 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"clean": "rm -rf node_modules dist .svelte-kit coverage build .turbo",
 		"lint": "eslint .",
+		"lint:fix": "eslint . --fix",
 		"format": "prettier --write .",
 		"test:e2e": "playwright test",
 		"test": "npm run test:e2e"

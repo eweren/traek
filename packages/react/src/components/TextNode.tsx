@@ -1,6 +1,5 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React from 'react';
 import type { TraekEngine, Node, MessageNode } from '@traek/core';
-import { highlightMatch } from '@traek/core';
 
 export interface TextNodeProps {
 	node: Node;
@@ -12,7 +11,7 @@ export interface TextNodeProps {
  * Default text node renderer for @traek/react.
  * Renders markdown content with basic streaming support.
  */
-export function TextNode({ node, engine, isActive }: TextNodeProps) {
+export function TextNode({ node, isActive }: TextNodeProps) {
 	const messageNode = node as MessageNode;
 	const content = messageNode.content ?? '';
 	const isStreaming = node.status === 'streaming';

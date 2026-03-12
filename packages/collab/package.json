@@ -22,6 +22,7 @@
 		"build": "tsc --project tsconfig.build.json",
 		"check": "tsc --noEmit",
 		"lint": "prettier --check . && eslint .",
+		"lint:fix": "prettier --write . && eslint . --fix",
 		"clean": "rm -rf node_modules dist coverage .turbo",
 		"format": "prettier --write .",
 		"test": "vitest run"

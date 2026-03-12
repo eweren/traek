@@ -3,6 +3,11 @@
 	"private": true,
 	"type": "module",
 	"packageManager": "pnpm@10.29.3",
+	"pnpm": {
+		"overrides": {
+			"stream-replace-string": "file:./apps/docs/stream-replace-string-shim"
+		}
+	},
 	"scripts": {
 		"dev": "turbo dev --filter=@traek/web --continue && pnpm run turbo watch",
 		"dev:docs": "turbo dev --filter=@traek/docs --continue",
@@ -12,6 +17,7 @@
 		"build": "turbo build",
 		"test": "turbo test",
 		"lint": "turbo lint",
+		"lint:fix": "turbo lint -- --fix",
 		"format": "prettier --write . && turbo format",
 		"check": "turbo check",
 		"changeset": "changeset",

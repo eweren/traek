@@ -29,7 +29,6 @@ function clear() {
 		<button
 			v-for="[key, cfg] in Object.entries(PREDEFINED_TAGS)"
 			:key="key"
-			@click="toggle(key)"
 			:style="{
 				padding: '3px 10px',
 				borderRadius: '12px',
@@ -40,12 +39,12 @@ function clear() {
 				fontSize: '11px',
 				fontWeight: 500
 			}"
+			@click="toggle(key)"
 		>
 			{{ cfg.label }}
 		</button>
 		<button
 			v-if="activeTags.length > 0"
-			@click="clear"
 			:style="{
 				padding: '3px 10px',
 				borderRadius: '12px',
@@ -55,6 +54,7 @@ function clear() {
 				cursor: 'pointer',
 				fontSize: '11px'
 			}"
+			@click="clear"
 		>
 			Clear
 		</button>

@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import { useCallback, useState } from 'react';
 import type { TraekEngine } from '@traek/core';
 import { getNodeTags, getTagConfig, PREDEFINED_TAGS } from './tagUtils.js';
 

@@ -1,21 +1,9 @@
 <script setup lang="ts">
-import { computed, inject, onMounted, provide, ref, type InjectionKey } from 'vue';
-import type { TraekTheme } from './tokens.js';
+import { computed, onMounted, provide, ref } from 'vue';
 import { themes, DEFAULT_THEME } from './themes.js';
 import type { ThemeName } from './themes.js';
-
-export interface ThemeContextValue {
-	currentTheme: TraekTheme;
-	currentThemeName: ThemeName;
-	setTheme: (name: ThemeName) => void;
-	applyTheme: (theme: TraekTheme) => void;
-}
-
-export const THEME_KEY: InjectionKey<ThemeContextValue> = Symbol('traek-theme');
-
-export interface ThemeProviderProps {
-	initialTheme?: ThemeName;
-}
+import type { ThemeProviderProps, ThemeContextValue } from './context.js';
+import { THEME_KEY } from './context.js';
 
 const props = withDefaults(defineProps<ThemeProviderProps>(), {
 	initialTheme: () => DEFAULT_THEME

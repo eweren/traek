@@ -64,12 +64,6 @@ function textColor(type: ToastData['type']): string {
 				<span :style="{ flex: 1 }">{{ t.message }}</span>
 				<button
 					v-if="t.type === 'undo' && t.onUndo"
-					@click="
-						() => {
-							t.onUndo?.();
-							toastStore.removeToast(t.id);
-						}
-					"
 					:style="{
 						background: 'rgba(0,0,0,0.2)',
 						border: 'none',
@@ -80,11 +74,16 @@ function textColor(type: ToastData['type']): string {
 						cursor: 'pointer',
 						fontSize: '12px'
 					}"
+					@click="
+						() => {
+							t.onUndo?.();
+							toastStore.removeToast(t.id);
+						}
+					"
 				>
 					Undo
 				</button>
 				<button
-					@click="() => toastStore.removeToast(t.id)"
 					aria-label="Dismiss"
 					:style="{
 						background: 'transparent',
@@ -96,6 +95,7 @@ function textColor(type: ToastData['type']): string {
 						fontSize: '16px',
 						lineHeight: 1
 					}"
+					@click="() => toastStore.removeToast(t.id)"
 				>
 					×
 				</button>

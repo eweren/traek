@@ -59,7 +59,6 @@ function addCustom() {
 			<button
 				v-for="[key, cfg] in Object.entries(PREDEFINED_TAGS)"
 				:key="key"
-				@click="toggleTag(key)"
 				:style="{
 					display: 'flex',
 					alignItems: 'center',
@@ -73,6 +72,7 @@ function addCustom() {
 					textAlign: 'left',
 					fontSize: '12px'
 				}"
+				@click="toggleTag(key)"
 			>
 				<span
 					:style="{
@@ -95,7 +95,6 @@ function addCustom() {
 		<div :style="{ display: 'flex', gap: '4px', marginTop: '8px' }">
 			<input
 				v-model="customInput"
-				@keydown.enter="addCustom"
 				placeholder="Custom tag..."
 				:style="{
 					flex: 1,
@@ -107,9 +106,9 @@ function addCustom() {
 					fontSize: '12px',
 					outline: 'none'
 				}"
+				@keydown.enter="addCustom"
 			/>
 			<button
-				@click="addCustom"
 				:style="{
 					padding: '4px 8px',
 					borderRadius: '6px',
@@ -119,13 +118,13 @@ function addCustom() {
 					cursor: 'pointer',
 					fontSize: '12px'
 				}"
+				@click="addCustom"
 			>
 				Add
 			</button>
 		</div>
 		<button
 			v-if="onClose"
-			@click="onClose"
 			:style="{
 				display: 'block',
 				width: '100%',
@@ -138,6 +137,7 @@ function addCustom() {
 				cursor: 'pointer',
 				fontSize: '11px'
 			}"
+			@click="onClose"
 		>
 			Close
 		</button>

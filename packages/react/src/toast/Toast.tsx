@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { useEffect, useState, useSyncExternalStore } from 'react';
 import { toastStore } from './toastStore.js';
 import type { ToastData } from './toastStore.js';
 
@@ -21,7 +21,6 @@ interface ToastItemProps {
 
 function ToastItem({ toast: t, onDismiss }: ToastItemProps) {
 	const [visible, setVisible] = useState(false);
-	const timerRef = useRef<ReturnType<typeof setTimeout>>();
 
 	useEffect(() => {
 		// Animate in

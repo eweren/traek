@@ -67,8 +67,6 @@ function closeSearch() {
 		<input
 			ref="inputRef"
 			:value="searchQuery"
-			@input="engine.searchNodesMethod(($event.target as HTMLInputElement).value)"
-			@keydown="handleKeyDown"
 			:placeholder="placeholder"
 			aria-label="Search conversation"
 			:style="{
@@ -80,6 +78,8 @@ function closeSearch() {
 				flex: 1,
 				minWidth: '120px'
 			}"
+			@input="engine.searchNodesMethod(($event.target as HTMLInputElement).value)"
+			@keydown="handleKeyDown"
 		/>
 		<span
 			v-if="searchMatches.length > 0"
@@ -94,28 +94,28 @@ function closeSearch() {
 			No matches
 		</span>
 		<button
-			@click="engine.previousSearchMatch()"
 			:disabled="searchMatches.length === 0"
 			title="Previous match (Shift+Enter)"
 			aria-label="Previous match"
 			:style="navBtnStyle"
+			@click="engine.previousSearchMatch()"
 		>
 			↑
 		</button>
 		<button
-			@click="engine.nextSearchMatch()"
 			:disabled="searchMatches.length === 0"
 			title="Next match (Enter)"
 			aria-label="Next match"
 			:style="navBtnStyle"
+			@click="engine.nextSearchMatch()"
 		>
 			↓
 		</button>
 		<button
-			@click="closeSearch"
 			title="Close search (Escape)"
 			aria-label="Close search"
 			:style="{ ...navBtnStyle, opacity: 0.6 }"
+			@click="closeSearch"
 		>
 			×
 		</button>

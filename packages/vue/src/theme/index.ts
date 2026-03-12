@@ -1,5 +1,6 @@
-export { default as ThemeProvider, THEME_KEY } from './ThemeProvider.vue';
-export type { ThemeContextValue, ThemeProviderProps } from './ThemeProvider.vue';
+export { default as ThemeProvider } from './ThemeProvider.vue';
+export { THEME_KEY } from './context.js';
+export type { ThemeContextValue, ThemeProviderProps } from './context.js';
 export {
 	themes,
 	darkTheme,
@@ -20,8 +21,8 @@ export type {
 } from './tokens.js';
 
 import { inject } from 'vue';
-import { THEME_KEY } from './ThemeProvider.vue';
-import type { ThemeContextValue } from './ThemeProvider.vue';
+import { THEME_KEY } from './context.js';
+import type { ThemeContextValue } from './context.js';
 
 /**
  * Access the nearest ThemeProvider context.

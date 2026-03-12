@@ -8,10 +8,6 @@ head:
       href: https://gettraek.com/guides/components/
 ---
 
-import ThemeShowcaseDemo from '../../../../components/demos/ThemeShowcaseDemo.svelte';
-import BranchShowcaseDemo from '../../../../components/demos/BranchShowcaseDemo.svelte';
-import LoadingOverlayDemo from '../../../../components/demos/LoadingOverlayDemo.svelte';
-
 # Component Showcase
 
 A visual reference for every exported Træk component — interactive demos, code snippets, and theming variations side by side.
@@ -21,8 +17,6 @@ A visual reference for every exported Træk component — interactive demos, cod
 ## TraekCanvas
 
 The main spatial canvas. Renders nodes on a pannable/zoomable surface with streaming input, connection lines, and keyboard navigation built in.
-
-<ThemeShowcaseDemo client:load />
 
 Switch between **Dark**, **Light**, and **High Contrast** using the tabs above the canvas. Each theme is a full token set — colors, spacing, radius, and typography — applied via CSS custom properties on `:root`.
 
@@ -72,8 +66,6 @@ Switch between **Dark**, **Light**, and **High Contrast** using the tabs above t
 
 Træk's core differentiator: any node can have multiple children. Click a node to set the context, then send a message to branch from it.
 
-<BranchShowcaseDemo client:load />
-
 When a node has two or more children, a **Branch Compare** button appears in the node toolbar — click it to view parallel paths side by side with word-level diff highlighting.
 
 **Creating branches programmatically:**
@@ -99,8 +91,6 @@ engine.addNode('Response B: more detailed explanation.', 'assistant', {
 ## DefaultLoadingOverlay
 
 A frosted-glass pill that renders while the canvas initialises. Pass it as the `loadingOverlay` slot or display it before hydration.
-
-<LoadingOverlayDemo client:load />
 
 **Usage:**
 

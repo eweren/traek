@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useSyncExternalStore } from 'react';
+import { useEffect, useRef, useSyncExternalStore } from 'react';
 import type { TraekEngine } from '@traek/core';
 import { ConversationStore } from './ConversationStore.js';
 import type { ConversationStoreOptions, ConversationStoreState } from './ConversationStore.js';

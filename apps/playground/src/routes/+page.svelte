@@ -216,8 +216,8 @@
 				<div class="demo-canvas" class:paused={prefersReducedMotion}>
 					<!-- Dot grid background -->
 					<svg class="demo-grid" viewBox="0 0 480 360" aria-hidden="true">
-						{#each Array(12) as _, row}
-							{#each Array(16) as _, col}
+						{#each Array(12) as _, row (row + _)}
+							{#each Array(16) as _, col (col + _)}
 								<circle cx={col * 32 + 8} cy={row * 32 + 8} r="1" fill="rgba(255,255,255,0.06)" />
 							{/each}
 						{/each}
@@ -768,7 +768,7 @@
 		<h2 class="section-title">What developers are saying.</h2>
 
 		<div class="testimonial-grid">
-			{#each testimonials as t}
+			{#each testimonials as t, i (i)}
 				<blockquote class="testimonial-card">
 					<p class="testimonial-quote">"{t.quote}"</p>
 					<footer class="testimonial-author">

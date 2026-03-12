@@ -1,4 +1,4 @@
-import type { WhitelabelConfig, TokenOverrides } from './types';
+import type { WhitelabelConfig } from './types';
 import { WhitelabelConfigSchema } from './types';
 
 // ---------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-import { computed, inject, provide, type InjectionKey } from 'vue';
+import { inject, provide, type InjectionKey } from 'vue';
 import type { TraekTranslations, PartialTraekTranslations } from './types.js';
 import { DEFAULT_TRANSLATIONS } from './defaults.js';
 

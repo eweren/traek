@@ -26,6 +26,7 @@
 		"build": "svelte-kit sync && svelte-package && publint",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"lint": "prettier --check . && eslint .",
+		"lint:fix": "prettier --write . && eslint . --fix",
 		"clean": "rm -rf node_modules dist .svelte-kit coverage build .turbo",
 		"format": "prettier --write . && eslint . --fix",
 		"test:unit": "vitest run",

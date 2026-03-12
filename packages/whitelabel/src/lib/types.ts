@@ -1,11 +1,10 @@
 import { z } from 'zod';
-import type { TraekTheme, TraekThemeColors } from '@traek/svelte';
 
 // ---------------------------------------------------------------------------
 // Deep-partial helper
 // ---------------------------------------------------------------------------
 
-type DeepPartial<T> = {
+export type DeepPartial<T> = {
 	[K in keyof T]?: T[K] extends object ? DeepPartial<T[K]> : T[K];
 };
 

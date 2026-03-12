@@ -47,7 +47,6 @@ export interface MessageNode extends Node {
  * `React.ComponentType<any>`, etc.
  */
 export type CustomTraekNode = Node & {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	component: unknown;
 	props?: Record<string, unknown>;
 };

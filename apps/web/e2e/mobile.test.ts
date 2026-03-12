@@ -51,8 +51,6 @@ test.describe('Mobile touch gestures', () => {
 		const centerY = box.y + box.height / 2;
 
 		const zoomDisplay = page.getByRole('button', { name: 'Reset zoom to 100%' });
-		const before = await zoomDisplay.textContent();
-		const beforeNum = parseInt(before?.replace('%', '') ?? '100', 10);
 
 		// Simulate pinch-to-zoom: two touch points moving apart (zoom in)
 		await page.touchscreen.tap(centerX, centerY);
@@ -122,7 +120,6 @@ test.describe('Mobile touch gestures', () => {
 		const centerY = box.y + box.height / 2;
 
 		const canvasSpace = page.locator('.canvas-space');
-		const transformBefore = await canvasSpace.evaluate((el) => el.style.transform);
 
 		// Single-finger drag (pan)
 		await page.touchscreen.tap(centerX, centerY);

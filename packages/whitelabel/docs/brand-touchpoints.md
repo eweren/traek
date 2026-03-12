@@ -8,17 +8,17 @@
 
 ## Summary
 
-| Category | Touchpoints | Removable via | Effort |
-|----------|-------------|---------------|--------|
-| Visual — accent color | ~12 tokens | `brandColors.accent` | Low |
-| Visual — loading screen | 1 component | `loadingScreen` config | Low |
-| Visual — canvas dot pattern | 1 token | `tokenOverrides` | Low |
-| Text — loading message | 1 string | `brand.loadingText` | Low |
-| Text — aria-labels / i18n | Multiple strings | `WhitelabelI18n` (v2) | Medium |
-| Text — console attribution | 1 log statement | Build flag (v2) | Medium |
-| Document — favicon | `<link>` tag | `brand.faviconUrl` | Low |
-| Document — page title | `<title>` tag | `brand.pageTitle` | Low |
-| Font — Space Grotesk / Space Mono | 2 families | `typography` config | Medium |
+| Category                          | Touchpoints      | Removable via          | Effort |
+| --------------------------------- | ---------------- | ---------------------- | ------ |
+| Visual — accent color             | ~12 tokens       | `brandColors.accent`   | Low    |
+| Visual — loading screen           | 1 component      | `loadingScreen` config | Low    |
+| Visual — canvas dot pattern       | 1 token          | `tokenOverrides`       | Low    |
+| Text — loading message            | 1 string         | `brand.loadingText`    | Low    |
+| Text — aria-labels / i18n         | Multiple strings | `WhitelabelI18n` (v2)  | Medium |
+| Text — console attribution        | 1 log statement  | Build flag (v2)        | Medium |
+| Document — favicon                | `<link>` tag     | `brand.faviconUrl`     | Low    |
+| Document — page title             | `<title>` tag    | `brand.pageTitle`      | Low    |
+| Font — Space Grotesk / Space Mono | 2 families       | `typography` config    | Medium |
 
 ---
 
@@ -28,20 +28,20 @@
 
 The Træk brand color appears in these CSS custom properties:
 
-| Token | Where used | Scope |
-|-------|-----------|-------|
-| `--traek-node-active-border` | Active node selection ring | Canvas |
-| `--traek-node-active-glow` | Active node outer glow | Canvas |
-| `--traek-node-user-border-top` | Top border on user message nodes | Node |
-| `--traek-connection-highlight` | Hovered connection line | Canvas |
-| `--traek-input-button-bg` | Send button background | Input |
-| `--traek-input-dot` | Status indicator in input area | Input |
-| `--traek-thought-panel-border-active` | Active thought panel border | Thought |
-| `--traek-thought-panel-glow` | Thought panel glow effect | Thought |
-| `--traek-thought-tag-cyan` | Cyan category tags | Thought |
-| `--traek-thought-badge-cyan` | Cyan badges | Thought |
-| `--traek-overlay-pill-bg` | Loading dot + CTA pills | Overlay |
-| `--traek-overlay-pill-shadow` | Loading dot glow | Overlay |
+| Token                                 | Where used                       | Scope   |
+| ------------------------------------- | -------------------------------- | ------- |
+| `--traek-node-active-border`          | Active node selection ring       | Canvas  |
+| `--traek-node-active-glow`            | Active node outer glow           | Canvas  |
+| `--traek-node-user-border-top`        | Top border on user message nodes | Node    |
+| `--traek-connection-highlight`        | Hovered connection line          | Canvas  |
+| `--traek-input-button-bg`             | Send button background           | Input   |
+| `--traek-input-dot`                   | Status indicator in input area   | Input   |
+| `--traek-thought-panel-border-active` | Active thought panel border      | Thought |
+| `--traek-thought-panel-glow`          | Thought panel glow effect        | Thought |
+| `--traek-thought-tag-cyan`            | Cyan category tags               | Thought |
+| `--traek-thought-badge-cyan`          | Cyan badges                      | Thought |
+| `--traek-overlay-pill-bg`             | Loading dot + CTA pills          | Overlay |
+| `--traek-overlay-pill-shadow`         | Loading dot glow                 | Overlay |
 
 **Replacement:** Set `brandColors.accent` in `WhitelabelConfig`. All 12 tokens are updated automatically with correct alpha variants.
 
@@ -49,20 +49,20 @@ The Træk brand color appears in these CSS custom properties:
 
 Used for:
 
-| Token | Where used |
-|-------|-----------|
+| Token                               | Where used                            |
+| ----------------------------------- | ------------------------------------- |
 | `--traek-node-assistant-border-top` | Top border on assistant message nodes |
-| `--traek-typing-cursor` | Blinking cursor during streaming |
-| `--traek-thought-tag-orange` | Orange category tags |
+| `--traek-typing-cursor`             | Blinking cursor during streaming      |
+| `--traek-thought-tag-orange`        | Orange category tags                  |
 
 **Replacement:** Set `brandColors.assistantAccent` or `tokenOverrides['traek-node-assistant-border-top']`.
 
 ### Canvas Dot Grid
 
-| Token | Default | Notes |
-|-------|---------|-------|
-| `--traek-canvas-bg` | `#0b0b0b` | Canvas background |
-| `--traek-canvas-dot` | `#333333` | Dot grid color |
+| Token                | Default   | Notes             |
+| -------------------- | --------- | ----------------- |
+| `--traek-canvas-bg`  | `#0b0b0b` | Canvas background |
+| `--traek-canvas-dot` | `#333333` | Dot grid color    |
 
 To remove the dot pattern entirely, set `--traek-canvas-dot` to the same value as `--traek-canvas-bg`.
 
@@ -73,29 +73,32 @@ To remove the dot pattern entirely, set `--traek-canvas-dot` to the same value a
 **Component:** `DefaultLoadingOverlay` (exported from `@traek/svelte`)
 
 **Current content:**
+
 - Blurred radial gradient background using `--traek-overlay-*` tokens
 - A pill badge with animated cyan dot and text "Preparing canvas…"
 
 **Branding elements:**
+
 - Cyan dot color (`--traek-overlay-pill-bg` = `#00d8ff`)
 - Text string: hardcoded via i18n key `loading.preparingCanvas`
 
 **Replacement options:**
 
-| Option | How |
-|--------|-----|
-| Change text only | `brand.loadingText` in config |
+| Option                 | How                                                                         |
+| ---------------------- | --------------------------------------------------------------------------- |
+| Change text only       | `brand.loadingText` in config                                               |
 | Replace entire overlay | Pass a custom component to `TraekCanvas` via the `loadingOverlay` slot/prop |
-| Use `MinimalLoading` | Same appearance, fully token-driven |
-| Use `BrandedLoading` | Logo + text, customizable |
-| Use `SplashLoading` | Full-screen, for app-level loading |
-| Disable loading screen | `loadingScreen.variant = 'none'` |
+| Use `MinimalLoading`   | Same appearance, fully token-driven                                         |
+| Use `BrandedLoading`   | Logo + text, customizable                                                   |
+| Use `SplashLoading`    | Full-screen, for app-level loading                                          |
+| Disable loading screen | `loadingScreen.variant = 'none'`                                            |
 
 ---
 
 ## 3. Typography
 
 **Current fonts:**
+
 - Primary: `'Space Grotesk', sans-serif` — set via `--traek-font-family`
 - Monospace: `'Space Mono', monospace` — set via `--traek-font-mono` (code blocks)
 
@@ -105,11 +108,11 @@ These fonts are loaded by the consuming application's CSS, not by `@traek/svelte
 
 ```ts
 applyWhitelabel({
-  typography: {
-    fontFamily: "'Inter', sans-serif",
-    fontMono: "'JetBrains Mono', monospace",
-  }
-})
+	typography: {
+		fontFamily: "'Inter', sans-serif",
+		fontMono: "'JetBrains Mono', monospace"
+	}
+});
 ```
 
 The consuming app must load the chosen fonts (via Google Fonts, Fontaine, etc.).
@@ -129,12 +132,12 @@ Træk does not control the page title. Use `brand.pageTitle` to store a brand pr
 ```svelte
 <!-- src/routes/+layout.svelte -->
 <script>
-  import { page } from '$app/stores'
-  const brandTitle = document.documentElement.dataset.traekBrandTitle ?? 'Træk'
+	import { page } from '$app/stores';
+	const brandTitle = document.documentElement.dataset.traekBrandTitle ?? 'Træk';
 </script>
 
 <svelte:head>
-  <title>{brandTitle} — {$page.data.title ?? 'Canvas'}</title>
+	<title>{brandTitle} — {$page.data.title ?? 'Canvas'}</title>
 </svelte:head>
 ```
 
@@ -144,13 +147,13 @@ Træk does not control the page title. Use `brand.pageTitle` to store a brand pr
 
 Internal text strings are currently set in `packages/svelte/src/lib/i18n/`. These include:
 
-| Key | Default text | Location |
-|-----|-------------|---------|
-| `loading.preparingCanvas` | "Preparing canvas…" | `DefaultLoadingOverlay` |
-| `toolbar.*` | Various toolbar labels | `NodeToolbar` |
-| `input.placeholder` | "Ask anything…" | Input component |
-| `search.*` | Search UI strings | Search overlay |
-| `empty.*` | Empty state messages | Canvas |
+| Key                       | Default text           | Location                |
+| ------------------------- | ---------------------- | ----------------------- |
+| `loading.preparingCanvas` | "Preparing canvas…"    | `DefaultLoadingOverlay` |
+| `toolbar.*`               | Various toolbar labels | `NodeToolbar`           |
+| `input.placeholder`       | "Ask anything…"        | Input component         |
+| `search.*`                | Search UI strings      | Search overlay          |
+| `empty.*`                 | Empty state messages   | Canvas                  |
 
 **v1:** Override the loading text via `brand.loadingText`. All other strings use the i18n system.
 
@@ -162,13 +165,13 @@ Internal text strings are currently set in `packages/svelte/src/lib/i18n/`. Thes
 
 These elements are intentionally not overridable in the first release:
 
-| Element | Reason | Planned for |
-|---------|--------|-------------|
-| All i18n strings | String override API needs design | v2 |
-| Console attribution log | Minor effort; low priority | v2 |
-| Node toolbar icon set | Requires icon injection system | v2 |
-| Connection line style (bezier vs straight) | Separate config option | v2 |
-| Node border radius | Currently in `ThemeRadius`, needs CSS var plumbing | v2 |
+| Element                                    | Reason                                             | Planned for |
+| ------------------------------------------ | -------------------------------------------------- | ----------- |
+| All i18n strings                           | String override API needs design                   | v2          |
+| Console attribution log                    | Minor effort; low priority                         | v2          |
+| Node toolbar icon set                      | Requires icon injection system                     | v2          |
+| Connection line style (bezier vs straight) | Separate config option                             | v2          |
+| Node border radius                         | Currently in `ThemeRadius`, needs CSS var plumbing | v2          |
 
 ---
 

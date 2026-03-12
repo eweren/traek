@@ -9,6 +9,7 @@
 		"deploy": "wrangler deploy",
 		"build": "tsc --noEmit",
 		"lint": "eslint src",
+		"lint:fix": "eslint src --fix",
 		"db:migrate": "wrangler d1 migrations apply traek-db",
 		"db:migrate:local": "wrangler d1 migrations apply traek-db --local"
 	},
@@ -17,7 +18,15 @@
 	},
 	"devDependencies": {
 		"@cloudflare/workers-types": "^4.20250525.0",
+		"@eslint/compat": "^2.0.2",
+		"@eslint/js": "^9.39.2",
+		"@types/react": "^18.3.0",
+		"@types/react-dom": "^18.3.0",
 		"typescript": "^5.9.3",
-		"wrangler": "^4.20.5"
+		"wrangler": "^4.20.5",
+		"eslint": "^9.39.2",
+		"eslint-config-prettier": "^10.1.8",
+		"globals": "^17.3.0",
+		"typescript-eslint": "^8.56.0"
 	}
 }
