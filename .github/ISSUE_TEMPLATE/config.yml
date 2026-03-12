@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: GitHub Discussions (Q&A)
+    url: https://github.com/gettraek/traek/discussions/categories/q-a
+    about: Ask a question about using træk
+  - name: GitHub Discussions (Ideas)
+    url: https://github.com/gettraek/traek/discussions/categories/ideas
+    about: Discuss a feature idea before opening a formal request
+  - name: Discord Community
+    url: https://discord.gg/traek
+    about: Real-time help and community chat

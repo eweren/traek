@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240" width="320" height="240" role="img" aria-labelledby="ec-title ec-desc">
+  <title id="ec-title">Empty canvas</title>
+  <desc id="ec-desc">An empty Traek canvas with a placeholder node and branching connection stubs suggesting potential conversations</desc>
+  <defs>
+    <pattern id="ec-grid" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="1" class="dot"/>
+    </pattern>
+    <radialGradient id="ec-vignette" cx="50%" cy="50%" r="65%">
+      <stop offset="0%" stop-color="transparent"/>
+      <stop offset="100%" stop-color="#000" stop-opacity="0.45"/>
+    </radialGradient>
+    <style>
+      .bg   { fill: #0b0b0b; }
+      .dot  { fill: #333; }
+      .stub { stroke: #2a2a2a; stroke-dasharray: 5 4; stroke-width: 1.5; fill: none; stroke-linecap: round; }
+      .stub-end { fill: #2a2a2a; }
+      .node { fill: #161616; stroke: #2a2a2a; stroke-width: 1; rx: 6; }
+      .node-ghost { fill: none; stroke: #2a2a2a; stroke-width: 1; stroke-dasharray: 5 3; }
+      .line-1 { fill: #333; }
+      .line-2 { fill: #2c2c2c; }
+      .cursor { fill: #00d8ff; }
+      .vignette { fill: url(#ec-vignette); }
+
+      @media (prefers-color-scheme: light) {
+        .bg   { fill: #f0f0f0; }
+        .dot  { fill: #c8c8c8; }
+        .stub { stroke: #d0d0d0; }
+        .stub-end { fill: #ccc; }
+        .node { fill: #fff; stroke: #d4d4d4; }
+        .node-ghost { stroke: #d0d0d0; }
+        .line-1 { fill: #e0e0e0; }
+        .line-2 { fill: #e8e8e8; }
+        .cursor { fill: #0099cc; }
+        .vignette { fill: none; }
+      }
+    </style>
+  </defs>
+
+  <!-- Canvas background -->
+  <rect width="320" height="240" class="bg"/>
+  <rect width="320" height="240" fill="url(#ec-grid)" opacity="0.6"/>
+
+  <!-- Branching stubs — cardinal directions from node center (160, 120) -->
+  <!-- Up stub -->
+  <line x1="160" y1="89" x2="160" y2="56" class="stub"/>
+  <circle cx="160" cy="54" r="2.5" class="stub-end" opacity="0.4"/>
+
+  <!-- Down stub -->
+  <line x1="160" y1="151" x2="160" y2="184" class="stub"/>
+  <circle cx="160" cy="186" r="2.5" class="stub-end" opacity="0.4"/>
+
+  <!-- Left stub -->
+  <line x1="95" y1="120" x2="62" y2="120" class="stub"/>
+  <circle cx="60" cy="120" r="2.5" class="stub-end" opacity="0.4"/>
+
+  <!-- Right stub -->
+  <line x1="225" y1="120" x2="258" y2="120" class="stub"/>
+  <circle cx="260" cy="120" r="2.5" class="stub-end" opacity="0.4"/>
+
+  <!-- Central ghost node: 130×62 centered at 160,120 → rect at (95,89) -->
+  <rect x="95" y="89" width="130" height="62" rx="6" class="node-ghost"/>
+
+  <!-- Placeholder text lines inside node -->
+  <rect x="112" y="106" width="55" height="3.5" rx="1.75" class="line-1" opacity="0.5"/>
+  <rect x="112" y="115" width="84" height="3.5" rx="1.75" class="line-2" opacity="0.35"/>
+  <rect x="112" y="124" width="40" height="3.5" rx="1.75" class="line-2" opacity="0.25"/>
+
+  <!-- Blinking cursor at end of first line -->
+  <rect x="170" y="104" width="1.5" height="7" rx="0.75" class="cursor" opacity="0.8"/>
+
+  <!-- Subtle vignette -->
+  <rect width="320" height="240" class="vignette"/>
+</svg>

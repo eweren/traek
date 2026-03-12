@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240" width="320" height="240" role="img" aria-labelledby="cs-title cs-desc">
+  <title id="cs-title">Start your first conversation</title>
+  <desc id="cs-desc">An empty Traek canvas with a single ready node highlighted in cyan, inviting the user to start their first conversation</desc>
+  <defs>
+    <pattern id="cs-grid" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="1" class="dot"/>
+    </pattern>
+    <filter id="cs-glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    <filter id="cs-node-glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="8" result="gblur"/>
+      <feFlood flood-color="#00d8ff" flood-opacity="0.18" result="color"/>
+      <feComposite in="color" in2="gblur" operator="in" result="glow"/>
+      <feComposite in="SourceGraphic" in2="glow" operator="over"/>
+    </filter>
+    <radialGradient id="cs-vignette" cx="50%" cy="50%" r="65%">
+      <stop offset="0%" stop-color="transparent"/>
+      <stop offset="100%" stop-color="#000" stop-opacity="0.5"/>
+    </radialGradient>
+    <style>
+      .bg        { fill: #0b0b0b; }
+      .dot       { fill: #2a2a2a; }
+      .node-bg   { fill: #161616; stroke: #2a2a2a; stroke-width: 1; }
+      .node-rim  { fill: none; stroke: #00d8ff; stroke-width: 1.5; }
+      .top-bar   { fill: #00d8ff; }
+      .line-a    { fill: #333; }
+      .line-b    { fill: #2a2a2a; }
+      .cursor    { fill: #00d8ff; }
+      .stub      { stroke: #2a2a2a; stroke-dasharray: 5 4; stroke-width: 1.5; fill: none; stroke-linecap: round; }
+      .stub-end  { fill: #1e1e1e; stroke: #2a2a2a; stroke-width: 1; }
+      .glow-ring { fill: none; stroke: #00d8ff; stroke-width: 1; opacity: 0.12; }
+      .vignette  { fill: url(#cs-vignette); }
+
+      @media (prefers-color-scheme: light) {
+        .bg        { fill: #f0f0f0; }
+        .dot       { fill: #c8c8c8; }
+        .node-bg   { fill: #fff; stroke: #d0d0d0; }
+        .node-rim  { stroke: #0099cc; }
+        .top-bar   { fill: #0099cc; }
+        .line-a    { fill: #e0e0e0; }
+        .line-b    { fill: #e8e8e8; }
+        .cursor    { fill: #0099cc; }
+        .stub      { stroke: #d0d0d0; }
+        .stub-end  { fill: #f5f5f5; stroke: #ccc; }
+        .glow-ring { stroke: #0099cc; }
+        .vignette  { fill: none; }
+      }
+    </style>
+  </defs>
+
+  <!-- Canvas background -->
+  <rect width="320" height="240" class="bg"/>
+  <rect width="320" height="240" fill="url(#cs-grid)" opacity="0.55"/>
+
+  <!-- Ambient glow rings around central node -->
+  <rect x="78" y="72" width="164" height="96" rx="14" class="glow-ring"/>
+  <rect x="64" y="58" width="192" height="124" rx="20" class="glow-ring" opacity="0.07"/>
+
+  <!-- Connection stub — going right to ghost response area -->
+  <line x1="225" y1="120" x2="272" y2="120" class="stub"/>
+  <!-- Ghost child node stub endpoint -->
+  <rect x="273" y="110" width="26" height="20" rx="3" class="stub-end"/>
+
+  <!-- Central active node: 130×64 centered at (160,120) → (95,88) -->
+  <rect x="95" y="88" width="130" height="64" rx="6" class="node-bg"/>
+  <!-- Cyan top accent bar -->
+  <rect x="95" y="88" width="130" height="3" rx="2" class="top-bar"/>
+  <!-- Active border rim -->
+  <rect x="95" y="88" width="130" height="64" rx="6" class="node-rim" fill="none"/>
+
+  <!-- Content lines -->
+  <rect x="112" y="104" width="48" height="3.5" rx="1.75" class="line-a" opacity="0.6"/>
+  <rect x="112" y="113" width="76" height="3.5" rx="1.75" class="line-b" opacity="0.4"/>
+  <rect x="112" y="122" width="34" height="3.5" rx="1.75" class="line-b" opacity="0.3"/>
+
+  <!-- Cursor after first line (blinking cursor indicator) -->
+  <rect x="163" y="102" width="1.5" height="7" rx="0.75" class="cursor"/>
+
+  <!-- Subtle vignette -->
+  <rect width="320" height="240" class="vignette"/>
+</svg>

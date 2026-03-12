@@ -1,30 +1,75 @@
 ---
-title: Installation
-description: How to install and set up Træk in your project.
+title: Install Træk — AI Chat UI for React, Svelte & Vue
+description: >-
+  Install the Træk AI chat UI library. npm packages for React 18+, Svelte 5,
+  Vue 3, and vanilla TypeScript. Get a branching, spatial conversation canvas
+  running in minutes.
+head:
+  - tag: link
+    attrs:
+      rel: canonical
+      href: https://gettraek.com/getting-started/installation/
 ---
 
 # Installation
 
 ## Requirements
 
-- Svelte 5 or later
-- SvelteKit 2 or later (recommended)
 - Node.js 20+
+- A package manager: npm, pnpm, or yarn
 
-## Install
+## Choose Your Package
 
-```bash
-npm install traek
-# or
-pnpm add traek
-# or
-yarn add traek
-```
+Install only the package for your framework:
 
-## Peer Dependencies
-
-Træk requires Svelte 5 as a peer dependency:
+### Svelte 5
 
 ```bash
-npm install svelte@^5
+npm install @traek/svelte
+# or
+pnpm add @traek/svelte
 ```
+
+Peer dependency: `svelte@^5`
+
+### React 18+
+
+```bash
+npm install @traek/react
+# or
+pnpm add @traek/react
+```
+
+Peer dependencies: `react@^18`, `react-dom@^18`
+
+### Vue 3
+
+```bash
+npm install @traek/vue
+# or
+pnpm add @traek/vue
+```
+
+Peer dependency: `vue@^3.4`
+
+### Vanilla TypeScript / JavaScript (headless core only)
+
+```bash
+npm install @traek/core
+# or
+pnpm add @traek/core
+```
+
+`@traek/core` has no framework or browser dependencies. All framework packages re-export everything from `@traek/core`, so you never need to install both.
+
+## CSS
+
+Import the base stylesheet once at the root of your app:
+
+```ts
+import '@traek/svelte/dist/traek.css'   // Svelte
+import '@traek/react/dist/traek.css'    // React
+import '@traek/vue/dist/traek.css'      // Vue
+```
+
+> **Note:** The canvas relies on a handful of `--traek-*` CSS custom properties. Override them on `:root` to customise the theme.

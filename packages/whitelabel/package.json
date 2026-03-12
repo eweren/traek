@@ -1,0 +1,54 @@
+{
+	"name": "@traek/whitelabel",
+	"version": "0.1.0",
+	"description": "White-label theming kit for @traek/svelte — brand customization, token overrides, and loading screen templates",
+	"license": "SEE LICENSE IN LICENSE",
+	"type": "module",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js"
+		}
+	},
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"files": [
+		"dist"
+	],
+	"scripts": {
+		"build": "svelte-package",
+		"check": "svelte-check --tsconfig ./tsconfig.json",
+		"lint": "prettier --check . && eslint .",
+		"lint:fix": "prettier --write . && eslint . --fix"
+	},
+	"peerDependencies": {
+		"@traek/svelte": ">=0.0.4",
+		"svelte": ">=5.0.0"
+	},
+	"devDependencies": {
+		"@eslint/compat": "^2.0.2",
+		"@eslint/js": "^9.39.2",
+		"@sveltejs/package": "^2.0.0",
+		"@traek/svelte": "workspace:*",
+		"eslint": "^9.39.2",
+		"eslint-config-prettier": "^10.1.8",
+		"eslint-plugin-svelte": "^3.14.0",
+		"globals": "^17.3.0",
+		"prettier": "^3.8.1",
+		"svelte": "^5.0.0",
+		"svelte-check": "^4.0.0",
+		"typescript": "^5.0.0",
+		"typescript-eslint": "^8.56.0"
+	},
+	"dependencies": {
+		"zod": "^3.22.0"
+	},
+	"keywords": [
+		"traek",
+		"svelte",
+		"white-label",
+		"theming",
+		"design-system",
+		"enterprise"
+	]
+}

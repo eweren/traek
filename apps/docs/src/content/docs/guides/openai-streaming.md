@@ -1,6 +1,14 @@
 ---
-title: OpenAI Streaming
-description: Real-time streaming with OpenAI and Træk.
+title: OpenAI Streaming Chat UI — React, Svelte & Vue | Træk
+description: >-
+  Build a real-time streaming OpenAI chat interface with Træk. Renders token
+  streams in a branching, spatial canvas. Full code examples for React 18+,
+  Svelte 5, and Vue 3.
+head:
+  - tag: link
+    attrs:
+      rel: canonical
+      href: https://gettraek.com/guides/openai-streaming/
 ---
 
 # OpenAI Streaming

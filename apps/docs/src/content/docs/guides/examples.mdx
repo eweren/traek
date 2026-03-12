@@ -1,0 +1,176 @@
+---
+title: Interactive Examples
+description: Live, runnable Træk demos for Svelte, React, and Vue — all running in the browser.
+---
+
+import SvelteDemo from '../../../components/demos/SvelteDemo.svelte';
+import ReactDemo from '../../../components/demos/ReactDemo.tsx';
+import VueDemo from '../../../components/demos/VueDemo.vue';
+
+# Interactive Examples
+
+All demos run **entirely in the browser** — no backend required. Type a message and hit Enter (or click Send) to see real-time streaming in action.
+
+---
+
+## Svelte 5
+
+The full `@traek/svelte` canvas with pan/zoom, branching, and mock streaming.
+
+<SvelteDemo client:load />
+
+**Try it:**
+
+- Type a message and send it
+- Click any node, then type another message to branch
+- Pinch or scroll to zoom; drag the canvas to pan
+
+**Source:**
+
+```svelte
+<script lang="ts">
+	import { TraekCanvas, TraekEngine, type MessageNode } from '@traek/svelte';
+
+	const engine = new TraekEngine();
+	engine.addNode('Hello! How can I help?', 'assistant', { type: 'text' });
+
+	async function handleSend(content: string, userNode: MessageNode) {
+		const assistant = engine.addNode('', 'assistant', {
+			type: 'text',
+			parentIds: [userNode.id],
+			status: 'streaming'
+		});
+
+		// Stream reply chunk by chunk
+		const reply = `You said: "${content}". Stream your real AI response here.`;
+		for (const char of reply) {
+			await delay(20);
+			engine.appendToNode(assistant.id, char);
+		}
+		engine.updateNode(assistant.id, { status: 'done' });
+	}
+</script>
+
+<TraekCanvas {engine} onSendMessage={handleSend} />
+```
+
+---
+
+## React 18
+
+`@traek/react` with the same spatial canvas, powered by `@traek/core` state.
+
+<ReactDemo client:load />
+
+**Source:**
+
+```tsx
+import { TraekCanvas, useCreateTraekEngine } from '@traek/react';
+import type { Node } from '@traek/core';
+
+export default function App() {
+	const engine = useCreateTraekEngine(() => {
+		engine.addNode('Hello from React!', 'assistant', { type: 'text' });
+	});
+
+	async function handleSend(content: string, userNode: Node) {
+		const assistant = engine.addNode('', 'assistant', {
+			parentIds: [userNode.id],
+			status: 'streaming'
+		});
+
+		const reply = `You said: "${content}".`;
+		for (let i = 0; i < reply.length; i++) {
+			await delay(18);
+			engine.updateNode(assistant.id, { content: reply.slice(0, i + 1) });
+		}
+		engine.updateNode(assistant.id, { status: 'done' });
+	}
+
+	return <TraekCanvas engine={engine} onSendMessage={handleSend} />;
+}
+```
+
+---
+
+## Vue 3
+
+`@traek/vue` adapter with composables.
+
+<VueDemo client:load />
+
+**Source:**
+
+```vue
+<script setup lang="ts">
+import { TraekCanvas, useCreateTraekEngine } from '@traek/vue';
+
+const engine = useCreateTraekEngine();
+engine.addNode('Hello from Vue!', 'assistant', { type: 'text' });
+
+async function handleSend(content: string, userNode: any) {
+	const assistant = engine.addNode('', 'assistant', {
+		parentIds: [userNode.id],
+		status: 'streaming'
+	});
+
+	const reply = `You said: "${content}".`;
+	for (const char of reply) {
+		await delay(18);
+		engine.appendToNode(assistant.id, char);
+	}
+	engine.updateNode(assistant.id, { status: 'done' });
+}
+</script>
+
+<template>
+	<TraekCanvas :engine="engine" :on-send-message="handleSend" />
+</template>
+```
+
+---
+
+## Connect to a Real AI
+
+Replace the mock streaming with a real backend call:
+
+```ts
+async function handleSend(content: string, userNode: MessageNode) {
+	const assistant = engine.addNode('', 'assistant', {
+		parentIds: [userNode.id],
+		status: 'streaming'
+	});
+
+	const res = await fetch('/api/chat', {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({
+			messages: engine.contextPath.map((n) => ({ role: n.role, content: n.content }))
+		})
+	});
+
+	const reader = res.body!.getReader();
+	const decoder = new TextDecoder();
+	let done = false;
+	while (!done) {
+		const { value, done: d } = await reader.read();
+		done = d;
+		if (value) engine.appendToNode(assistant.id, decoder.decode(value));
+	}
+	engine.updateNode(assistant.id, { status: 'done' });
+}
+```
+
+See the [OpenAI Streaming guide](/guides/openai-streaming) for the full API route implementation.
+
+---
+
+## Next Steps
+
+| Guide                                                            | Description                                 |
+| ---------------------------------------------------------------- | ------------------------------------------- |
+| [Migration from Linear Chat](/guides/migration-from-linear-chat) | Replace an existing chat UI step-by-step    |
+| [Advanced Theming](/guides/advanced-theming)                     | Customise colors, CSS variables, and themes |
+| [Plugin Development](/guides/plugin-development)                 | Build custom node types and toolbar actions |
+| [SvelteKit](/guides/sveltekit)                                   | SSR setup and streaming API routes          |
+| [OpenAI Streaming](/guides/openai-streaming)                     | Integrate OpenAI real-time streaming        |

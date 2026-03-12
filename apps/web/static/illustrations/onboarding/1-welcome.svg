@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240" width="320" height="240" role="img" aria-labelledby="ob1-title ob1-desc">
+  <title id="ob1-title">Welcome to Træk</title>
+  <desc id="ob1-desc">The Træk logomark on a dark canvas with floating nodes suggesting the spatial conversation interface</desc>
+  <defs>
+    <pattern id="ob1-grid" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="1" class="dot"/>
+    </pattern>
+    <radialGradient id="ob1-center-glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#00d8ff" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+    <radialGradient id="ob1-vignette" cx="50%" cy="50%" r="65%">
+      <stop offset="0%" stop-color="transparent"/>
+      <stop offset="100%" stop-color="#000" stop-opacity="0.55"/>
+    </radialGradient>
+    <style>
+      .bg         { fill: #0b0b0b; }
+      .dot        { fill: #2c2c2c; }
+      .glow       { fill: url(#ob1-center-glow); }
+      .mark       { fill: #e8e8e8; }
+      .mark-cyan  { fill: #00d8ff; }
+      .node-float { fill: #161616; stroke: #2a2a2a; stroke-width: 1; }
+      .node-cyan  { stroke: #00d8ff; stroke-width: 1; fill: #161616; }
+      .node-ora   { stroke: #ff3e00; stroke-width: 1; fill: #161616; }
+      .bar-cyan   { fill: #00d8ff; }
+      .bar-ora    { fill: #ff3e00; }
+      .line-a     { fill: #333; }
+      .conn       { stroke: #2a2a2a; stroke-width: 1.5; fill: none; stroke-linecap: round; }
+      .vignette   { fill: url(#ob1-vignette); }
+
+      @media (prefers-color-scheme: light) {
+        .bg         { fill: #f0f0f0; }
+        .dot        { fill: #c8c8c8; }
+        .glow       { fill: none; }
+        .mark       { fill: #1a1a1a; }
+        .mark-cyan  { fill: #0099cc; }
+        .node-float { fill: #fff; stroke: #d4d4d4; }
+        .node-cyan  { stroke: #0099cc; fill: #fff; }
+        .node-ora   { stroke: #e03a00; fill: #fff; }
+        .bar-cyan   { fill: #0099cc; }
+        .bar-ora    { fill: #e03a00; }
+        .line-a     { fill: #e0e0e0; }
+        .conn       { stroke: #d0d0d0; }
+        .vignette   { fill: none; }
+      }
+    </style>
+  </defs>
+
+  <!-- Canvas background -->
+  <rect width="320" height="240" class="bg"/>
+  <rect width="320" height="240" fill="url(#ob1-grid)" opacity="0.55"/>
+  <!-- Central ambient glow -->
+  <rect width="320" height="240" class="glow"/>
+
+  <!-- Floating nodes — background context -->
+  <!-- Top-left node -->
+  <rect x="22" y="32" width="80" height="40" rx="4" class="node-float" opacity="0.6"/>
+  <rect x="22" y="32" width="80" height="2.5" rx="1.25" class="bar-cyan" opacity="0.5"/>
+  <rect x="32" y="42" width="36" height="3" rx="1.5" class="line-a" opacity="0.4"/>
+  <rect x="32" y="50" width="54" height="3" rx="1.5" class="line-a" opacity="0.3"/>
+
+  <!-- Bottom-right node -->
+  <rect x="218" y="168" width="80" height="40" rx="4" class="node-float" opacity="0.6"/>
+  <rect x="218" y="168" width="80" height="2.5" rx="1.25" class="bar-ora" opacity="0.5"/>
+  <rect x="228" y="178" width="44" height="3" rx="1.5" class="line-a" opacity="0.4"/>
+  <rect x="228" y="186" width="30" height="3" rx="1.5" class="line-a" opacity="0.3"/>
+
+  <!-- Top-right mini node -->
+  <rect x="252" y="42" width="48" height="30" rx="3" class="node-float" opacity="0.4"/>
+  <rect x="260" y="52" width="28" height="2.5" rx="1.25" class="line-a" opacity="0.3"/>
+  <rect x="260" y="59" width="20" height="2.5" rx="1.25" class="line-a" opacity="0.2"/>
+
+  <!-- Bottom-left mini node -->
+  <rect x="20" y="180" width="48" height="30" rx="3" class="node-float" opacity="0.4"/>
+  <rect x="28" y="190" width="28" height="2.5" rx="1.25" class="line-a" opacity="0.3"/>
+  <rect x="28" y="197" width="20" height="2.5" rx="1.25" class="line-a" opacity="0.2"/>
+
+  <!-- Subtle connection lines between nodes -->
+  <path d="M102,52 C130,64 130,108 130,120" class="conn" opacity="0.3"/>
+  <path d="M218,188 C190,178 190,138 190,120" class="conn" opacity="0.3"/>
+
+  <!-- Træk logomark — centered, approx 80×60, at (120,90) -->
+  <!-- Simplified æ letterform: "a" + "e" fused -->
+  <!-- Left a-shape: rounded rectangle forming the "a" bowl -->
+  <path d="M120,112 L120,97 C120,90.4 125.4,85 132,85 L148,85 C152.4,85 156,88.6 156,93 L156,112 L120,112 Z"
+        class="mark" opacity="0.9"/>
+  <rect x="120" y="93" width="36" height="3" rx="1.5" class="bg" opacity="0.7"/>
+
+  <!-- Right e-shape: mirrored form -->
+  <path d="M163,112 L163,97 C163,90.4 168.4,85 175,85 L191,85 C197.6,85 203,90.4 203,97 L203,112 L163,112 Z"
+        class="mark" opacity="0.9"/>
+  <rect x="163" y="97" width="40" height="3" rx="1.5" class="bg" opacity="0.7"/>
+
+  <!-- Connecting bridge / crossbar of æ -->
+  <rect x="156" y="98" width="7" height="3" rx="1.5" class="mark-cyan" opacity="0.9"/>
+
+  <!-- Stem of "k" extending right -->
+  <rect x="203" y="85" width="3" height="27" rx="1.5" class="mark" opacity="0.9"/>
+  <!-- k-arm upper -->
+  <path d="M206,98 L216,87" stroke-width="3" stroke-linecap="round" class="conn" style="stroke: #e8e8e8;" opacity="0.9"/>
+  <!-- k-arm lower -->
+  <path d="M206,101 L216,112" stroke-width="3" stroke-linecap="round" class="conn" style="stroke: #e8e8e8;" opacity="0.9"/>
+
+  <!-- Cyan accent dot beneath logomark -->
+  <circle cx="160" cy="122" r="2" class="mark-cyan" opacity="0.7"/>
+
+  <!-- Subtle vignette -->
+  <rect width="320" height="240" class="vignette"/>
+</svg>

@@ -6,9 +6,10 @@
 		TraekCanvas,
 		DefaultLoadingOverlay,
 		createDefaultRegistry
-	} from 'traek';
+	} from '@traek/svelte';
 	import { createHeroEngine } from '$lib/heroDemoEngine';
 	import GravityDotsBackground from '$lib/components/GravityDotsBackground.svelte';
+	import SiteNav from '$lib/components/SiteNav.svelte';
 	import highlightDarkUrl from 'highlight.js/styles/github-dark.css?url';
 	import highlightLightUrl from 'highlight.js/styles/github.css?url';
 	import { resolve } from '$app/paths';
@@ -23,7 +24,7 @@
 	const renderedContent = $derived(
 		markdownToHtml(
 			`\`\`\`bash
-npm install traek
+npm install @traek/svelte
 \`\`\`
 
 \`\`\`svelte
@@ -32,7 +33,7 @@ npm install traek
     TraekCanvas,
     TraekEngine,
     DEFAULT_TRACK_ENGINE_CONFIG
-  } from 'traek';
+  } from '@traek/svelte';
 
   const engine = new TraekEngine(DEFAULT_TRACK_ENGINE_CONFIG);
 
@@ -65,6 +66,7 @@ npm install traek
 	<link rel="stylesheet" href={currentTheme === 'light' ? highlightLightUrl : highlightDarkUrl} />
 </svelte:head>
 
+<SiteNav />
 <main class="landing">
 	<section class="hero">
 		<div class="hero-copy">
@@ -85,17 +87,25 @@ npm install traek
 			</div>
 
 			<div class="hero-cta-row">
-				<a href={resolve('/demo')} class="btn primary" data-umami-event="landing-cta-demo"
-					>Open interactive demo</a
+				<a
+					href={resolve('/demo/explore')}
+					class="btn primary"
+					data-umami-event="landing-cta-explore">Try it — no API key</a
 				>
 				<a
-					href="https://www.npmjs.com/package/traek"
+					href="https://www.npmjs.com/package/@traek/svelte"
 					class="btn secondary"
 					rel="noreferrer"
 					data-umami-event="landing-cta-npm"
 				>
-					npm install traek
+					npm install @traek/svelte
 				</a>
+			</div>
+
+			<div class="framework-badges" aria-label="Framework support">
+				<span class="fw-badge fw-badge--active">Svelte 5</span>
+				<span class="fw-badge fw-badge--active">React</span>
+				<span class="fw-badge">Vue <span class="fw-soon">soon</span></span>
 			</div>
 		</div>
 
@@ -221,12 +231,18 @@ npm install traek
 				conversation can be.
 			</p>
 			<div class="hero-cta-row">
-				<a href={resolve('/demo')} class="btn primary" data-umami-event="landing-cta-demo-bottom"
-					>Open interactive demo</a
+				<a
+					href={resolve('/demo/explore')}
+					class="btn primary"
+					data-umami-event="landing-cta-explore-bottom">Try it — no API key</a
+				>
+				<a href={resolve('/demo')} class="btn secondary" data-umami-event="landing-cta-demo-bottom"
+					>Full demo</a
 				>
 				<a
 					href="https://github.com/gettraek/traek"
 					class="btn tertiary"
+					rel="noreferrer"
 					data-umami-event="landing-cta-github">View source</a
 				>
 			</div>
@@ -246,7 +262,7 @@ npm install traek
 		display: flex;
 		flex-direction: column;
 		gap: 4rem;
-		padding: 3rem max(5vw, 2rem) 4rem;
+		padding: calc(52px + 2.5rem) max(5vw, 2rem) 4rem;
 		box-sizing: border-box;
 	}
 
@@ -598,6 +614,39 @@ npm install traek
 	.final-inner p {
 		margin-bottom: 1.4rem;
 		color: var(--traek-final-muted);
+	}
+
+	.framework-badges {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		align-items: center;
+		margin-top: 0.75rem;
+	}
+
+	.fw-badge {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.3rem;
+		padding: 0.25rem 0.7rem;
+		border-radius: 999px;
+		font-size: 0.75rem;
+		font-weight: 500;
+		background: rgba(255, 255, 255, 0.04);
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		color: var(--traek-landing-text-muted-2, #a5a5a5);
+	}
+
+	.fw-badge--active {
+		background: var(--traek-accent-cyan-soft, rgba(0, 216, 255, 0.08));
+		border-color: rgba(0, 216, 255, 0.22);
+		color: var(--traek-accent-cyan, #00d8ff);
+	}
+
+	.fw-soon {
+		font-size: 0.65rem;
+		opacity: 0.65;
+		font-style: italic;
 	}
 
 	@media (max-width: 900px) {

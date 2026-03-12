@@ -1,0 +1,93 @@
+---
+title: Svelte
+description: Using @traek/svelte in a Svelte 5 / SvelteKit project.
+---
+
+import SvelteDemo from '../../../components/demos/SvelteDemo.svelte';
+
+# Svelte Adapter
+
+`@traek/svelte` provides the full Træk experience for **Svelte 5** and **SvelteKit**.
+
+## Install
+
+```bash
+pnpm add @traek/svelte
+```
+
+Peer dependency: `svelte@^5`
+
+## Quick Setup
+
+```svelte
+<script>
+	import { TraekCanvas, TraekEngine } from '@traek/svelte';
+
+	const engine = new TraekEngine();
+	engine.addNode({ role: 'assistant', content: 'Hello! How can I help?' });
+
+	async function handleSend({ content, parentId }) {
+		const userNode = engine.addNode({
+			role: 'user',
+			content,
+			parentIds: parentId ? [parentId] : []
+		});
+
+		// Stream from your AI backend
+		const res = await fetch('/api/chat', {
+			method: 'POST',
+			body: JSON.stringify({
+				messages: engine.contextPath.map((n) => ({ role: n.role, content: n.content }))
+			})
+		});
+
+		const assistantNode = engine.addNode({
+			role: 'assistant',
+			content: '',
+			parentIds: [userNode.id],
+			status: 'streaming'
+		});
+
+		const reader = res.body.getReader();
+		const decoder = new TextDecoder();
+		let done = false;
+		while (!done) {
+			const { value, done: d } = await reader.read();
+			done = d;
+			if (value) {
+				engine.appendToNode(assistantNode.id, decoder.decode(value));
+			}
+		}
+		engine.updateNode(assistantNode.id, { status: 'done' });
+	}
+</script>
+
+<TraekCanvas {engine} onSendMessage={handleSend} />
+```
+
+## Live Demo
+
+<SvelteDemo client:load />
+
+## API
+
+### `TraekEngine`
+
+The Svelte adapter re-exports `TraekEngine` from `@traek/core` with Svelte 5 reactive wrappers. See [TraekEngine API](/api/traek-engine) for the full method reference.
+
+### `TraekCanvas` Props
+
+| Prop            | Type                     | Required | Description                       |
+| --------------- | ------------------------ | -------- | --------------------------------- |
+| `engine`        | `TraekEngine`            | Yes      | Engine instance                   |
+| `onSendMessage` | `(e: SendEvent) => void` | Yes      | Fired when user submits a message |
+| `components`    | `ComponentMap`           | No       | Override default node renderers   |
+| `class`         | `string`                 | No       | Additional CSS classes            |
+
+### `TextNode`
+
+Default markdown renderer. Used automatically unless you provide a custom `components` map.
+
+## SvelteKit Integration
+
+See the [SvelteKit guide](/guides/sveltekit) for SSR considerations and how to wire up a streaming API route.

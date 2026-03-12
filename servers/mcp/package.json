@@ -14,12 +14,14 @@
 		"build": "tsup src/index.ts --format esm --out-dir dist --clean",
 		"start": "node dist/index.js",
 		"lint": "prettier --check .",
+		"lint:fix": "prettier --write .",
 		"clean": "rm -rf node_modules dist .svelte-kit coverage build .turbo",
 		"format": "prettier --write .",
 		"check": "tsc --noEmit"
 	},
 	"dependencies": {
 		"@modelcontextprotocol/sdk": "^1.12.0",
+		"@traek/core": "workspace:*",
 		"zod": "^4.3.6"
 	},
 	"devDependencies": {

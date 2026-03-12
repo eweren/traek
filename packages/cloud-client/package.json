@@ -1,0 +1,59 @@
+{
+	"name": "@traek/cloud-client",
+	"version": "0.0.1",
+	"description": "Cloud persistence SDK for Træk — drop-in conversation storage for any Traek app",
+	"author": "Nico Hülscher",
+	"license": "MIT",
+	"type": "module",
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js"
+		}
+	},
+	"files": [
+		"dist",
+		"!dist/**/*.test.*",
+		"!dist/**/*.spec.*"
+	],
+	"scripts": {
+		"build": "tsc --project tsconfig.build.json",
+		"check": "tsc --noEmit",
+		"lint": "prettier --check . && eslint .",
+		"lint:fix": "prettier --write . && eslint . --fix",
+		"clean": "rm -rf node_modules dist coverage .turbo",
+		"format": "prettier --write .",
+		"test": "vitest run"
+	},
+	"dependencies": {
+		"@traek/core": "workspace:*",
+		"zod": "^4.3.6"
+	},
+	"devDependencies": {
+		"@eslint/compat": "^2.0.2",
+		"@eslint/js": "^9.39.2",
+		"@types/node": "^24",
+		"eslint": "^9.39.2",
+		"eslint-config-prettier": "^10.1.8",
+		"globals": "^17.3.0",
+		"prettier": "^3.8.1",
+		"typescript": "^5.9.3",
+		"typescript-eslint": "^8.56.0",
+		"vitest": "^4.0.18"
+	},
+	"keywords": [
+		"traek",
+		"ai",
+		"cloud",
+		"storage",
+		"persistence",
+		"conversation",
+		"sdk"
+	],
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/gettraek/traek.git"
+	}
+}

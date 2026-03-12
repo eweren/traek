@@ -197,7 +197,7 @@ export const componentDocs: Record<string, ComponentDoc> = {
 			"For streaming: add an assistant node with status: 'streaming', then update its content incrementally, then set status: 'done'."
 		],
 		example: `<script lang="ts">
-  import { TraekEngine, TraekCanvas, type MessageNode } from 'traek'
+  import { TraekEngine, TraekCanvas, type MessageNode } from '@traek/svelte'
 
   const engine = new TraekEngine()
 
@@ -538,7 +538,7 @@ export const componentDocs: Record<string, ComponentDoc> = {
 			}
 		],
 		example: `<script lang="ts">
-  import { TraekEngine, ConversationStore, TraekCanvas } from 'traek'
+  import { TraekEngine, ConversationStore, TraekCanvas } from '@traek/svelte'
 
   const engine = new TraekEngine()
   const store = new ConversationStore(engine)
@@ -591,7 +591,7 @@ export const componentDocs: Record<string, ComponentDoc> = {
 			}
 		],
 		example: `<script lang="ts">
-  import { createDefaultRegistry, TraekCanvas } from 'traek'
+  import { createDefaultRegistry, TraekCanvas } from '@traek/svelte'
   import MyCustomNode from './MyCustomNode.svelte'
 
   const registry = createDefaultRegistry()
@@ -624,7 +624,7 @@ export const componentDocs: Record<string, ComponentDoc> = {
 		],
 		example: `<!-- +layout.svelte -->
 <script lang="ts">
-  import { ThemeProvider } from 'traek'
+  import { ThemeProvider } from '@traek/svelte'
 <\/script>
 
 <ThemeProvider theme="dark">

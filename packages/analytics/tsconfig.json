@@ -1,0 +1,12 @@
+{
+	"extends": "../../tsconfig.base.json",
+	"include": ["src/**/*"],
+	"exclude": ["node_modules", "dist"],
+	"compilerOptions": {
+		"lib": ["ESNext"],
+		"outDir": "./dist",
+		"declarationDir": "./dist",
+		"declaration": true,
+		"forceConsistentCasingInFileNames": true
+	}
+}

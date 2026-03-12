@@ -1,0 +1,615 @@
+---
+title: Token Preview
+description: Visual reference for all Træk design tokens — colors, spacing, typography, and animation.
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+Visual reference for all `--traek-*` CSS custom properties. Values shown are the **dark theme defaults** (the library default).
+
+<style>{`
+  .token-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    margin: 1.5rem 0;
+  }
+  .token-swatch {
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: #111113;
+  }
+  .token-swatch-color {
+    height: 56px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .token-swatch-meta {
+    padding: 8px 10px;
+  }
+  .token-swatch-name {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 10px;
+    color: #a1a1aa;
+    word-break: break-all;
+    line-height: 1.4;
+  }
+  .token-swatch-value {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 10px;
+    color: #52525b;
+    margin-top: 2px;
+  }
+  .token-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .token-table th {
+    text-align: left;
+    padding: 8px 12px;
+    border-bottom: 1px solid #27272a;
+    color: #a1a1aa;
+    font-weight: 500;
+  }
+  .token-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid #1f1f24;
+    vertical-align: middle;
+  }
+  .token-table code {
+    font-size: 11px;
+    background: #1a1a1e;
+    padding: 2px 5px;
+    border-radius: 3px;
+    white-space: nowrap;
+  }
+  .scale-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid #1f1f24;
+  }
+  .scale-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: #71717a;
+    width: 120px;
+    flex-shrink: 0;
+  }
+  .scale-bar {
+    background: #00d8ff;
+    height: 20px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+  }
+  .scale-value {
+    font-size: 11px;
+    color: #000;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .radius-demo {
+    width: 40px;
+    height: 40px;
+    background: #00d8ff22;
+    border: 2px solid #00d8ff;
+    display: inline-block;
+    margin-right: 8px;
+  }
+  .font-row {
+    padding: 10px 0;
+    border-bottom: 1px solid #1f1f24;
+  }
+  .font-label {
+    font-family: monospace;
+    font-size: 11px;
+    color: #71717a;
+    margin-bottom: 4px;
+  }
+  .duration-bar-wrap {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 10px 0;
+    border-bottom: 1px solid #1f1f24;
+  }
+  .duration-label {
+    font-family: monospace;
+    font-size: 11px;
+    color: #71717a;
+    width: 140px;
+    flex-shrink: 0;
+  }
+  .duration-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #00d8ff;
+    animation: none;
+  }
+  .checkerboard {
+    background-image: repeating-conic-gradient(#333 0% 25%, #444 0% 50%);
+    background-size: 12px 12px;
+  }
+`}</style>
+
+## Colors — Canvas
+
+<div class="token-grid">
+	<div class="token-swatch">
+		<div class="token-swatch-color checkerboard">
+			<div style="width:100%;height:100%;background:#070708;" />
+		</div>
+		<div class="token-swatch-meta">
+			<div class="token-swatch-name">--traek-canvas-bg</div>
+			<div class="token-swatch-value">#070708</div>
+		</div>
+	</div>
+	<div class="token-swatch">
+		<div class="token-swatch-color" style="background:#070708">
+			<div style="width:16px;height:16px;border-radius:50%;background:#1e1e22;" />
+		</div>
+		<div class="token-swatch-meta">
+			<div class="token-swatch-name">--traek-canvas-dot</div>
+			<div class="token-swatch-value">#1e1e22</div>
+		</div>
+	</div>
+</div>
+
+## Colors — Nodes
+
+<div class="token-grid">
+	<div class="token-swatch">
+		<div class="token-swatch-color checkerboard">
+			<div style="width:100%;height:100%;background:#0e0e10;" />
+		</div>
+		<div class="token-swatch-meta">
+			<div class="token-swatch-name">--traek-node-bg</div>
+			<div class="token-swatch-value">#0e0e10</div>
+		</div>
+	</div>
+	<div class="token-swatch">
+		<div class="token-swatch-color" style="background:#1f1f24;" />
+		<div class="token-swatch-meta">
+			<div class="token-swatch-name">--traek-node-border</div>
+			<div class="token-swatch-value">#1f1f24</div>
+		</div>
+	</div>
+	<div class="token-swatch">
+		<div class="token-swatch-color" style="background:#e4e4e7;" />
+		<div class="token-swatch-meta">
+			<div class="token-swatch-name">--traek-node-text</div>
+			<div class="token-swatch-value">#e4e4e7</div>
+		</div>
+	</div>
+	<div class="token-swatch">
+		<div class="token-swatch-color" style="background:#00d8ff;" />
+		<div class="token-swatch-meta">
+			<div class="token-swatch-name">--traek-node-active-border</div>
+			<div class="token-swatch-value">#00d8ff</div>
+		</div>
+	</div>
+	<div class="token-swatch">
+		<div class="token-swatch-color checkerboard">
+			<div style="width:100%;height:100%;background:rgba(0,216,255,0.12);" />
+		</div>
+		<div class="token-swatch-meta">
+			<div class="token-swatch-name">--traek-node-active-glow</div>
+			<div class="token-swatch-value">rgba(0,216,255,.12)</div>
+		</div>
+	</div>
+	<div class="token-swatch">
+		<div class="token-swatch-color" style="background:#00d8ff;" />
+		<div class="token-swatch-meta">
+			<div class="token-swatch-name">--traek-node-user-border-top</div>
+			<div class="token-swatch-value">#00d8ff (user)</div>
+		</div>
+	</div>
+	<div class="token-swatch">
+		<div class="token-swatch-color" style="background:#ff4400;" />
+		<div class="token-swatch-meta">
+			<div class="token-swatch-name">--traek-node-assistant-border-top</div>
+			<div class="token-swatch-value">#ff4400 (assistant)</div>
+		</div>
+	</div>
+</div>
+
+## Colors — Categorical Palette
+
+Node color-coding for conversation branches and categories.
+
+<div class="token-grid">
+	<div class="token-swatch">
+		<div class="token-swatch-color" style="background:#ef4444;" />
+		<div class="token-swatch-meta">
+			<div class="token-swatch-name">--traek-color-red</div>
+			<div class="token-swatch-value">#ef4444</div>
+		</div>
+	</div>
+	<div class="token-swatch">
+		<div class="token-swatch-color" style="background:#f97316;" />
+		<div class="token-swatch-meta">
+			<div class="token-swatch-name">--traek-color-orange</div>
+			<div class="token-swatch-value">#f97316</div>
+		</div>
+	</div>
+	<div class="token-swatch">
+		<div class="token-swatch-color" style="background:#eab308;" />
+		<div class="token-swatch-meta">
+			<div class="token-swatch-name">--traek-color-yellow</div>
+			<div class="token-swatch-value">#eab308</div>
+		</div>
+	</div>
+	<div class="token-swatch">
+		<div class="token-swatch-color" style="background:#22c55e;" />
+		<div class="token-swatch-meta">
+			<div class="token-swatch-name">--traek-color-green</div>
+			<div class="token-swatch-value">#22c55e</div>
+		</div>
+	</div>
+	<div class="token-swatch">
+		<div class="token-swatch-color" style="background:#3b82f6;" />
+		<div class="token-swatch-meta">
+			<div class="token-swatch-name">--traek-color-blue</div>
+			<div class="token-swatch-value">#3b82f6</div>
+		</div>
+	</div>
+	<div class="token-swatch">
+		<div class="token-swatch-color" style="background:#a855f7;" />
+		<div class="token-swatch-meta">
+			<div class="token-swatch-name">--traek-color-purple</div>
+			<div class="token-swatch-value">#a855f7</div>
+		</div>
+	</div>
+	<div class="token-swatch">
+		<div class="token-swatch-color" style="background:#ec4899;" />
+		<div class="token-swatch-meta">
+			<div class="token-swatch-name">--traek-color-pink</div>
+			<div class="token-swatch-value">#ec4899</div>
+		</div>
+	</div>
+	<div class="token-swatch">
+		<div class="token-swatch-color" style="background:#06b6d4;" />
+		<div class="token-swatch-meta">
+			<div class="token-swatch-name">--traek-color-cyan</div>
+			<div class="token-swatch-value">#06b6d4</div>
+		</div>
+	</div>
+</div>
+
+## Colors — Input / Composer
+
+<div class="token-grid">
+	<div class="token-swatch">
+		<div class="token-swatch-color checkerboard">
+			<div style="width:100%;height:100%;background:rgba(14,14,16,0.85);" />
+		</div>
+		<div class="token-swatch-meta">
+			<div class="token-swatch-name">--traek-input-bg</div>
+			<div class="token-swatch-value">rgba(14,14,16,.85)</div>
+		</div>
+	</div>
+	<div class="token-swatch">
+		<div class="token-swatch-color" style="background:#2a2a30;" />
+		<div class="token-swatch-meta">
+			<div class="token-swatch-name">--traek-input-border</div>
+			<div class="token-swatch-value">#2a2a30</div>
+		</div>
+	</div>
+	<div class="token-swatch">
+		<div
+			class="token-swatch-color"
+			style="background:#00d8ff; display:flex; align-items:center; justify-content:center;"
+		>
+			<span style="color:#000;font-size:12px;font-weight:700;">Send</span>
+		</div>
+		<div class="token-swatch-meta">
+			<div class="token-swatch-name">--traek-input-button-bg</div>
+			<div class="token-swatch-value">#00d8ff</div>
+		</div>
+	</div>
+	<div class="token-swatch">
+		<div class="token-swatch-color" style="background:#f4f4f5;" />
+		<div class="token-swatch-meta">
+			<div class="token-swatch-name">--traek-input-text</div>
+			<div class="token-swatch-value">#f4f4f5</div>
+		</div>
+	</div>
+</div>
+
+## Colors — Thought Panel
+
+<div class="token-grid">
+	<div class="token-swatch">
+		<div class="token-swatch-color checkerboard">
+			<div style="width:100%;height:100%;background:rgba(14,14,16,0.92);" />
+		</div>
+		<div class="token-swatch-meta">
+			<div class="token-swatch-name">--traek-thought-panel-bg</div>
+			<div class="token-swatch-value">rgba(14,14,16,.92)</div>
+		</div>
+	</div>
+	<div class="token-swatch">
+		<div class="token-swatch-color" style="background:#00d8ff;" />
+		<div class="token-swatch-meta">
+			<div class="token-swatch-name">--traek-thought-panel-border-active</div>
+			<div class="token-swatch-value">#00d8ff</div>
+		</div>
+	</div>
+	<div class="token-swatch">
+		<div class="token-swatch-color" style="background:#00d8ff;" />
+		<div class="token-swatch-meta">
+			<div class="token-swatch-name">--traek-thought-tag-cyan</div>
+			<div class="token-swatch-value">#00d8ff</div>
+		</div>
+	</div>
+	<div class="token-swatch">
+		<div class="token-swatch-color" style="background:#ff4400;" />
+		<div class="token-swatch-meta">
+			<div class="token-swatch-name">--traek-thought-tag-orange</div>
+			<div class="token-swatch-value">#ff4400</div>
+		</div>
+	</div>
+</div>
+
+## Spacing Scale
+
+<div>
+	<div class="scale-row">
+		<div class="scale-label">--traek-space-xs</div>
+		<div class="scale-bar" style="width:4px">
+			<span class="scale-value" style="display:none" />
+		</div>
+		<code style="font-size:11px;color:#71717a;">4px</code>
+	</div>
+	<div class="scale-row">
+		<div class="scale-label">--traek-space-sm</div>
+		<div class="scale-bar" style="width:8px" />
+		<code style="font-size:11px;color:#71717a;">8px</code>
+	</div>
+	<div class="scale-row">
+		<div class="scale-label">--traek-space-md</div>
+		<div class="scale-bar" style="width:16px" />
+		<code style="font-size:11px;color:#71717a;">16px</code>
+	</div>
+	<div class="scale-row">
+		<div class="scale-label">--traek-space-lg</div>
+		<div class="scale-bar" style="width:24px" />
+		<code style="font-size:11px;color:#71717a;">24px</code>
+	</div>
+	<div class="scale-row">
+		<div class="scale-label">--traek-space-xl</div>
+		<div class="scale-bar" style="width:32px" />
+		<code style="font-size:11px;color:#71717a;">32px</code>
+	</div>
+</div>
+
+## Border Radius
+
+<div style="display:flex;gap:24px;align-items:flex-end;padding:1rem 0;flex-wrap:wrap;">
+	<div style="text-align:center;">
+		<div style="width:56px;height:56px;background:#00d8ff22;border:2px solid #00d8ff;border-radius:6px;margin:0 auto 8px;" />
+		<code style="font-size:10px;color:#71717a;">
+			--traek-radius-sm
+			<br />
+			6px
+		</code>
+	</div>
+	<div style="text-align:center;">
+		<div style="width:56px;height:56px;background:#00d8ff22;border:2px solid #00d8ff;border-radius:12px;margin:0 auto 8px;" />
+		<code style="font-size:10px;color:#71717a;">
+			--traek-radius-md
+			<br />
+			12px
+		</code>
+	</div>
+	<div style="text-align:center;">
+		<div style="width:56px;height:56px;background:#00d8ff22;border:2px solid #00d8ff;border-radius:24px;margin:0 auto 8px;" />
+		<code style="font-size:10px;color:#71717a;">
+			--traek-radius-lg
+			<br />
+			24px
+		</code>
+	</div>
+</div>
+
+## Typography
+
+### Font Sizes
+
+<table class="token-table">
+	<thead>
+		<tr>
+			<th>Token</th>
+			<th>Value</th>
+			<th>Preview</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>
+				<code>--traek-text-xs</code>
+			</td>
+			<td>10px</td>
+			<td>
+				<span style="font-size:10px;color:#e4e4e7;">The quick brown fox</span>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<code>--traek-text-sm</code>
+			</td>
+			<td>12px</td>
+			<td>
+				<span style="font-size:12px;color:#e4e4e7;">The quick brown fox</span>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<code>--traek-text-base</code>
+			</td>
+			<td>14px</td>
+			<td>
+				<span style="font-size:14px;color:#e4e4e7;">The quick brown fox</span>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<code>--traek-text-lg</code>
+			</td>
+			<td>16px</td>
+			<td>
+				<span style="font-size:16px;color:#e4e4e7;">The quick brown fox</span>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<code>--traek-text-xl</code>
+			</td>
+			<td>20px</td>
+			<td>
+				<span style="font-size:20px;color:#e4e4e7;">The quick brown fox</span>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<code>--traek-text-2xl</code>
+			</td>
+			<td>28px</td>
+			<td>
+				<span style="font-size:28px;color:#e4e4e7;">The quick brown fox</span>
+			</td>
+		</tr>
+	</tbody>
+</table>
+
+### Font Weights
+
+<table class="token-table">
+	<thead>
+		<tr>
+			<th>Token</th>
+			<th>Value</th>
+			<th>Preview</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>
+				<code>--traek-weight-normal</code>
+			</td>
+			<td>400</td>
+			<td>
+				<span style="font-weight:400;font-size:15px;color:#e4e4e7;">Normal weight text</span>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<code>--traek-weight-medium</code>
+			</td>
+			<td>500</td>
+			<td>
+				<span style="font-weight:500;font-size:15px;color:#e4e4e7;">Medium weight text</span>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<code>--traek-weight-semibold</code>
+			</td>
+			<td>600</td>
+			<td>
+				<span style="font-weight:600;font-size:15px;color:#e4e4e7;">Semibold weight text</span>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<code>--traek-weight-bold</code>
+			</td>
+			<td>700</td>
+			<td>
+				<span style="font-weight:700;font-size:15px;color:#e4e4e7;">Bold weight text</span>
+			</td>
+		</tr>
+	</tbody>
+</table>
+
+### Font Families
+
+<table class="token-table">
+	<thead>
+		<tr>
+			<th>Token</th>
+			<th>Stack</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>
+				<code>--traek-font-family</code>
+			</td>
+			<td>
+				<span style="font-family:system-ui;color:#e4e4e7;">
+					system-ui, -apple-system, BlinkMacSystemFont, sans-serif
+				</span>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<code>--traek-font-mono</code>
+			</td>
+			<td>
+				<span style="font-family:'JetBrains Mono','Fira Code',monospace;color:#e4e4e7;">
+					'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace
+				</span>
+			</td>
+		</tr>
+	</tbody>
+</table>
+
+## Animation Durations
+
+<table class="token-table">
+	<thead>
+		<tr>
+			<th>Token</th>
+			<th>Value</th>
+			<th>Use case</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>
+				<code>--traek-duration-fast</code>
+			</td>
+			<td>120ms</td>
+			<td>Hover states, micro-interactions</td>
+		</tr>
+		<tr>
+			<td>
+				<code>--traek-duration-normal</code>
+			</td>
+			<td>220ms</td>
+			<td>Panel open/close, node transitions</td>
+		</tr>
+		<tr>
+			<td>
+				<code>--traek-duration-slow</code>
+			</td>
+			<td>380ms</td>
+			<td>Canvas pan/zoom, layout changes</td>
+		</tr>
+	</tbody>
+</table>
+
+## Full token reference
+
+The complete machine-readable token file is at `packages/svelte/src/lib/theme/tokens.json`. It follows the [W3C DTCG format](https://tr.designtokens.org/format/) and can be consumed directly by Style Dictionary or Figma Tokens.
+
+See the [Design Tokens & Figma Sync](/guides/design-tokens) guide to set up automated token export and Figma Variable sync.

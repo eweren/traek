@@ -1,32 +1,91 @@
 ---
-title: Quick Start
-description: Get Træk running in 5 minutes.
+title: Quick Start — Build a Branching AI Chat UI in 5 Minutes
+description: >-
+  Get Træk's spatial AI chat canvas running in 5 minutes. Code examples for
+  React, Svelte, and Vue. Connect OpenAI or any LLM API with streaming support.
+head:
+  - tag: link
+    attrs:
+      rel: canonical
+      href: https://gettraek.com/getting-started/quick-start/
 ---
 
 # Quick Start
 
-## Basic Setup
+Pick your framework below.
+
+## Svelte 5
 
 ```svelte
 <script>
-  import { TraekCanvas, TraekEngine } from 'traek'
+  import { TraekCanvas, TraekEngine } from '@traek/svelte'
 
   const engine = new TraekEngine()
-  engine.addNode({
-    role: 'assistant',
-    content: 'Hello! How can I help you today?'
-  })
+  engine.addNode({ role: 'assistant', content: 'Hello! How can I help?' })
 
   async function handleSend({ content }) {
     engine.addNode({ role: 'user', content })
-    // Add your AI response here
-    engine.addNode({ role: 'assistant', content: '...' })
+    engine.addNode({ role: 'assistant', content: 'Working on it…' })
   }
 </script>
 
 <TraekCanvas {engine} onSendMessage={handleSend} />
 ```
 
-## With OpenAI Streaming
+## React
 
-See the [OpenAI Streaming guide](/guides/openai-streaming) for a complete example with real-time streaming responses.
+```tsx
+import { TraekCanvas, useCreateTraekEngine } from '@traek/react'
+
+export default function App() {
+  const engine = useCreateTraekEngine()
+
+  useEffect(() => {
+    engine.addNode({ role: 'assistant', content: 'Hello! How can I help?' })
+  }, [engine])
+
+  async function handleSend({ content }: { content: string }) {
+    engine.addNode({ role: 'user', content })
+    engine.addNode({ role: 'assistant', content: 'Working on it…' })
+  }
+
+  return <TraekCanvas engine={engine} onSendMessage={handleSend} />
+}
+```
+
+## Vue 3
+
+```vue
+<script setup lang="ts">
+import { TraekCanvas, useCreateTraekEngine } from '@traek/vue'
+
+const engine = useCreateTraekEngine()
+engine.addNode({ role: 'assistant', content: 'Hello! How can I help?' })
+
+async function handleSend({ content }: { content: string }) {
+  engine.addNode({ role: 'user', content })
+  engine.addNode({ role: 'assistant', content: 'Working on it…' })
+}
+</script>
+
+<template>
+  <TraekCanvas :engine="engine" :on-send-message="handleSend" />
+</template>
+```
+
+## Vanilla TypeScript
+
+```ts
+import { TraekEngine } from '@traek/core'
+
+const engine = new TraekEngine()
+engine.addNode({ role: 'assistant', content: 'Hello! How can I help?' })
+
+engine.subscribe(() => {
+  console.log('Nodes updated:', engine.nodes)
+})
+```
+
+---
+
+See the **Frameworks** section in the sidebar for full guides and live demos for each adapter.

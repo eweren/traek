@@ -1,4 +1,4 @@
-import { TraekEngine, DEFAULT_TRACK_ENGINE_CONFIG, type TraekEngineConfig } from 'traek';
+import { TraekEngine, DEFAULT_TRACK_ENGINE_CONFIG, type TraekEngineConfig } from '@traek/svelte';
 import ExampleCustomComponent from './components/ExampleCustomComponent.svelte';
 
 /**

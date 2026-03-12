@@ -1,0 +1,110 @@
+---
+title: Vue
+description: Using @traek/vue in a Vue 3 project.
+---
+
+import VueDemo from '../../../components/demos/VueDemo.vue';
+
+# Vue Adapter
+
+`@traek/vue` provides composables and a `TraekCanvas` component for **Vue 3**.
+
+## Install
+
+```bash
+pnpm add @traek/vue
+```
+
+Peer dependency: `vue@^3.4`
+
+## Quick Setup
+
+```vue
+<script setup lang="ts">
+import { TraekCanvas, useCreateTraekEngine } from '@traek/vue';
+import type { SendEvent } from '@traek/core';
+
+const engine = useCreateTraekEngine();
+engine.addNode({ role: 'assistant', content: 'Hello! How can I help?' });
+
+async function handleSend({ content, parentId }: SendEvent) {
+	const userNode = engine.addNode({
+		role: 'user',
+		content,
+		parentIds: parentId ? [parentId] : []
+	});
+
+	const res = await fetch('/api/chat', {
+		method: 'POST',
+		body: JSON.stringify({
+			messages: engine.contextPath.map((n) => ({ role: n.role, content: n.content }))
+		})
+	});
+
+	const assistantNode = engine.addNode({
+		role: 'assistant',
+		content: '',
+		parentIds: [userNode.id],
+		status: 'streaming'
+	});
+
+	const reader = res.body!.getReader();
+	const decoder = new TextDecoder();
+	let done = false;
+	while (!done) {
+		const { value, done: d } = await reader.read();
+		done = d;
+		if (value) engine.appendToNode(assistantNode.id, decoder.decode(value));
+	}
+	engine.updateNode(assistantNode.id, { status: 'done' });
+}
+</script>
+
+<template>
+	<TraekCanvas :engine="engine" :on-send-message="handleSend" />
+</template>
+```
+
+## Live Demo
+
+<VueDemo client:load />
+
+## Composables
+
+### `useCreateTraekEngine(config?)`
+
+Creates a `TraekEngine` instance and returns it. The engine persists for the lifetime of the calling component.
+
+```ts
+import { useCreateTraekEngine } from '@traek/vue';
+
+const engine = useCreateTraekEngine({ layoutGapX: 40 });
+```
+
+### `useTraekEngine(engine)`
+
+Binds an external `TraekEngine` to reactive Vue refs. Automatically unsubscribes on unmount.
+
+```ts
+import { useTraekEngine } from '@traek/vue';
+
+const { nodes, activeNodeId, collapsedNodes } = useTraekEngine(myEngine);
+```
+
+Returns `TraekEngineRefs` — a reactive object where each field is a Vue `Ref` / `ShallowRef`.
+
+## API
+
+### `TraekCanvas` Props
+
+| Prop            | Type                     | Required | Description                       |
+| --------------- | ------------------------ | -------- | --------------------------------- |
+| `engine`        | `TraekEngine`            | Yes      | Engine instance                   |
+| `onSendMessage` | `(e: SendEvent) => void` | Yes      | Fired when user submits a message |
+| `class`         | `string`                 | No       | Additional CSS classes            |
+
+### Slots
+
+| Slot   | Props                        | Description                        |
+| ------ | ---------------------------- | ---------------------------------- |
+| `node` | `{ node, engine, isActive }` | Override the default node renderer |
